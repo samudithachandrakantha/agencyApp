@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "000000000000",
+    "firebase_url": "https://agencysalesapp-dev.firebaseio.com",
+    "project_id": "agencysalesapp-dev",
+    "storage_bucket": "agencysalesapp-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "android_client_info": {
+          "package_name": "com.hfad.agencyapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "000000000000-0000000000000000000000000000.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hfad.agencyapp",
+            "certificate_hash": "0000000000000000000000000000000000000000"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDummyKeyForDevelopmentOnly00000000000"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
+
+
+
