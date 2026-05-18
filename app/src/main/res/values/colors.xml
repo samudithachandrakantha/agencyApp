@@ -2,6 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blur_white">#EEFFFFFF</color>
+    <color name="blur_white_stroke">#80FFFFFF</color>
     <color name="dashboard_bg">#F3F5F9</color>
     <color name="navy_900">#102A43</color>
     <color name="navy_700">#1F3B5C</color>
@@ -21,4 +23,7 @@
     <color name="badge_credit_text">#C66A1D</color>
     <color name="badge_cheque_bg">#EAF0FF</color>
     <color name="badge_cheque_text">#2D5DD7</color>
+
+    <!-- Additional colors for Create Invoice -->
+    <color name="error_red">#DC2626</color>
 </resources>
