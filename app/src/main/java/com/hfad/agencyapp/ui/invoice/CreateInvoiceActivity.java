@@ -140,7 +140,8 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         // Observe selected customer
         viewModel.getSelectedCustomer().observe(this, customer -> {
             if (customer != null) {
-                binding.tvCustomerName.setText(customer.getCustomerName());
+                // Customer model now uses businessName/contactPerson
+                binding.tvCustomerName.setText(customer.getBusinessName());
                 binding.tvCustomerError.setVisibility(View.GONE);
             }
         });
@@ -237,20 +238,31 @@ public class CreateInvoiceActivity extends AppCompatActivity {
      * TODO: Implement customer picker dialog or launch customer selection activity.
      */
     private void openCustomerPicker() {
-        // Placeholder: Show a dialog with mock customers
-        String[] customers = {"Customer 1", "Customer 2", "Customer 3"};
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Select Customer")
-                .setItems(customers, (dialog, which) -> {
-                    Customer selected = new Customer(
-                            "cust_" + which,
-                            customers[which],
-                            "+94715123456",
-                            "123 Main Street"
-                    );
-                    viewModel.setSelectedCustomer(selected);
-                })
-                .show();
+        // Load customers from local DB repository and show in dialog
+        com.hfad.agencyapp.data.CustomerRepository repo = new com.hfad.agencyapp.data.CustomerRepository(this);
+        try {
+            java.util.List<Customer> list = repo.getAllCustomersAsync().get();
+            if (list == null || list.isEmpty()) {
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("No customers")
+                        .setMessage("No customers found. Please add a customer first.")
+                        .setPositiveButton("OK", null)
+                        .show();
+                return;
+            }
+            CharSequence[] names = new CharSequence[list.size()];
+            for (int i = 0; i < list.size(); i++) names[i] = list.get(i).getBusinessName();
+
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Select Customer")
+                    .setItems(names, (dialog, which) -> {
+                        Customer selected = list.get(which);
+                        viewModel.setSelectedCustomer(selected);
+                    })
+                    .show();
+        } catch (java.util.concurrent.ExecutionException | InterruptedException e) {
+            Snackbar.make(binding.getRoot(), "Failed to load customers", Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     /**

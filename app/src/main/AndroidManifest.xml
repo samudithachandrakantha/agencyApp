@@ -47,6 +47,18 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.customers.CustomersActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.customers.AddEditCustomerActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.customers.CustomerDetailActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.invoice.CreateInvoiceActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

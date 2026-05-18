@@ -54,7 +54,10 @@ public class DashboardActivity extends AppCompatActivity {
             Intent intent = new Intent(this, CreateInvoiceActivity.class);
             startActivity(intent);
         });
-        binding.actionCustomers.setOnClickListener(v -> showFeatureToast("Customers"));
+        binding.actionCustomers.setOnClickListener(v -> {
+            Intent intent = new Intent(this, com.hfad.agencyapp.ui.customers.CustomersActivity.class);
+            startActivity(intent);
+        });
         binding.actionProducts.setOnClickListener(v -> showFeatureToast("Products"));
         binding.actionSync.setOnClickListener(v -> showFeatureToast("Sync"));
 
