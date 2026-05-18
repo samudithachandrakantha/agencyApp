@@ -12,6 +12,7 @@ import com.hfad.agencyapp.databinding.ActivityDashboardBinding;
 import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.ui.adapters.RecentInvoiceAdapter;
 import com.hfad.agencyapp.ui.auth.LoginActivity;
+import com.hfad.agencyapp.ui.invoice.CreateInvoiceActivity;
 import com.hfad.agencyapp.ui.models.RecentInvoiceUiModel;
 
 import java.util.ArrayList;
@@ -49,7 +50,10 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void setupQuickActions() {
-        binding.actionNewInvoice.setOnClickListener(v -> showFeatureToast("New Invoice"));
+        binding.actionNewInvoice.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CreateInvoiceActivity.class);
+            startActivity(intent);
+        });
         binding.actionCustomers.setOnClickListener(v -> showFeatureToast("Customers"));
         binding.actionProducts.setOnClickListener(v -> showFeatureToast("Products"));
         binding.actionSync.setOnClickListener(v -> showFeatureToast("Sync"));

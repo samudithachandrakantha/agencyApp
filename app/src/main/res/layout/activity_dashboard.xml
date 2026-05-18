@@ -85,8 +85,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/space_sm"
                     android:layout_weight="1"
+                    app:cardBackgroundColor="@color/blur_white"
                     app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="3dp">
+                    app:cardElevation="3dp"
+                    app:strokeColor="@color/blur_white_stroke"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -136,8 +139,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_sm"
                     android:layout_weight="1"
+                    app:cardBackgroundColor="@color/blur_white"
                     app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="3dp">
+                    app:cardElevation="3dp"
+                    app:strokeColor="@color/blur_white_stroke"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -198,8 +204,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/space_sm"
                     android:layout_weight="1"
+                    app:cardBackgroundColor="@color/blur_white"
                     app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="2dp">
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/blur_white_stroke"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -233,8 +242,11 @@
                     android:layout_marginStart="@dimen/space_sm"
                     android:layout_marginEnd="@dimen/space_sm"
                     android:layout_weight="1"
+                    app:cardBackgroundColor="@color/blur_white"
                     app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="2dp">
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/blur_white_stroke"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -268,8 +280,11 @@
                     android:layout_marginStart="@dimen/space_sm"
                     android:layout_marginEnd="@dimen/space_sm"
                     android:layout_weight="1"
+                    app:cardBackgroundColor="@color/blur_white"
                     app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="2dp">
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/blur_white_stroke"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -302,8 +317,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_sm"
                     android:layout_weight="1"
+                    app:cardBackgroundColor="@color/blur_white"
                     app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="2dp">
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/blur_white_stroke"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"

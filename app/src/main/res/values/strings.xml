@@ -1,3 +1,30 @@
 <resources>
     <string name="app_name">agencyApp</string>
+
+    <!-- Create Invoice Activity Strings -->
+    <string name="create_invoice_title">Create Invoice</string>
+    <string name="customer_label">Customer</string>
+    <string name="select_customer">Select Customer</string>
+    <string name="customer_required_error">Customer is required</string>
+    <string name="items_title">Items</string>
+    <string name="add_item_button">+ Add Item</string>
+    <string name="no_items_message">No items added yet. Tap \'+ Add Item\' to begin.</string>
+    <string name="subtotal_label">Subtotal</string>
+    <string name="discount_label">Discount</string>
+    <string name="total_label">Total</string>
+    <string name="zero_amount">Rs. 0.00</string>
+    <string name="items_required_error">At least one item is required</string>
+    <string name="payment_type_label">Payment Type</string>
+    <string name="payment_cash">Cash</string>
+    <string name="payment_credit">Credit</string>
+    <string name="payment_cheque">Cheque</string>
+    <string name="cheque_number_hint">Cheque Number</string>
+    <string name="bank_name_hint">Bank Name</string>
+    <string name="cheque_date_hint">Cheque Date (Read-only)</string>
+    <string name="cheque_image_text">Tap to capture cheque image</string>
+    <string name="cheque_thumbnail_desc">Cheque image thumbnail</string>
+    <string name="cheque_required_error">All cheque details are required</string>
+    <string name="save_invoice_button">Preview &amp; Save</string>
+    <string name="chevron_icon">Chevron icon</string>
+    <string name="currency_icon">Currency icon</string>
 </resources>
