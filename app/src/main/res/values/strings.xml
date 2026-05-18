@@ -27,4 +27,17 @@
     <string name="save_invoice_button">Preview &amp; Save</string>
     <string name="chevron_icon">Chevron icon</string>
     <string name="currency_icon">Currency icon</string>
+    <!-- Customers -->
+    <string name="customers_title">Customers</string>
+    <string name="search_customers_hint">Search customers...</string>
+    <string name="no_customers_message">No customers yet</string>
+    <string name="no_customers_sub">Tap + to add your first customer</string>
+    <string name="add_customer">Add Customer</string>
+    <string name="edit_customer">Edit Customer</string>
+    <string name="business_name">Business Name</string>
+    <string name="contact_person">Contact Person</string>
+    <string name="phone">Phone</string>
+    <string name="city">City</string>
+    <string name="address">Address</string>
+    <string name="save">Save</string>
 </resources>
