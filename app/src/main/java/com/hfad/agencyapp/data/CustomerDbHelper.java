@@ -16,14 +16,20 @@ import java.util.UUID;
  * Simple SQLiteOpenHelper for customers table. Uses TEXT id (UUID) to keep compatibility.
  */
 public class CustomerDbHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "agency_app.db";
-    private static final int DATABASE_VERSION = 2;
+    // Keep this separate from Room's agency_app.db to avoid schema conflicts.
+    private static final String DATABASE_NAME = "customer_ui.db";
+    // bumped to 3 to add optional phone, business registration and id number columns
+    private static final int DATABASE_VERSION = 3;
 
     public static final String TABLE_CUSTOMERS = "customers";
     public static final String COL_ID = "id";
     public static final String COL_BUSINESS = "business_name";
     public static final String COL_CONTACT = "contact_person";
     public static final String COL_CITY = "city";
+    // Optional fields
+    public static final String COL_PHONE = "phone";
+    public static final String COL_BR_NUMBER = "br_number";
+    public static final String COL_ID_NUMBER = "id_number";
 
     public CustomerDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,20 +38,33 @@ public class CustomerDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Create customers table with only the required columns: id, business_name, contact_person, city
+        // include optional columns (may be NULL)
         String sql = "CREATE TABLE " + TABLE_CUSTOMERS + " ("
                 + COL_ID + " TEXT PRIMARY KEY,"
                 + COL_BUSINESS + " TEXT,"
                 + COL_CONTACT + " TEXT,"
-                + COL_CITY + " TEXT"
+                + COL_CITY + " TEXT,"
+                + COL_PHONE + " TEXT,"
+                + COL_BR_NUMBER + " TEXT,"
+                + COL_ID_NUMBER + " TEXT"
                 + ");";
         db.execSQL(sql);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // For schema change to simple customers table, drop and recreate.
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CUSTOMERS);
-        onCreate(db);
+        // Migrate existing DB without dropping data. Add new optional columns when upgrading to version 3.
+        if (oldVersion < 3) {
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_CUSTOMERS + " ADD COLUMN " + COL_PHONE + " TEXT");
+            } catch (Exception ignored) {}
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_CUSTOMERS + " ADD COLUMN " + COL_BR_NUMBER + " TEXT");
+            } catch (Exception ignored) {}
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_CUSTOMERS + " ADD COLUMN " + COL_ID_NUMBER + " TEXT");
+            } catch (Exception ignored) {}
+        }
     }
 
     // Insert or update
@@ -59,6 +78,10 @@ public class CustomerDbHelper extends SQLiteOpenHelper {
         cv.put(COL_BUSINESS, c.getBusinessName());
         cv.put(COL_CONTACT, c.getContactPerson());
         cv.put(COL_CITY, c.getCity());
+        // optional fields may be null
+        cv.put(COL_PHONE, c.getPhone());
+        cv.put(COL_BR_NUMBER, c.getBrNumber());
+        cv.put(COL_ID_NUMBER, c.getIdNumber());
 
         long res = db.insertWithOnConflict(TABLE_CUSTOMERS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
         return res == -1 ? null : c.getId();
@@ -73,42 +96,36 @@ public class CustomerDbHelper extends SQLiteOpenHelper {
     public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_CUSTOMERS, null, null, null, null, null, COL_BUSINESS + " ASC");
-        if (cursor != null) {
+        try (Cursor cursor = db.query(TABLE_CUSTOMERS, null, null, null, null, null, COL_BUSINESS + " ASC")) {
             while (cursor.moveToNext()) {
-                Customer c = cursorToCustomer(cursor);
-                list.add(c);
+                list.add(cursorToCustomer(cursor));
             }
-            cursor.close();
         }
         return list;
     }
 
     public Customer getCustomerById(String id) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_CUSTOMERS, null, COL_ID + " = ?", new String[]{id}, null, null, null);
-        if (cursor != null) {
+        try (Cursor cursor = db.query(TABLE_CUSTOMERS, null, COL_ID + " = ?", new String[]{id}, null, null, null)) {
             if (cursor.moveToFirst()) {
-                Customer c = cursorToCustomer(cursor);
-                cursor.close();
-                return c;
+                return cursorToCustomer(cursor);
             }
-            cursor.close();
+            return null;
         }
-        return null;
     }
 
     public List<Customer> searchCustomers(String query) {
         List<Customer> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         String q = "%" + query + "%";
-        Cursor cursor = db.query(TABLE_CUSTOMERS, null, COL_BUSINESS + " LIKE ? OR " + COL_CONTACT + " LIKE ? OR " + COL_CITY + " LIKE ?",
-                new String[]{q, q, q}, null, null, COL_BUSINESS + " ASC");
-        if (cursor != null) {
+        // include optional fields in search (phone, br number, id number)
+        String selection = COL_BUSINESS + " LIKE ? OR " + COL_CONTACT + " LIKE ? OR " + COL_CITY + " LIKE ?"
+                + " OR " + COL_PHONE + " LIKE ? OR " + COL_BR_NUMBER + " LIKE ? OR " + COL_ID_NUMBER + " LIKE ?";
+        String[] args = new String[]{q, q, q, q, q, q};
+        try (Cursor cursor = db.query(TABLE_CUSTOMERS, null, selection, args, null, null, COL_BUSINESS + " ASC")) {
             while (cursor.moveToNext()) {
                 list.add(cursorToCustomer(cursor));
             }
-            cursor.close();
         }
         return list;
     }
@@ -118,8 +135,19 @@ public class CustomerDbHelper extends SQLiteOpenHelper {
         String business = cursor.getString(cursor.getColumnIndexOrThrow(COL_BUSINESS));
         String contact = cursor.getString(cursor.getColumnIndexOrThrow(COL_CONTACT));
         String city = cursor.getString(cursor.getColumnIndexOrThrow(COL_CITY));
-        // Phone and address are no longer stored in the simplified schema
-        return new Customer(id, business, contact, "", "", city);
+        // optional fields may be null if not set
+        String phone = null;
+        String br = null;
+        String idNum = null;
+        int idx;
+        idx = cursor.getColumnIndex(COL_PHONE);
+        if (idx != -1) phone = cursor.getString(idx);
+        idx = cursor.getColumnIndex(COL_BR_NUMBER);
+        if (idx != -1) br = cursor.getString(idx);
+        idx = cursor.getColumnIndex(COL_ID_NUMBER);
+        if (idx != -1) idNum = cursor.getString(idx);
+
+        return new Customer(id, business, contact, city, phone, br, idNum);
     }
 }
 

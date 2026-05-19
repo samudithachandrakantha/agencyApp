@@ -86,19 +86,10 @@
             android:layout_marginTop="8dp">
 
             <TextView
-                android:id="@+id/tvPhone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📞 0771234567"
-                android:textColor="@color/text_secondary"
-                android:ellipsize="end"
-                android:maxLines="1" />
-
-            <TextView
                 android:id="@+id/tvCity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📍 City name"
+                android:text="City name"
                 android:textColor="@color/text_secondary"
                 android:ellipsize="end"
                 android:maxLines="1"
