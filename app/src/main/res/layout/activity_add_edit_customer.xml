@@ -65,18 +65,62 @@
 
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilCity"
+                        android:id="@+id/tilAddress"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="City"
+                        android:hint="Address"
                         android:layout_marginTop="8dp">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etCity"
+                            android:id="@+id/etAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/allowed_payment_methods"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_primary" />
+
+                            <CheckBox
+                                android:id="@+id/cbCash"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:checked="true"
+                                android:text="@string/payment_cash" />
+
+                            <CheckBox
+                                android:id="@+id/cbCredit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/payment_credit" />
+
+                            <CheckBox
+                                android:id="@+id/cbCheque"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/payment_cheque" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- Optional fields: phone, business reg number, id number -->
                     <com.google.android.material.textfield.TextInputLayout

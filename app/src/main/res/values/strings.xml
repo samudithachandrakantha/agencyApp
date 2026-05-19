@@ -37,6 +37,14 @@
     <string name="business_name">Business Name</string>
     <string name="contact_person">Contact Person</string>
     <string name="phone">Phone</string>
+    <string name="allowed_payment_methods">Allowed Payment Methods</string>
+    <string name="cash">Cash</string>
+    <string name="credit">Credit</string>
+    <string name="cheque">Cheque</string>
+    <string name="outstanding_label">Outstanding</string>
+    <string name="next">Next</string>
+    <string name="back">Back</string>
+    <string name="amount_format">Rs. %1$s</string>
     <string name="product_detail_sku">SKU: %1$s</string>
     <string name="product_detail_category">Category: %1$s</string>
     <string name="product_detail_brand">Brand: %1$s</string>
@@ -47,7 +55,7 @@
     <string name="product_detail_description">Description: %1$s</string>
     <string name="product_detail_current_stock">Current stock: %1$d</string>
     <string name="stock_movement_qty">%1$s%2$d</string>
-    <string name="city">City</string>
+    <string name="city">Address</string>
     <string name="address">Address</string>
     <string name="save">Save</string>
 </resources>
