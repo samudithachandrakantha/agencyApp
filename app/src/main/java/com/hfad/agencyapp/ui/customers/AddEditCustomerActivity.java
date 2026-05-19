@@ -50,9 +50,17 @@ public class AddEditCustomerActivity extends AppCompatActivity {
         if (c != null) {
             binding.etBusinessName.setText(c.getBusinessName());
             binding.etContactPerson.setText(c.getContactPerson());
-            binding.etPhone.setText(c.getPhoneNumber());
             binding.etCity.setText(c.getCity());
-            binding.etAddress.setText(c.getAddress());
+            // optional fields
+            if (binding.getRoot().findViewById(com.hfad.agencyapp.R.id.etPhone) != null) {
+                binding.etPhone.setText(c.getPhone());
+            }
+            if (binding.getRoot().findViewById(com.hfad.agencyapp.R.id.etBrNumber) != null) {
+                binding.etBrNumber.setText(c.getBrNumber());
+            }
+            if (binding.getRoot().findViewById(com.hfad.agencyapp.R.id.etIdNumber) != null) {
+                binding.etIdNumber.setText(c.getIdNumber());
+            }
         }
     }
 
@@ -74,9 +82,19 @@ public class AddEditCustomerActivity extends AppCompatActivity {
     private void saveCustomer() {
         String business = binding.etBusinessName.getText().toString().trim();
         String contact = binding.etContactPerson.getText().toString().trim();
-        String phone = binding.etPhone.getText().toString().trim();
         String city = binding.etCity.getText().toString().trim();
-        String address = binding.etAddress.getText().toString().trim();
+        String phone = "";
+        String br = "";
+        String idNum = "";
+        if (binding.getRoot().findViewById(com.hfad.agencyapp.R.id.etPhone) != null) {
+            phone = binding.etPhone.getText() != null ? binding.etPhone.getText().toString().trim() : "";
+        }
+        if (binding.getRoot().findViewById(com.hfad.agencyapp.R.id.etBrNumber) != null) {
+            br = binding.etBrNumber.getText() != null ? binding.etBrNumber.getText().toString().trim() : "";
+        }
+        if (binding.getRoot().findViewById(com.hfad.agencyapp.R.id.etIdNumber) != null) {
+            idNum = binding.etIdNumber.getText() != null ? binding.etIdNumber.getText().toString().trim() : "";
+        }
 
         boolean valid = true;
         if (TextUtils.isEmpty(business)) {
@@ -91,12 +109,6 @@ public class AddEditCustomerActivity extends AppCompatActivity {
         } else {
             binding.tilContactPerson.setError(null);
         }
-        if (TextUtils.isEmpty(phone) || phone.length() < 10) {
-            binding.tilPhone.setError("Valid phone required");
-            valid = false;
-        } else {
-            binding.tilPhone.setError(null);
-        }
         if (TextUtils.isEmpty(city)) {
             binding.tilCity.setError("City required");
             valid = false;
@@ -106,7 +118,10 @@ public class AddEditCustomerActivity extends AppCompatActivity {
 
         if (!valid) return;
 
-        Customer c = new Customer(customerId, business, contact, phone, address, city);
+        Customer c = new Customer(customerId, business, contact, city,
+                phone.isEmpty() ? null : phone,
+                br.isEmpty() ? null : br,
+                idNum.isEmpty() ? null : idNum);
         boolean ok = viewModel.saveCustomer(c);
         if (ok) {
             Snackbar.make(binding.getRoot(), "Customer saved", Snackbar.LENGTH_SHORT).show();

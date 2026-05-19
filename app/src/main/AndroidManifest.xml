@@ -59,6 +59,18 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.products.ProductsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.products.AddEditProductActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.products.ProductDetailActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.invoice.CreateInvoiceActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

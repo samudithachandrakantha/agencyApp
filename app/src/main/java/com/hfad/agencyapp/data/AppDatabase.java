@@ -13,6 +13,7 @@ import com.hfad.agencyapp.data.dao.InvoiceDao;
 import com.hfad.agencyapp.data.dao.InvoiceItemDao;
 import com.hfad.agencyapp.data.dao.PaymentDao;
 import com.hfad.agencyapp.data.dao.ChequePaymentDao;
+import com.hfad.agencyapp.data.dao.StockMovementDao;
 import com.hfad.agencyapp.data.entities.Category;
 import com.hfad.agencyapp.data.entities.Product;
 import com.hfad.agencyapp.data.entities.Customer;
@@ -20,6 +21,7 @@ import com.hfad.agencyapp.data.entities.Invoice;
 import com.hfad.agencyapp.data.entities.InvoiceItem;
 import com.hfad.agencyapp.data.entities.Payment;
 import com.hfad.agencyapp.data.entities.ChequePayment;
+import com.hfad.agencyapp.data.entities.StockMovement;
 
 @Database(entities = {
         Category.class,
@@ -28,8 +30,9 @@ import com.hfad.agencyapp.data.entities.ChequePayment;
         Invoice.class,
         InvoiceItem.class,
         Payment.class,
-        ChequePayment.class
-}, version = 1, exportSchema = false)
+        ChequePayment.class,
+        StockMovement.class
+}, version = 3, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -41,6 +44,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract InvoiceItemDao invoiceItemDao();
     public abstract PaymentDao paymentDao();
     public abstract ChequePaymentDao chequePaymentDao();
+    public abstract StockMovementDao stockMovementDao();
 
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {

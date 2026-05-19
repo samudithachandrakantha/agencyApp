@@ -2,36 +2,45 @@ package com.hfad.agencyapp.ui.models;
 
 /**
  * Data model for customer information used across the app.
- * Fields include minimal required details: id, business/shop name, contact person and city.
+ * Fields include required details (id, business/shop name, contact person and city)
+ * and optional fields (phone, business registration number, id number).
  */
 public class Customer {
     private String id; // unique id (can be UUID or provider id)
     private String businessName;
     private String contactPerson;
     private String city;
-    private String phoneNumber;
-    private String address;
+
+    // Optional fields
+    private String phone;
+    private String brNumber; // business registration number
+    private String idNumber; // national ID / tax id etc.
 
     public Customer() {
     }
 
-    public Customer(String id, String businessName, String contactPerson, String phoneNumber, String address, String city) {
+    /**
+     * Backwards-compatible constructor used across the app.
+     */
+    public Customer(String id, String businessName, String contactPerson, String city) {
         this.id = id;
         this.businessName = businessName;
         this.contactPerson = contactPerson;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
         this.city = city;
     }
 
-    // Convenience constructor used earlier (legacy places)
-    public Customer(String id, String name, String phone, String address) {
+    /**
+     * Extended constructor including optional fields. Any of the optional values may be null.
+     */
+    public Customer(String id, String businessName, String contactPerson, String city,
+                    String phone, String brNumber, String idNumber) {
         this.id = id;
-        this.businessName = name;
-        this.contactPerson = "";
-        this.phoneNumber = phone;
-        this.address = address;
-        this.city = "";
+        this.businessName = businessName;
+        this.contactPerson = contactPerson;
+        this.city = city;
+        this.phone = phone;
+        this.brNumber = brNumber;
+        this.idNumber = idNumber;
     }
 
     // Getters and setters
@@ -47,10 +56,13 @@ public class Customer {
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
 
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public String getBrNumber() { return brNumber; }
+    public void setBrNumber(String brNumber) { this.brNumber = brNumber; }
+
+    public String getIdNumber() { return idNumber; }
+    public void setIdNumber(String idNumber) { this.idNumber = idNumber; }
 }
 

@@ -69,9 +69,7 @@ public class Repository {
     }
 
     public LiveData<List<Product>> getAllProducts() {
-        MutableLiveData<List<Product>> result = new MutableLiveData<>();
-        executor.execute(() -> result.postValue(db.productDao().getAll()));
-        return result;
+        return db.productDao().getAll();
     }
 
     // Customer operations

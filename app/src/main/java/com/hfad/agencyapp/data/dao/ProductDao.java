@@ -5,6 +5,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 import androidx.room.Delete;
+import androidx.lifecycle.LiveData;
 
 import com.hfad.agencyapp.data.entities.Product;
 
@@ -22,12 +23,27 @@ public interface ProductDao {
     int delete(Product product);
 
     @Query("SELECT * FROM products ORDER BY name ASC")
-    List<Product> getAll();
+    LiveData<List<Product>> getAll();
 
     @Query("SELECT * FROM products WHERE id = :id LIMIT 1")
     Product getById(long id);
 
     @Query("SELECT * FROM products WHERE categoryId = :categoryId ORDER BY name ASC")
     List<Product> getByCategoryId(long categoryId);
+
+    @Query("SELECT * FROM products WHERE name LIKE :q OR sku LIKE :q ORDER BY name ASC")
+    List<Product> search(String q);
+
+    @Query("SELECT * FROM products WHERE stock < lowStockThreshold ORDER BY name ASC")
+    List<Product> getLowStock();
+
+    @Query("SELECT * FROM products WHERE stock = 0 ORDER BY name ASC")
+    List<Product> getOutOfStock();
+
+    @Query("DELETE FROM products WHERE id = :id")
+    int deleteById(long id);
+
+    @Query("UPDATE products SET stock = :newStock, updatedAt = :updatedAt WHERE id = :id")
+    int updateStock(long id, int newStock, long updatedAt);
 }
 
