@@ -17,6 +17,7 @@ public class Customer {
     private String brNumber; // business registration number
     private String idNumber; // national ID / tax id etc.
     private String paymentMethods; // CSV of allowed methods e.g. CASH,CHEQUE
+    private boolean isBlocked; // temporary block status
 
     public Customer() {
     }
@@ -52,6 +53,15 @@ public class Customer {
                     String phone, String brNumber, String idNumber, String paymentMethods) {
         this(id, businessName, contactPerson, address, phone, brNumber, idNumber);
         this.paymentMethods = paymentMethods;
+    }
+
+    /**
+     * Extended constructor including payment methods and blocked status.
+     */
+    public Customer(String id, String businessName, String contactPerson, String address,
+                    String phone, String brNumber, String idNumber, String paymentMethods, boolean isBlocked) {
+        this(id, businessName, contactPerson, address, phone, brNumber, idNumber, paymentMethods);
+        this.isBlocked = isBlocked;
     }
 
     // Getters and setters
@@ -90,5 +100,8 @@ public class Customer {
 
     public String getPaymentMethods() { return paymentMethods; }
     public void setPaymentMethods(String paymentMethods) { this.paymentMethods = paymentMethods; }
+
+    public boolean isBlocked() { return isBlocked; }
+    public void setBlocked(boolean blocked) { isBlocked = blocked; }
 }
 

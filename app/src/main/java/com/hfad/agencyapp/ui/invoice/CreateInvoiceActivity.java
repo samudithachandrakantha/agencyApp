@@ -257,13 +257,33 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                         .show();
                 return;
             }
-            CharSequence[] names = new CharSequence[list.size()];
-            for (int i = 0; i < list.size(); i++) names[i] = list.get(i).getBusinessName();
+
+            // Filter out blocked customers
+            java.util.List<Customer> activeCustomers = new java.util.ArrayList<>();
+            for (Customer c : list) {
+                if (!c.isBlocked()) {
+                    activeCustomers.add(c);
+                }
+            }
+
+            if (activeCustomers.isEmpty()) {
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("No active customers")
+                        .setMessage("All customers are blocked. Please unblock a customer first.")
+                        .setPositiveButton("OK", null)
+                        .show();
+                return;
+            }
+
+            CharSequence[] names = new CharSequence[activeCustomers.size()];
+            for (int i = 0; i < activeCustomers.size(); i++) {
+                names[i] = activeCustomers.get(i).getBusinessName();
+            }
 
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Select Customer")
                     .setItems(names, (dialog, which) -> {
-                        Customer selected = list.get(which);
+                        Customer selected = activeCustomers.get(which);
                         viewModel.setSelectedCustomer(selected);
                     })
                     .show();

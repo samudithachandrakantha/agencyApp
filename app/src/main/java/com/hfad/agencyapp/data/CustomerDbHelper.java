@@ -18,8 +18,8 @@ import java.util.UUID;
 public class CustomerDbHelper extends SQLiteOpenHelper {
     // Keep this separate from Room's agency_app.db to avoid schema conflicts.
     private static final String DATABASE_NAME = "customer_ui.db";
-    // bumped to 4 to add address/payment methods while preserving legacy city data
-    private static final int DATABASE_VERSION = 4;
+    // bumped to 5 to add blocked status column
+    private static final int DATABASE_VERSION = 5;
 
     public static final String TABLE_CUSTOMERS = "customers";
     public static final String COL_ID = "id";
@@ -32,6 +32,7 @@ public class CustomerDbHelper extends SQLiteOpenHelper {
     public static final String COL_BR_NUMBER = "br_number";
     public static final String COL_ID_NUMBER = "id_number";
     public static final String COL_PAYMENT_METHODS = "payment_methods";
+    public static final String COL_IS_BLOCKED = "is_blocked";
 
     public CustomerDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -49,7 +50,8 @@ public class CustomerDbHelper extends SQLiteOpenHelper {
                 + COL_PHONE + " TEXT,"
                 + COL_BR_NUMBER + " TEXT,"
                 + COL_ID_NUMBER + " TEXT,"
-                + COL_PAYMENT_METHODS + " TEXT"
+                + COL_PAYMENT_METHODS + " TEXT,"
+                + COL_IS_BLOCKED + " INTEGER DEFAULT 0"
                 + ");";
         db.execSQL(sql);
     }
@@ -57,6 +59,11 @@ public class CustomerDbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Migrate existing DB without dropping data.
+        if (oldVersion < 5) {
+            try {
+                db.execSQL("ALTER TABLE " + TABLE_CUSTOMERS + " ADD COLUMN " + COL_IS_BLOCKED + " INTEGER DEFAULT 0");
+            } catch (Exception ignored) {}
+        }
         if (oldVersion < 4) {
             try {
                 db.execSQL("ALTER TABLE " + TABLE_CUSTOMERS + " ADD COLUMN " + COL_ADDRESS + " TEXT");
@@ -96,6 +103,7 @@ public class CustomerDbHelper extends SQLiteOpenHelper {
         cv.put(COL_BR_NUMBER, c.getBrNumber());
         cv.put(COL_ID_NUMBER, c.getIdNumber());
         cv.put(COL_PAYMENT_METHODS, c.getPaymentMethods());
+        cv.put(COL_IS_BLOCKED, c.isBlocked() ? 1 : 0);
 
         long res = db.insertWithOnConflict(TABLE_CUSTOMERS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
         return res == -1 ? null : c.getId();
@@ -168,8 +176,11 @@ public class CustomerDbHelper extends SQLiteOpenHelper {
         String paymentMethods = null;
         idx = cursor.getColumnIndex(COL_PAYMENT_METHODS);
         if (idx != -1) paymentMethods = cursor.getString(idx);
+        boolean isBlocked = false;
+        idx = cursor.getColumnIndex(COL_IS_BLOCKED);
+        if (idx != -1) isBlocked = cursor.getInt(idx) == 1;
 
-        return new Customer(id, business, contact, address, phone, br, idNum, paymentMethods);
+        return new Customer(id, business, contact, address, phone, br, idNum, paymentMethods, isBlocked);
     }
 }
 

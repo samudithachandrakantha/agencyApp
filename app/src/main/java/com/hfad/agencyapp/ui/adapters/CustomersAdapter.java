@@ -17,7 +17,6 @@ import java.util.Objects;
 /**
  * Adapter for customer list using ListAdapter + DiffUtil and ViewBinding.
  */
-@SuppressWarnings("rawtypes")
 public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.CustomerViewHolder> {
 
     public interface OnCustomerActionListener {
@@ -74,6 +73,15 @@ public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.Cus
             // Outstanding placeholder: 0.00
             binding.tvOutstandingLabel.setText(com.hfad.agencyapp.R.string.outstanding_label);
             binding.tvOutstandingAmount.setText(com.hfad.agencyapp.R.string.zero_amount);
+
+            // Apply blocked styling if customer is blocked
+            if (c.isBlocked()) {
+                itemView.setAlpha(0.5f);
+                itemView.setEnabled(false);
+            } else {
+                itemView.setAlpha(1.0f);
+                itemView.setEnabled(true);
+            }
 
             binding.getRoot().setOnClickListener(v -> listener.onClick(c));
             binding.getRoot().setOnLongClickListener(v -> {
