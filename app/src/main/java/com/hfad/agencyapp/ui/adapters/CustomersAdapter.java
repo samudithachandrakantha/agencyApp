@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * Adapter for customer list using ListAdapter + DiffUtil and ViewBinding.
  */
-public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.CustomerViewHolder> {
+public class CustomersAdapter extends ListAdapter<Customer, RecyclerView.ViewHolder> {
 
     public interface OnCustomerActionListener {
         void onClick(Customer customer);
@@ -38,7 +38,8 @@ public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.Cus
                 return Objects.equals(oldItem.getBusinessName(), newItem.getBusinessName())
                         && Objects.equals(oldItem.getContactPerson(), newItem.getContactPerson())
                         && Objects.equals(oldItem.getAddress(), newItem.getAddress())
-                        && Objects.equals(oldItem.getPaymentMethods(), newItem.getPaymentMethods());
+                        && Objects.equals(oldItem.getPaymentMethods(), newItem.getPaymentMethods())
+                        && oldItem.isBlocked() == newItem.isBlocked();
             }
         });
         this.listener = listener;
@@ -46,18 +47,18 @@ public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.Cus
 
     @NonNull
     @Override
-    public CustomerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemCustomerBinding binding = ItemCustomerBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new CustomerViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CustomerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Customer c = getItem(position);
-        holder.bind(c, listener);
+        ((CustomerViewHolder) holder).bind(c, listener);
     }
 
-    static class CustomerViewHolder extends RecyclerView.ViewHolder {
+    public static class CustomerViewHolder extends RecyclerView.ViewHolder {
         private final ItemCustomerBinding binding;
 
         CustomerViewHolder(ItemCustomerBinding binding) {
@@ -77,10 +78,8 @@ public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.Cus
             // Apply blocked styling if customer is blocked
             if (c.isBlocked()) {
                 itemView.setAlpha(0.5f);
-                itemView.setEnabled(false);
             } else {
                 itemView.setAlpha(1.0f);
-                itemView.setEnabled(true);
             }
 
             binding.getRoot().setOnClickListener(v -> listener.onClick(c));
