@@ -16,6 +16,10 @@ import com.hfad.agencyapp.databinding.ActivityAddEditCustomerBinding;
 import com.hfad.agencyapp.ui.models.Customer;
 import com.hfad.agencyapp.viewmodel.CustomerViewModel;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Activity for adding or editing a customer.
  */
@@ -31,8 +35,10 @@ public class AddEditCustomerActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        binding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        binding.toolbar.setNavigationOnClickListener(v -> finish());
 
         viewModel = new ViewModelProvider(this).get(CustomerViewModel.class);
 
@@ -50,7 +56,7 @@ public class AddEditCustomerActivity extends AppCompatActivity {
         if (c != null) {
             binding.etBusinessName.setText(c.getBusinessName());
             binding.etContactPerson.setText(c.getContactPerson());
-            binding.etCity.setText(c.getCity());
+            binding.etAddress.setText(c.getAddress());
             // optional fields
             if (binding.getRoot().findViewById(com.hfad.agencyapp.R.id.etPhone) != null) {
                 binding.etPhone.setText(c.getPhone());
@@ -61,6 +67,7 @@ public class AddEditCustomerActivity extends AppCompatActivity {
             if (binding.getRoot().findViewById(com.hfad.agencyapp.R.id.etIdNumber) != null) {
                 binding.etIdNumber.setText(c.getIdNumber());
             }
+            applyPaymentMethods(c.getPaymentMethods());
         }
     }
 
@@ -80,9 +87,9 @@ public class AddEditCustomerActivity extends AppCompatActivity {
     }
 
     private void saveCustomer() {
-        String business = binding.etBusinessName.getText().toString().trim();
-        String contact = binding.etContactPerson.getText().toString().trim();
-        String city = binding.etCity.getText().toString().trim();
+        String business = safeText(binding.etBusinessName);
+        String contact = safeText(binding.etContactPerson);
+        String address = safeText(binding.etAddress);
         String phone = "";
         String br = "";
         String idNum = "";
@@ -109,26 +116,73 @@ public class AddEditCustomerActivity extends AppCompatActivity {
         } else {
             binding.tilContactPerson.setError(null);
         }
-        if (TextUtils.isEmpty(city)) {
-            binding.tilCity.setError("City required");
+        if (TextUtils.isEmpty(address)) {
+            binding.tilAddress.setError("Address required");
             valid = false;
         } else {
-            binding.tilCity.setError(null);
+            binding.tilAddress.setError(null);
+        }
+
+        String paymentMethods = collectPaymentMethods();
+        if (paymentMethods.isEmpty()) {
+            Toast.makeText(this, "Select at least one payment method", Toast.LENGTH_SHORT).show();
+            valid = false;
         }
 
         if (!valid) return;
 
-        Customer c = new Customer(customerId, business, contact, city,
+        Customer c = new Customer(customerId, business, contact, address,
                 phone.isEmpty() ? null : phone,
                 br.isEmpty() ? null : br,
-                idNum.isEmpty() ? null : idNum);
-        boolean ok = viewModel.saveCustomer(c);
-        if (ok) {
-            Snackbar.make(binding.getRoot(), "Customer saved", Snackbar.LENGTH_SHORT).show();
-            finish();
-        } else {
-            Toast.makeText(this, "Save failed", Toast.LENGTH_SHORT).show();
+                idNum.isEmpty() ? null : idNum,
+                paymentMethods);
+
+        new Thread(() -> {
+            boolean ok = viewModel.saveCustomer(c);
+            runOnUiThread(() -> {
+                if (ok) {
+                    Snackbar.make(binding.getRoot(), "Customer saved", Snackbar.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(this, "Save failed", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
+    }
+
+    private String safeText(com.google.android.material.textfield.TextInputEditText editText) {
+        return editText != null && editText.getText() != null ? editText.getText().toString().trim() : "";
+    }
+
+    private void applyPaymentMethods(String paymentMethods) {
+        Set<String> methods = parsePaymentMethods(paymentMethods);
+        binding.cbCash.setChecked(methods.contains("CASH"));
+        binding.cbCredit.setChecked(methods.contains("CREDIT"));
+        binding.cbCheque.setChecked(methods.contains("CHEQUE"));
+    }
+
+    private String collectPaymentMethods() {
+        StringBuilder builder = new StringBuilder();
+        if (binding.cbCash.isChecked()) builder.append("CASH,");
+        if (binding.cbCredit.isChecked()) builder.append("CREDIT,");
+        if (binding.cbCheque.isChecked()) builder.append("CHEQUE,");
+        if (builder.length() == 0) return "";
+        builder.setLength(builder.length() - 1);
+        return builder.toString();
+    }
+
+    private Set<String> parsePaymentMethods(String paymentMethods) {
+        Set<String> methods = new HashSet<>();
+        if (paymentMethods == null || paymentMethods.trim().isEmpty()) {
+            methods.addAll(Arrays.asList("CASH", "CREDIT", "CHEQUE"));
+            return methods;
         }
+        for (String method : paymentMethods.split(",")) {
+            if (!TextUtils.isEmpty(method)) {
+                methods.add(method.trim().toUpperCase());
+            }
+        }
+        return methods;
     }
 }
 

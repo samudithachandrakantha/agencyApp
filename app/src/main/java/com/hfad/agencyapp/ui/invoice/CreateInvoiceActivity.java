@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import java.io.File;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -35,6 +34,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Date;
 import java.util.Locale;
 
@@ -89,7 +92,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(null);
         }
-        binding.toolbar.setNavigationOnClickListener(v -> super.onBackPressed());
+        binding.toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     /**
@@ -124,17 +127,17 @@ public class CreateInvoiceActivity extends AppCompatActivity {
 
         // Observe subtotal
         viewModel.getSubtotal().observe(this, subtotal -> 
-            binding.tvSubtotal.setText("Rs. " + currencyFormat.format(subtotal))
+            binding.tvSubtotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(subtotal)))
         );
 
         // Observe discount
         viewModel.getDiscount().observe(this, discount -> 
-            binding.tvDiscount.setText("Rs. " + currencyFormat.format(discount))
+            binding.tvDiscount.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(discount)))
         );
 
         // Observe total
         viewModel.getTotal().observe(this, total -> 
-            binding.tvTotal.setText("Rs. " + currencyFormat.format(total))
+            binding.tvTotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(total)))
         );
 
         // Observe selected customer
@@ -143,6 +146,9 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                 // Customer model now uses businessName/contactPerson
                 binding.tvCustomerName.setText(customer.getBusinessName());
                 binding.tvCustomerError.setVisibility(View.GONE);
+                applyAllowedPaymentMethods(customer);
+            } else {
+                applyAllowedPaymentMethods(null);
             }
         });
 
@@ -198,6 +204,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                 viewModel.setPaymentType(type);
             }
         });
+        applyAllowedPaymentMethods(viewModel.getSelectedCustomer().getValue());
     }
 
     /**
@@ -241,7 +248,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         // Load customers from local DB repository and show in dialog
         com.hfad.agencyapp.data.CustomerRepository repo = new com.hfad.agencyapp.data.CustomerRepository(this);
         try {
-            java.util.List<Customer> list = repo.getAllCustomersAsync().get();
+            List<Customer> list = repo.getAllCustomersAsync().get();
             if (list == null || list.isEmpty()) {
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("No customers")
@@ -263,6 +270,54 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         } catch (java.util.concurrent.ExecutionException | InterruptedException e) {
             Snackbar.make(binding.getRoot(), "Failed to load customers", Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    private void applyAllowedPaymentMethods(Customer customer) {
+        Set<PaymentType> allowed = parseAllowedPaymentTypes(customer != null ? customer.getPaymentMethods() : null);
+
+        binding.btnCash.setVisibility(allowed.contains(PaymentType.CASH) ? View.VISIBLE : View.GONE);
+        binding.btnCredit.setVisibility(allowed.contains(PaymentType.CREDIT) ? View.VISIBLE : View.GONE);
+        binding.btnCheque.setVisibility(allowed.contains(PaymentType.CHEQUE) ? View.VISIBLE : View.GONE);
+
+        PaymentType current = viewModel.getPaymentType().getValue();
+        if (current == null || !allowed.contains(current)) {
+            PaymentType fallback = allowed.contains(PaymentType.CASH)
+                    ? PaymentType.CASH
+                    : (allowed.contains(PaymentType.CREDIT) ? PaymentType.CREDIT : PaymentType.CHEQUE);
+            viewModel.setPaymentType(fallback);
+            checkPaymentButton(fallback);
+        } else {
+            checkPaymentButton(current);
+        }
+    }
+
+    private void checkPaymentButton(PaymentType type) {
+        if (type == PaymentType.CASH) {
+            binding.togglePaymentType.check(binding.btnCash.getId());
+        } else if (type == PaymentType.CREDIT) {
+            binding.togglePaymentType.check(binding.btnCredit.getId());
+        } else if (type == PaymentType.CHEQUE) {
+            binding.togglePaymentType.check(binding.btnCheque.getId());
+        }
+    }
+
+    private Set<PaymentType> parseAllowedPaymentTypes(String paymentMethods) {
+        Set<PaymentType> allowed = new HashSet<>();
+        if (paymentMethods == null || paymentMethods.trim().isEmpty()) {
+            allowed.addAll(Arrays.asList(PaymentType.CASH, PaymentType.CREDIT, PaymentType.CHEQUE));
+            return allowed;
+        }
+        for (String token : paymentMethods.split(",")) {
+            if (token == null || token.trim().isEmpty()) continue;
+            try {
+                allowed.add(PaymentType.valueOf(token.trim().toUpperCase()));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        if (allowed.isEmpty()) {
+            allowed.addAll(Arrays.asList(PaymentType.CASH, PaymentType.CREDIT, PaymentType.CHEQUE));
+        }
+        return allowed;
     }
 
     /**

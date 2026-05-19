@@ -12,9 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hfad.agencyapp.databinding.ItemCustomerBinding;
 import com.hfad.agencyapp.ui.models.Customer;
 
+import java.util.Objects;
+
 /**
  * Adapter for customer list using ListAdapter + DiffUtil and ViewBinding.
  */
+@SuppressWarnings("rawtypes")
 public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.CustomerViewHolder> {
 
     public interface OnCustomerActionListener {
@@ -25,7 +28,7 @@ public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.Cus
     private final OnCustomerActionListener listener;
 
     public CustomersAdapter(OnCustomerActionListener listener) {
-        super(new DiffUtil.ItemCallback<Customer>() {
+        super(new DiffUtil.ItemCallback<>() {
             @Override
             public boolean areItemsTheSame(@NonNull Customer oldItem, @NonNull Customer newItem) {
                 return oldItem.getId() != null && oldItem.getId().equals(newItem.getId());
@@ -33,9 +36,10 @@ public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.Cus
 
             @Override
             public boolean areContentsTheSame(@NonNull Customer oldItem, @NonNull Customer newItem) {
-                return oldItem.getBusinessName().equals(newItem.getBusinessName())
-                        && oldItem.getContactPerson().equals(newItem.getContactPerson())
-                        && oldItem.getCity().equals(newItem.getCity());
+                return Objects.equals(oldItem.getBusinessName(), newItem.getBusinessName())
+                        && Objects.equals(oldItem.getContactPerson(), newItem.getContactPerson())
+                        && Objects.equals(oldItem.getAddress(), newItem.getAddress())
+                        && Objects.equals(oldItem.getPaymentMethods(), newItem.getPaymentMethods());
             }
         });
         this.listener = listener;
@@ -65,11 +69,11 @@ public class CustomersAdapter extends ListAdapter<Customer, CustomersAdapter.Cus
         void bind(Customer c, OnCustomerActionListener listener) {
             binding.tvBusinessName.setText(c.getBusinessName());
             binding.tvContactPerson.setText(c.getContactPerson());
-            binding.tvCity.setText(c.getCity());
+            binding.tvAddress.setText(c.getAddress());
 
             // Outstanding placeholder: 0.00
-            binding.tvOutstandingLabel.setText("Outstanding");
-            binding.tvOutstandingAmount.setText("Rs. 0.00");
+            binding.tvOutstandingLabel.setText(com.hfad.agencyapp.R.string.outstanding_label);
+            binding.tvOutstandingAmount.setText(com.hfad.agencyapp.R.string.zero_amount);
 
             binding.getRoot().setOnClickListener(v -> listener.onClick(c));
             binding.getRoot().setOnLongClickListener(v -> {
