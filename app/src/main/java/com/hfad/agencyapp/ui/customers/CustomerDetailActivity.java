@@ -1,9 +1,14 @@
 package com.hfad.agencyapp.ui.customers;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import com.google.android.material.snackbar.Snackbar;
+import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.databinding.ActivityCustomerDetailBinding;
 import com.hfad.agencyapp.ui.models.Customer;
 import com.hfad.agencyapp.viewmodel.CustomerViewModel;
@@ -14,6 +19,7 @@ import com.hfad.agencyapp.viewmodel.CustomerViewModel;
 public class CustomerDetailActivity extends AppCompatActivity {
     private ActivityCustomerDetailBinding binding;
     private CustomerViewModel viewModel;
+    private Customer currentCustomer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,9 +43,9 @@ public class CustomerDetailActivity extends AppCompatActivity {
     }
 
     private void loadCustomerDetails(String customerId) {
-        Customer customer = viewModel.getById(customerId);
-        if (customer != null) {
-            displayCustomerDetails(customer);
+        currentCustomer = viewModel.getById(customerId);
+        if (currentCustomer != null) {
+            displayCustomerDetails(currentCustomer);
         }
     }
 
@@ -59,6 +65,68 @@ public class CustomerDetailActivity extends AppCompatActivity {
         // Payment Methods
         String paymentMethods = formatPaymentMethods(customer.getPaymentMethods());
         binding.tvPaymentMethods.setText(paymentMethods);
+
+        // Update UI based on blocked status
+        updateBlockedStatus();
+    }
+
+    private void updateBlockedStatus() {
+        if (currentCustomer == null) return;
+        
+        // Apply visual styling if blocked
+        if (currentCustomer.isBlocked()) {
+            binding.getRoot().setAlpha(0.6f);
+        } else {
+            binding.getRoot().setAlpha(1.0f);
+        }
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_customer_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (currentCustomer != null) {
+            MenuItem blockItem = menu.findItem(R.id.action_block);
+            if (blockItem != null) {
+                blockItem.setTitle(currentCustomer.isBlocked() ? "Unblock Customer" : "Block Customer");
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_block) {
+            toggleBlockStatus();
+            return true;
+        } else if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void toggleBlockStatus() {
+        if (currentCustomer == null) return;
+
+        currentCustomer.setBlocked(!currentCustomer.isBlocked());
+        new Thread(() -> {
+            boolean ok = viewModel.saveCustomer(currentCustomer);
+            runOnUiThread(() -> {
+                if (ok) {
+                    updateBlockedStatus();
+                    String message = currentCustomer.isBlocked() ? "Customer blocked" : "Customer unblocked";
+                    Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Failed to update customer status", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }).start();
     }
 
     private String formatPaymentMethods(String paymentMethods) {
