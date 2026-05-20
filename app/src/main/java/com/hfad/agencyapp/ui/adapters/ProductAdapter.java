@@ -30,11 +30,15 @@ public class ProductAdapter extends ListAdapter<Product, ProductViewHolder> {
 
             @Override
             public boolean areContentsTheSame(@NonNull Product oldItem, @NonNull Product newItem) {
-                return oldItem.name.equals(newItem.name)
+                return java.util.Objects.equals(oldItem.name, newItem.name)
                         && safeEquals(oldItem.sku, newItem.sku)
+                        && safeEquals(oldItem.brand, newItem.brand)
                         && oldItem.stock == newItem.stock
                         && oldItem.sellingPrice == newItem.sellingPrice
-                        && safeEquals(oldItem.imagePath, newItem.imagePath);
+                        && oldItem.costPrice == newItem.costPrice
+                        && oldItem.discountPercent == newItem.discountPercent
+                        && oldItem.buyQtyForFreeIssue == newItem.buyQtyForFreeIssue
+                        && oldItem.freeIssueQty == newItem.freeIssueQty;
             }
         });
         this.listener = listener;

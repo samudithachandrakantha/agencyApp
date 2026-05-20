@@ -21,13 +21,7 @@ public class Constants {
     public static final String PAYMENT_METHOD_CARD = "CARD";
     public static final String PAYMENT_METHOD_ONLINE = "ONLINE";
 
-    // Image compression settings
-    public static final int IMAGE_MAX_WIDTH = 800;
-    public static final int IMAGE_QUALITY = 85;
-
     // Request codes
     public static final int PERMISSION_REQUEST_CODE = 1001;
-    public static final int CAMERA_REQUEST_CODE = 1002;
-    public static final int GALLERY_REQUEST_CODE = 1003;
 }
 

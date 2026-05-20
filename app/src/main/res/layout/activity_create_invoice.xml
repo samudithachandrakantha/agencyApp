@@ -430,48 +430,6 @@
                                 android:maxLines="1" />
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <!-- Cheque Image Upload Area -->
-                        <FrameLayout
-                            android:id="@+id/frameChecqueImage"
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:layout_marginTop="@dimen/space_md"
-                            android:background="@drawable/bg_dashed_border"
-                            android:clickable="true"
-                            android:focusable="true">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:layout_width="32dp"
-                                    android:layout_height="32dp"
-                                    android:contentDescription="@string/currency_icon"
-                                    android:src="@android:drawable/ic_menu_camera"
-                                    app:tint="@color/soft_blue_icon" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="@dimen/space_xs"
-                                    android:text="@string/cheque_image_text"
-                                    android:textColor="@color/soft_blue_icon"
-                                    android:textSize="12sp" />
-                            </LinearLayout>
-
-                            <!-- Cheque Image Thumbnail (shown when captured) -->
-                            <ImageView
-                                android:id="@+id/iv_cheque_thumbnail"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="@string/cheque_thumbnail_desc"
-                                android:scaleType="centerCrop"
-                                android:visibility="gone" />
-                        </FrameLayout>
-
                         <!-- Error Message -->
                         <TextView
                             android:id="@+id/tv_cheque_error"

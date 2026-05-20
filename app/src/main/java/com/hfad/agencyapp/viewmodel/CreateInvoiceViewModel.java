@@ -35,9 +35,6 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
     
     // LiveData for cheque details (only used when payment type is CHEQUE)
     private final MutableLiveData<ChequeDetails> chequeDetailsLiveData = new MutableLiveData<>(new ChequeDetails());
-    
-    // LiveData for cheque image path
-    private final MutableLiveData<String> chequeImagePathLiveData = new MutableLiveData<>();
 
     public CreateInvoiceViewModel(@NonNull Application application) {
         super(application);
@@ -71,10 +68,6 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
 
     public LiveData<ChequeDetails> getChequeDetails() {
         return chequeDetailsLiveData;
-    }
-
-    public LiveData<String> getChequeImagePath() {
-        return chequeImagePathLiveData;
     }
 
     // ===== Item Management Methods =====
@@ -188,18 +181,6 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         }
     }
 
-    /**
-     * Set cheque image path.
-     */
-    public void setChequeImagePath(String imagePath) {
-        chequeImagePathLiveData.setValue(imagePath);
-        ChequeDetails details = chequeDetailsLiveData.getValue();
-        if (details != null) {
-            details.setChequeImagePath(imagePath);
-            chequeDetailsLiveData.setValue(details);
-        }
-    }
-
     // ===== Validation & Submission =====
 
     /**
@@ -222,7 +203,7 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         if (paymentTypeLiveData.getValue() == PaymentType.CHEQUE) {
             ChequeDetails details = chequeDetailsLiveData.getValue();
             if (details == null || !details.isValid()) {
-                return "All cheque details (number, bank, date, image) are required";
+                return "Cheque number, bank name, and date are required";
             }
         }
 
@@ -253,7 +234,6 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         selectedCustomerLiveData.setValue(null);
         paymentTypeLiveData.setValue(PaymentType.CASH);
         chequeDetailsLiveData.setValue(new ChequeDetails());
-        chequeImagePathLiveData.setValue(null);
     }
 }
 

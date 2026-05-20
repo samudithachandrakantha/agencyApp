@@ -20,10 +20,8 @@
     <string name="payment_cheque">Cheque</string>
     <string name="cheque_number_hint">Cheque Number</string>
     <string name="bank_name_hint">Bank Name</string>
-    <string name="cheque_date_hint">Cheque Date (Read-only)</string>
-    <string name="cheque_image_text">Tap to capture cheque image</string>
-    <string name="cheque_thumbnail_desc">Cheque image thumbnail</string>
-    <string name="cheque_required_error">All cheque details are required</string>
+    <string name="cheque_date_hint">Cheque Date</string>
+    <string name="cheque_required_error">Cheque number, bank name, and date are required</string>
     <string name="save_invoice_button">Preview &amp; Save</string>
     <string name="chevron_icon">Chevron icon</string>
     <string name="currency_icon">Currency icon</string>
@@ -58,4 +56,41 @@
     <string name="city">Address</string>
     <string name="address">Address</string>
     <string name="save">Save</string>
+
+    <!-- Add / edit product (simplified) -->
+    <string name="add_product">Add Product</string>
+    <string name="edit_product">Edit Product</string>
+    <string name="product_section_basic">Product</string>
+    <string name="product_section_pricing">Pricing</string>
+    <string name="product_section_free_issue">Free issue (optional)</string>
+    <string name="product_free_issue_help">Leave buy quantity empty to disable. When set, both buy quantity and free units are required.</string>
+    <string name="hint_product_name_required">Product name *</string>
+    <string name="hint_brand_optional">Brand (optional)</string>
+    <string name="hint_cost_price_required">Cost price *</string>
+    <string name="hint_selling_price_required">Selling price *</string>
+    <string name="hint_discount_percent">Discount % (0–100)</string>
+    <string name="hint_stock_level_required">Stock level *</string>
+    <string name="error_stock_level_required">Stock level is required</string>
+    <string name="hint_buy_qty_for_free_optional">Buy quantity for free issue (optional)</string>
+    <string name="hint_free_issue_qty">Free issue units allowed</string>
+    <string name="error_product_name_required">Product name is required</string>
+    <string name="error_cost_price_required">Cost price is required</string>
+    <string name="error_selling_price_required">Selling price is required</string>
+    <string name="error_invalid_amount">Enter a valid amount</string>
+    <string name="error_discount_range">Discount must be between 0 and 100</string>
+    <string name="error_invalid_quantity">Enter a valid whole number</string>
+    <string name="error_free_issue_qty_required">Enter how many free units when offer is enabled</string>
+    <string name="error_buy_qty_for_free_required">Enter buy quantity when free units are set</string>
+    <string name="product_saved">Product saved</string>
+    <string name="product_save_failed">Save failed</string>
+    <string name="product_not_found">Product not found</string>
+    <string name="product_detail_cost">Cost: Rs. %1$.2f</string>
+    <string name="product_detail_selling">Selling: Rs. %1$.2f</string>
+    <string name="product_detail_discount">Discount: %1$.1f%%</string>
+    <string name="product_detail_free_issue_none">Free issue: not set</string>
+    <string name="product_detail_free_issue_format">Free issue: buy %1$d, get %2$d free</string>
+    <string name="brand_not_set">No brand</string>
+    <string name="filter_all">All</string>
+    <string name="filter_low_stock">Low Stock</string>
+    <string name="filter_out_of_stock">Out of Stock</string>
 </resources>

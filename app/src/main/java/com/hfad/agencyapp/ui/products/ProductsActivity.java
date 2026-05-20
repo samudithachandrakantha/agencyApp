@@ -9,10 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,14 +19,12 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.hfad.agencyapp.R;
-import com.hfad.agencyapp.data.entities.Category;
 import com.hfad.agencyapp.data.entities.Product;
 import com.hfad.agencyapp.databinding.ActivityProductsBinding;
 import com.hfad.agencyapp.ui.adapters.ProductAdapter;
 import com.hfad.agencyapp.viewmodel.ProductViewModel;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ProductsActivity extends AppCompatActivity {
@@ -39,7 +35,6 @@ public class ProductsActivity extends AppCompatActivity {
     private ProductViewModel viewModel;
     private ProductAdapter adapter;
     private final Map<Integer, String> chipTagMap = new HashMap<>();
-    private final Map<Long, String> categoryNames = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +53,7 @@ public class ProductsActivity extends AppCompatActivity {
         setupRecyclerView();
         setupObservers();
         setupSearch();
-        setupStaticFilters();
+        setupStockFilters();
 
         binding.fabAddProduct.setOnClickListener(v -> openAddEditProduct(null));
     }
@@ -86,18 +81,9 @@ public class ProductsActivity extends AppCompatActivity {
 
     private void setupObservers() {
         viewModel.getProducts().observe(this, list -> {
-            if (list != null) {
-                for (Product product : list) {
-                    if (categoryNames.containsKey(product.categoryId)) {
-                        product.categoryName = categoryNames.get(product.categoryId);
-                    }
-                }
-            }
             adapter.submitList(list);
             binding.emptyState.getRoot().setVisibility(list == null || list.isEmpty() ? View.VISIBLE : View.GONE);
         });
-
-        viewModel.getCategories().observe(this, this::buildCategoryChips);
     }
 
     private void setupSearch() {
@@ -117,40 +103,43 @@ public class ProductsActivity extends AppCompatActivity {
         });
     }
 
-    private void setupStaticFilters() {
+    private void setupStockFilters() {
         binding.chipGroupFilters.removeAllViews();
         chipTagMap.clear();
-        addFilterChip("All", "ALL", true);
-        addFilterChip("Low Stock", "LOW", false);
-        addFilterChip("Out of Stock", "OUT", false);
+        addFilterChip(getString(R.string.filter_all), "ALL", true);
+        addFilterChip(getString(R.string.filter_low_stock), "LOW", false);
+        addFilterChip(getString(R.string.filter_out_of_stock), "OUT", false);
 
         binding.chipGroupFilters.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            if (checkedIds == null || checkedIds.isEmpty()) return;
-            int id = checkedIds.get(0);
-            String tag = chipTagMap.get(id);
+            if (checkedIds == null || checkedIds.isEmpty()) {
+                viewModel.setStockFilter(ProductViewModel.StockFilter.ALL);
+                return;
+            }
+            String tag = chipTagMap.get(checkedIds.get(0));
             if ("LOW".equals(tag)) {
                 viewModel.setStockFilter(ProductViewModel.StockFilter.LOW_STOCK);
-                viewModel.setCategoryFilter(-1L);
             } else if ("OUT".equals(tag)) {
                 viewModel.setStockFilter(ProductViewModel.StockFilter.OUT_OF_STOCK);
-                viewModel.setCategoryFilter(-1L);
             } else {
                 viewModel.setStockFilter(ProductViewModel.StockFilter.ALL);
-                String catTag = chipTagMap.get(id);
-                if (catTag != null && catTag.startsWith("CAT:")) {
-                    viewModel.setCategoryFilter(Long.parseLong(catTag.substring(4)));
-                } else {
-                    viewModel.setCategoryFilter(-1L);
-                }
             }
+            updateChipStyles(checkedIds.get(0));
         });
     }
 
-    private void buildCategoryChips(List<Category> categories) {
-        setupStaticFilters();
-        for (Category category : categories) {
-            categoryNames.put(category.id, category.name);
-            addFilterChip(category.name, "CAT:" + category.id, false);
+    private void updateChipStyles(int selectedChipId) {
+        for (int i = 0; i < binding.chipGroupFilters.getChildCount(); i++) {
+            View child = binding.chipGroupFilters.getChildAt(i);
+            if (!(child instanceof Chip)) continue;
+            Chip chip = (Chip) child;
+            boolean selected = chip.getId() == selectedChipId;
+            if (selected) {
+                chip.setTextColor(getColor(R.color.white));
+                chip.setChipBackgroundColorResource(R.color.navy_900);
+            } else {
+                chip.setTextColor(getColor(R.color.text_primary));
+                chip.setChipBackgroundColorResource(R.color.white);
+            }
         }
     }
 
@@ -179,7 +168,6 @@ public class ProductsActivity extends AppCompatActivity {
         PopupMenu popupMenu = new PopupMenu(this, anchor);
         popupMenu.getMenu().add("Edit");
         popupMenu.getMenu().add("Delete");
-        popupMenu.getMenu().add("Adjust Stock");
         popupMenu.setOnMenuItemClickListener(item -> {
             String title = item.getTitle().toString();
             if ("Edit".equals(title)) {
@@ -187,9 +175,6 @@ public class ProductsActivity extends AppCompatActivity {
                 return true;
             } else if ("Delete".equals(title)) {
                 confirmDelete(product);
-                return true;
-            } else if ("Adjust Stock".equals(title)) {
-                showAdjustStockDialog(product);
                 return true;
             }
             return false;
@@ -223,57 +208,6 @@ public class ProductsActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void showAdjustStockDialog(Product product) {
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_adjust_stock, null);
-        com.google.android.material.textfield.TextInputLayout tilQty = dialogView.findViewById(R.id.tilQuantity);
-        com.google.android.material.textfield.TextInputLayout tilReason = dialogView.findViewById(R.id.tilReason);
-        com.google.android.material.textfield.TextInputEditText etQty = dialogView.findViewById(R.id.etQuantity);
-        com.google.android.material.textfield.MaterialAutoCompleteTextView etReason = dialogView.findViewById(R.id.etReason);
-        com.google.android.material.textfield.TextInputEditText etNotes = dialogView.findViewById(R.id.etNotes);
-        android.widget.TextView tvCurrent = dialogView.findViewById(R.id.tvCurrentStock);
-        com.google.android.material.button.MaterialButtonToggleGroup group = dialogView.findViewById(R.id.toggleStockType);
-
-        tvCurrent.setText("Current stock: " + product.stock);
-        String[] reasons = new String[]{"Purchase", "Sale", "Damage", "Return", "Correction"};
-        etReason.setAdapter(new android.widget.ArrayAdapter<>(this, android.R.layout.simple_list_item_1, reasons));
-        etReason.setText(reasons[0], false);
-        group.check(R.id.btnAddStock);
-
-        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-                .setTitle("Adjust Stock")
-                .setView(dialogView)
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Confirm", null)
-                .create();
-
-        dialog.setOnShowListener(d -> {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                String qtyStr = etQty.getText() != null ? etQty.getText().toString().trim() : "";
-                String reason = etReason.getText() != null ? etReason.getText().toString().trim() : "";
-                String notes = etNotes.getText() != null ? etNotes.getText().toString().trim() : "";
-                boolean add = group.getCheckedButtonId() == R.id.btnAddStock;
-                if (qtyStr.isEmpty()) {
-                    tilQty.setError("Quantity required");
-                    return;
-                }
-                int qty = Integer.parseInt(qtyStr);
-                if (qty <= 0) {
-                    tilQty.setError("Quantity must be > 0");
-                    return;
-                }
-                if (!add && qty > product.stock) {
-                    tilQty.setError("Cannot remove more than current stock");
-                    return;
-                }
-                tilQty.setError(null);
-                boolean ok = viewModel.adjustStock(product.id, add, qty, reason, notes);
-                Snackbar.make(binding.getRoot(), ok ? "Stock updated" : "Stock update failed", Snackbar.LENGTH_SHORT).show();
-                dialog.dismiss();
-            });
-        });
-        dialog.show();
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_products, menu);
@@ -290,17 +224,11 @@ public class ProductsActivity extends AppCompatActivity {
         if (id == R.id.action_search) {
             binding.etSearch.requestFocus();
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            if (imm != null) imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT);
-            return true;
-        }
-        if (id == R.id.action_filter) {
-            binding.chipScroll.setVisibility(binding.chipScroll.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+            if (imm != null) {
+                imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT);
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 }
-
-
-
-

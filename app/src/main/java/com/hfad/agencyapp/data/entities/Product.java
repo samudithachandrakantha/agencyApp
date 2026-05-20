@@ -1,7 +1,7 @@
 package com.hfad.agencyapp.data.entities;
 
-import androidx.room.Ignore;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "products")
@@ -11,19 +11,24 @@ public class Product {
     public long id;
 
     public String name;
-    public String sku;
-    public long categoryId;
     public String brand;
-    public String description;
-    public double sellingPrice;
-    public double mrp;
     public double costPrice;
-    public double taxRate;
+    public double sellingPrice;
+
+    /** Buy this many units to qualify for free issue; 0 = no free-issue offer */
+    public int buyQtyForFreeIssue;
+    /** Free units given when the buy threshold is met */
+    public int freeIssueQty;
+    /** Discount percentage applied to this product (0–100) */
+    public double discountPercent;
+
+    /** Auto-generated code for search / internal use */
+    public String sku;
+    /** Default category when not chosen in UI (e.g. General) */
+    public long categoryId;
     public int stock;
-    public String unit;
     public int lowStockThreshold;
-    public String location;
-    public String imagePath;
+
     public long createdAt;
     public long updatedAt;
     public String syncStatus;
@@ -34,41 +39,28 @@ public class Product {
     public Product() {
     }
 
-    public Product(String name, String sku, long categoryId, double sellingPrice, int stock, String imagePath) {
-        this.name = name;
-        this.sku = sku;
-        this.categoryId = categoryId;
-        this.sellingPrice = sellingPrice;
-        this.mrp = sellingPrice;
-        this.stock = stock;
-        this.unit = "pcs";
-        this.lowStockThreshold = 20;
-        this.imagePath = imagePath;
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.syncStatus = "LOCAL";
-    }
-
-    public Product(String name, String sku, long categoryId, String brand, String description,
-                   double sellingPrice, double mrp, double costPrice, double taxRate,
-                   int stock, String unit, int lowStockThreshold, String location, String imagePath) {
-        this.name = name;
-        this.sku = sku;
-        this.categoryId = categoryId;
-        this.brand = brand;
-        this.description = description;
-        this.sellingPrice = sellingPrice;
-        this.mrp = mrp;
-        this.costPrice = costPrice;
-        this.taxRate = taxRate;
-        this.stock = stock;
-        this.unit = unit;
-        this.lowStockThreshold = lowStockThreshold;
-        this.location = location;
-        this.imagePath = imagePath;
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.syncStatus = "LOCAL";
+    /**
+     * Creates a new product row with sensible defaults for stock and metadata.
+     */
+    public static Product createNew(String name, String brand, double costPrice, double sellingPrice,
+                                    int buyQtyForFreeIssue, int freeIssueQty, double discountPercent,
+                                    long categoryId, String sku) {
+        Product p = new Product();
+        p.name = name;
+        p.brand = brand != null ? brand : "";
+        p.costPrice = costPrice;
+        p.sellingPrice = sellingPrice;
+        p.buyQtyForFreeIssue = buyQtyForFreeIssue;
+        p.freeIssueQty = freeIssueQty;
+        p.discountPercent = discountPercent;
+        p.categoryId = categoryId;
+        p.sku = sku != null ? sku : "";
+        p.stock = 0;
+        p.lowStockThreshold = 5;
+        long now = System.currentTimeMillis();
+        p.createdAt = now;
+        p.updatedAt = now;
+        p.syncStatus = "LOCAL";
+        return p;
     }
 }
-

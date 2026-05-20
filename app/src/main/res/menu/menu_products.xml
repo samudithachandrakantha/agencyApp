@@ -7,11 +7,4 @@
         android:icon="@android:drawable/ic_menu_search"
         android:title="Search"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_filter"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
-        android:title="Filter"
-        app:showAsAction="always" />
 </menu>
-
