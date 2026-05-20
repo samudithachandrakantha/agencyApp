@@ -5,6 +5,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 import androidx.room.Delete;
+import androidx.lifecycle.LiveData;
 
 import com.hfad.agencyapp.data.entities.Payment;
 
@@ -21,8 +22,14 @@ public interface PaymentDao {
     @Delete
     int delete(Payment payment);
 
+    @Query("DELETE FROM payments WHERE invoiceId = :invoiceId")
+    void deleteByInvoiceId(long invoiceId);
+
     @Query("SELECT * FROM payments WHERE invoiceId = :invoiceId ORDER BY timestamp DESC")
-    List<Payment> getByInvoiceId(long invoiceId);
+    LiveData<List<Payment>> getByInvoiceId(long invoiceId);
+
+    @Query("SELECT * FROM payments WHERE invoiceId = :invoiceId ORDER BY timestamp DESC")
+    List<Payment> getByInvoiceIdOnce(long invoiceId);
 
     @Query("SELECT * FROM payments WHERE id = :id LIMIT 1")
     Payment getById(long id);

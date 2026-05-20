@@ -19,6 +19,15 @@ import java.util.Locale;
 public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdapter.InvoiceViewHolder> {
 
     private final List<RecentInvoiceUiModel> items = new ArrayList<>();
+    private OnInvoiceClickListener listener;
+
+    public interface OnInvoiceClickListener {
+        void onInvoiceClick(long invoiceDbId);
+    }
+
+    public void setOnInvoiceClickListener(OnInvoiceClickListener l) {
+        this.listener = l;
+    }
 
     @NonNull
     @Override
@@ -29,7 +38,13 @@ public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdap
 
     @Override
     public void onBindViewHolder(@NonNull InvoiceViewHolder holder, int position) {
-        holder.bind(items.get(position));
+        RecentInvoiceUiModel model = items.get(position);
+        holder.bind(model);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null && model.invoiceDbId > 0) {
+                listener.onInvoiceClick(model.invoiceDbId);
+            }
+        });
     }
 
     @Override

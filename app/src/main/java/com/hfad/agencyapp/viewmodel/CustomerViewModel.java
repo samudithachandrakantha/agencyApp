@@ -22,6 +22,7 @@ public class CustomerViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Customer>> customers = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
     private final MutableLiveData<String> error = new MutableLiveData<>(null);
+    private String currentQuery = "";
 
     public CustomerViewModel(@NonNull Application application) {
         super(application);
@@ -47,12 +48,13 @@ public class CustomerViewModel extends AndroidViewModel {
     }
 
     public void filter(String q) {
-        if (q == null || q.trim().isEmpty()) {
+        currentQuery = q == null ? "" : q.trim();
+        if (currentQuery.isEmpty()) {
             loadAll();
             return;
         }
         loading.postValue(true);
-        Future<List<Customer>> f = repository.searchCustomersAsync(q);
+        Future<List<Customer>> f = repository.searchCustomersAsync(currentQuery);
         try {
             List<Customer> list = f.get();
             customers.postValue(list);
@@ -96,6 +98,14 @@ public class CustomerViewModel extends AndroidViewModel {
         } catch (ExecutionException | InterruptedException e) {
             error.postValue(e.getMessage());
             return null;
+        }
+    }
+
+    public void refresh() {
+        if (currentQuery == null || currentQuery.isEmpty()) {
+            loadAll();
+        } else {
+            filter(currentQuery);
         }
     }
 }

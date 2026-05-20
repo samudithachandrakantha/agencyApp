@@ -5,6 +5,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 import androidx.room.Delete;
+import androidx.lifecycle.LiveData;
 
 import com.hfad.agencyapp.data.entities.Invoice;
 
@@ -21,11 +22,20 @@ public interface InvoiceDao {
     @Delete
     int delete(Invoice invoice);
 
+    @Query("DELETE FROM invoices WHERE id = :id")
+    void deleteById(long id);
+
     @Query("SELECT * FROM invoices ORDER BY createdAt DESC")
-    List<Invoice> getAll();
+    LiveData<List<Invoice>> getAll();
+
+    @Query("SELECT COALESCE(SUM(totalAmount), 0) FROM invoices WHERE createdAt >= :startOfDay AND createdAt < :endOfDay")
+    LiveData<Double> getTodaySales(long startOfDay, long endOfDay);
+
+    @Query("SELECT COUNT(*) FROM invoices WHERE createdAt >= :startOfDay AND createdAt < :endOfDay")
+    LiveData<Integer> getTodayInvoiceCount(long startOfDay, long endOfDay);
 
     @Query("SELECT * FROM invoices WHERE id = :id LIMIT 1")
-    Invoice getById(long id);
+    LiveData<Invoice> getById(long id);
 
     @Query("SELECT * FROM invoices WHERE customerId = :customerId ORDER BY createdAt DESC")
     List<Invoice> getByCustomerId(long customerId);

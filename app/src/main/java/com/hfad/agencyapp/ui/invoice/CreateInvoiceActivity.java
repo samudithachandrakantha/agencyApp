@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.LayoutInflater;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -33,11 +35,15 @@ import java.util.Set;
  */
 public class CreateInvoiceActivity extends AppCompatActivity {
 
+    public static final String EXTRA_INVOICE_ID = "extra_invoice_id";
+
     private ActivityCreateInvoiceBinding binding;
     private CreateInvoiceViewModel viewModel;
     private InvoiceItemsAdapter adapter;
     private DecimalFormat currencyFormat;
     private SimpleDateFormat dateFormat;
+    private long editingInvoiceId = -1L;
+    private String editingInvoiceNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +54,8 @@ public class CreateInvoiceActivity extends AppCompatActivity {
 
         viewModel = new ViewModelProvider(this).get(CreateInvoiceViewModel.class);
 
+        editingInvoiceId = getIntent().getLongExtra(EXTRA_INVOICE_ID, -1L);
+
         currencyFormat = new DecimalFormat("#,##0.00");
         dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
@@ -57,6 +65,10 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         setupClickListeners();
         setupToggleGroup();
         setupTextInputListeners();
+
+        if (editingInvoiceId > 0) {
+            loadInvoiceForEdit(editingInvoiceId);
+        }
     }
 
     private void setupToolbar() {
@@ -121,7 +133,77 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         binding.btnAddItem.setOnClickListener(v -> openProductPicker());
         binding.etChequeDate.setOnClickListener(v -> openDatePicker());
         binding.tilChequeDate.setEndIconOnClickListener(v -> openDatePicker());
-        binding.btnSaveInvoice.setOnClickListener(v -> saveInvoice());
+        binding.btnSaveInvoice.setOnClickListener(v -> showPreview());
+    }
+
+    private void showPreview() {
+        String error = viewModel.validateInvoice();
+
+        if (!error.isEmpty()) {
+            if (error.toLowerCase().contains("customer")) {
+                binding.tvCustomerError.setVisibility(View.VISIBLE);
+            } else if (error.toLowerCase().contains("item")) {
+                binding.tvItemsError.setVisibility(View.VISIBLE);
+            } else if (error.toLowerCase().contains("cheque")) {
+                binding.tvChequeError.setVisibility(View.VISIBLE);
+            }
+            Snackbar.make(binding.getRoot(), error, Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        binding.tvCustomerError.setVisibility(View.GONE);
+        binding.tvItemsError.setVisibility(View.GONE);
+        binding.tvChequeError.setVisibility(View.GONE);
+
+        View previewView = LayoutInflater.from(this).inflate(com.hfad.agencyapp.R.layout.dialog_invoice_preview, null);
+        TextView tvCustomer = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewCustomer);
+        TextView tvInvoiceNumber = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewInvoiceNumber);
+        TextView tvItems = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewItems);
+        TextView tvSubtotal = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewSubtotal);
+        TextView tvTotal = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewTotal);
+        TextView tvPayment = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewPayment);
+
+        com.hfad.agencyapp.ui.models.Customer customer = viewModel.getSelectedCustomer().getValue();
+        tvCustomer.setText(customer != null ? customer.getBusinessName() : "Unknown");
+
+        String invoiceNumber = "INV-" + (System.currentTimeMillis() / 1000);
+        tvInvoiceNumber.setText(invoiceNumber);
+
+        StringBuilder sb = new StringBuilder();
+        java.util.List<com.hfad.agencyapp.ui.models.InvoiceItem> items = viewModel.getItems().getValue();
+        if (items != null) {
+            for (com.hfad.agencyapp.ui.models.InvoiceItem it : items) {
+                double lineTotal = it.getQuantity() * it.getUnitPrice() - it.getDiscount();
+                sb.append(it.getProductName())
+                        .append(" x ")
+                        .append(it.getQuantity())
+                        .append(" — Rs. ")
+                        .append(currencyFormat.format(it.getUnitPrice()))
+                        .append(" = Rs. ")
+                        .append(currencyFormat.format(lineTotal))
+                        .append("\n");
+            }
+        }
+        tvItems.setText(sb.toString());
+
+        Double subtotal = viewModel.getSubtotal().getValue();
+        Double total = viewModel.getTotal().getValue();
+        tvSubtotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(subtotal != null ? subtotal : 0.0)));
+        tvTotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(total != null ? total : 0.0)));
+
+        tvPayment.setText(viewModel.getPaymentType().getValue().name());
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Invoice Preview")
+                .setView(previewView)
+                .setNegativeButton("Edit", (d, which) -> d.dismiss())
+                .setPositiveButton("Save", (d, which) -> {
+                    viewModel.saveInvoice(editingInvoiceId > 0 ? editingInvoiceId : null, editingInvoiceNumber);
+                    Snackbar.make(binding.getRoot(), "Invoice saved successfully", Snackbar.LENGTH_SHORT).show();
+                    d.dismiss();
+                    finish();
+                })
+                .show();
     }
 
     private void setupToggleGroup() {
@@ -322,8 +404,65 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         binding.tvItemsError.setVisibility(View.GONE);
         binding.tvChequeError.setVisibility(View.GONE);
 
-        viewModel.saveInvoice();
+        viewModel.saveInvoice(editingInvoiceId > 0 ? editingInvoiceId : null, editingInvoiceNumber);
         Snackbar.make(binding.getRoot(), "Invoice saved successfully", Snackbar.LENGTH_SHORT).show();
         finish();
+    }
+
+    private void loadInvoiceForEdit(long invoiceId) {
+        setTitle("Edit Invoice");
+        com.hfad.agencyapp.data.Repository repo = com.hfad.agencyapp.data.Repository.getInstance(this);
+        repo.getInvoiceById(invoiceId).observe(this, invoice -> {
+            if (invoice == null) {
+                return;
+            }
+
+            editingInvoiceNumber = invoice.invoiceNumber;
+
+            if (invoice.customerId > 0) {
+                com.hfad.agencyapp.data.CustomerRepository customerRepository = new com.hfad.agencyapp.data.CustomerRepository(this);
+                try {
+                    com.hfad.agencyapp.ui.models.Customer customer = customerRepository.getByIdAsync(String.valueOf(invoice.customerId)).get();
+                    if (customer != null) {
+                        viewModel.setSelectedCustomer(customer);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+            if (invoice.paymentMethod != null) {
+                try {
+                    viewModel.setPaymentType(PaymentType.valueOf(invoice.paymentMethod));
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+
+            repo.getAllProducts().observe(this, products -> {
+                java.util.Map<Long, Product> productMap = new java.util.HashMap<>();
+                if (products != null) {
+                    for (Product product : products) {
+                        productMap.put(product.id, product);
+                    }
+                }
+
+                repo.getInvoiceItems(invoiceId).observe(this, items -> {
+                    java.util.List<com.hfad.agencyapp.ui.models.InvoiceItem> uiItems = new java.util.ArrayList<>();
+                    if (items != null) {
+                        for (com.hfad.agencyapp.data.entities.InvoiceItem item : items) {
+                            Product product = productMap.get(item.productId);
+                            String productName = product != null && product.name != null ? product.name : String.valueOf(item.productId);
+                            uiItems.add(new com.hfad.agencyapp.ui.models.InvoiceItem(
+                                    String.valueOf(item.productId),
+                                    productName,
+                                    item.quantity,
+                                    item.unitPrice,
+                                    0.0
+                            ));
+                        }
+                    }
+                    viewModel.setItems(uiItems);
+                });
+            });
+        });
     }
 }

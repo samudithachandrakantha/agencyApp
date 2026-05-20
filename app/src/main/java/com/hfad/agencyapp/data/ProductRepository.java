@@ -33,14 +33,14 @@ public class ProductRepository {
         return executor.submit(new Callable<List<Category>>() {
             @Override
             public List<Category> call() {
-                return db.categoryDao().getAll();
+                return db.categoryDao().getAllOnce();
             }
         });
     }
 
     public Future<Void> ensureDefaultCategories() {
         return executor.submit(() -> {
-            List<Category> categories = db.categoryDao().getAll();
+            List<Category> categories = db.categoryDao().getAllOnce();
             if (categories == null || categories.isEmpty()) {
                 List<Category> defaults = Arrays.asList(
                         new Category("General", "Default category for products"),
