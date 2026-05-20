@@ -56,10 +56,6 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
 
-    // Image loading / compression
-    implementation("com.github.bumptech.glide:glide:4.15.1")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
-
     // Utilities
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains:annotations:24.0.1")

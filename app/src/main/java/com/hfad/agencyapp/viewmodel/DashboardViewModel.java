@@ -38,8 +38,9 @@ public class DashboardViewModel extends AndroidViewModel {
         // Data auto-loads via LiveData from Repository
     }
 
-    public void insertProduct(String name, String sku, long categoryId, double price, int stock, String imageUrl) {
-        Product product = new Product(name, sku, categoryId, price, stock, imageUrl);
+    public void insertProduct(String name, String sku, long categoryId, double price, int stock) {
+        Product product = Product.createNew(name, "", 0, price, 0, 0, 0, categoryId, sku);
+        product.stock = stock;
         repository.insertProduct(product);
     }
 

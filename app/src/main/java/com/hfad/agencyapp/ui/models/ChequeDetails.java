@@ -9,18 +9,15 @@ public class ChequeDetails {
     private String chequeNumber;
     private String bankName;
     private Date chequeDate;
-    private String chequeImagePath; // File path to stored cheque image
 
     public ChequeDetails() {}
 
-    public ChequeDetails(String chequeNumber, String bankName, Date chequeDate, String chequeImagePath) {
+    public ChequeDetails(String chequeNumber, String bankName, Date chequeDate) {
         this.chequeNumber = chequeNumber;
         this.bankName = bankName;
         this.chequeDate = chequeDate;
-        this.chequeImagePath = chequeImagePath;
     }
 
-    // Getters & Setters
     public String getChequeNumber() {
         return chequeNumber;
     }
@@ -45,22 +42,9 @@ public class ChequeDetails {
         this.chequeDate = chequeDate;
     }
 
-    public String getChequeImagePath() {
-        return chequeImagePath;
-    }
-
-    public void setChequeImagePath(String chequeImagePath) {
-        this.chequeImagePath = chequeImagePath;
-    }
-
-    /**
-     * Validate cheque details for completeness.
-     */
     public boolean isValid() {
-        return chequeNumber != null && !chequeNumber.trim().isEmpty() &&
-               bankName != null && !bankName.trim().isEmpty() &&
-               chequeDate != null &&
-               chequeImagePath != null && !chequeImagePath.trim().isEmpty();
+        return chequeNumber != null && !chequeNumber.trim().isEmpty()
+                && bankName != null && !bankName.trim().isEmpty()
+                && chequeDate != null;
     }
 }
-

@@ -11,7 +11,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.hfad.agencyapp.data.ProductRepository;
 import com.hfad.agencyapp.data.entities.Category;
 import com.hfad.agencyapp.data.entities.Product;
-import com.hfad.agencyapp.data.entities.StockMovement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +24,7 @@ public class ProductViewModel extends AndroidViewModel {
     private final ProductRepository repository;
     private final LiveData<List<Product>> allProducts;
     private final MediatorLiveData<List<Product>> products = new MediatorLiveData<>();
-    private final MutableLiveData<List<Category>> categories = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<String> searchQuery = new MutableLiveData<>("");
-    private final MutableLiveData<Long> categoryFilter = new MutableLiveData<>(-1L);
     private final MutableLiveData<StockFilter> stockFilter = new MutableLiveData<>(StockFilter.ALL);
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>(false);
     private final MutableLiveData<String> error = new MutableLiveData<>(null);
@@ -44,49 +41,23 @@ public class ProductViewModel extends AndroidViewModel {
             applyFilters();
         });
         products.addSource(searchQuery, s -> applyFilters());
-        products.addSource(categoryFilter, id -> applyFilters());
         products.addSource(stockFilter, sf -> applyFilters());
-
-        loadCategories();
     }
 
     public LiveData<List<Product>> getProducts() { return products; }
-    public LiveData<List<Category>> getCategories() { return categories; }
     public LiveData<Boolean> getLoading() { return loading; }
     public LiveData<String> getError() { return error; }
     public LiveData<String> getSearchQuery() { return searchQuery; }
-    public LiveData<Long> getCategoryFilter() { return categoryFilter; }
     public LiveData<StockFilter> getStockFilter() { return stockFilter; }
 
     public void setSearchQuery(String q) { searchQuery.setValue(q == null ? "" : q); }
-    public void setCategoryFilter(long id) { categoryFilter.setValue(id); }
-    public void setStockFilter(StockFilter filter) { stockFilter.setValue(filter == null ? StockFilter.ALL : filter); }
-
-    public void resetFilters() {
-        searchQuery.setValue("");
-        categoryFilter.setValue(-1L);
-        stockFilter.setValue(StockFilter.ALL);
-    }
-
-    public void loadCategories() {
-        loading.postValue(true);
-        new Thread(() -> {
-            try {
-                repository.ensureDefaultCategories().get();
-                Future<List<Category>> future = repository.getAllCategoriesAsync();
-                categories.postValue(future.get());
-            } catch (ExecutionException | InterruptedException e) {
-                error.postValue(e.getMessage());
-            } finally {
-                loading.postValue(false);
-            }
-        }).start();
+    public void setStockFilter(StockFilter filter) {
+        stockFilter.setValue(filter == null ? StockFilter.ALL : filter);
     }
 
     private void applyFilters() {
         List<Product> filtered = new ArrayList<>(cache);
         String q = searchQuery.getValue();
-        Long catId = categoryFilter.getValue();
         StockFilter sf = stockFilter.getValue();
 
         if (q != null && !q.trim().isEmpty()) {
@@ -94,26 +65,20 @@ public class ProductViewModel extends AndroidViewModel {
             List<Product> tmp = new ArrayList<>();
             for (Product p : filtered) {
                 if ((p.name != null && p.name.toLowerCase().contains(lower)) ||
-                        (p.sku != null && p.sku.toLowerCase().contains(lower))) {
+                        (p.sku != null && p.sku.toLowerCase().contains(lower)) ||
+                        (p.brand != null && p.brand.toLowerCase().contains(lower))) {
                     tmp.add(p);
                 }
             }
             filtered = tmp;
         }
 
-        if (catId != null && catId > 0) {
+        if (sf != null && sf != StockFilter.ALL) {
             List<Product> tmp = new ArrayList<>();
             for (Product p : filtered) {
-                if (p.categoryId == catId) tmp.add(p);
-            }
-            filtered = tmp;
-        }
-
-        if (sf != null) {
-            List<Product> tmp = new ArrayList<>();
-            for (Product p : filtered) {
-                boolean low = p.stock <= 0 || p.stock < p.lowStockThreshold;
-                if (sf == StockFilter.ALL || (sf == StockFilter.LOW_STOCK && low) || (sf == StockFilter.OUT_OF_STOCK && p.stock == 0)) {
+                if (sf == StockFilter.OUT_OF_STOCK && p.stock == 0) {
+                    tmp.add(p);
+                } else if (sf == StockFilter.LOW_STOCK && p.stock > 0 && p.stock < p.lowStockThreshold) {
                     tmp.add(p);
                 }
             }
@@ -131,6 +96,30 @@ public class ProductViewModel extends AndroidViewModel {
             error.postValue(e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * Resolves category for products created without category UI (prefers "General").
+     * Call from a background thread.
+     */
+    public long resolveDefaultCategoryId() {
+        try {
+            repository.ensureDefaultCategories().get();
+            List<Category> cats = repository.getAllCategoriesAsync().get();
+            if (cats != null) {
+                for (Category c : cats) {
+                    if ("General".equals(c.name)) {
+                        return c.id;
+                    }
+                }
+                if (!cats.isEmpty()) {
+                    return cats.get(0).id;
+                }
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            error.postValue(e.getMessage());
+        }
+        return 1L;
     }
 
     public boolean deleteProduct(long id) {
@@ -153,32 +142,9 @@ public class ProductViewModel extends AndroidViewModel {
         }
     }
 
-    public List<StockMovement> getRecentMovements(long productId) {
-        try {
-            Future<List<StockMovement>> future = repository.getRecentMovementsAsync(productId);
-            return future.get();
-        } catch (ExecutionException | InterruptedException e) {
-            error.postValue(e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    public boolean adjustStock(long productId, boolean add, int qty, String reason, String notes) {
-        try {
-            Future<Boolean> future = repository.adjustStockAsync(productId, add, qty, reason, notes);
-            return future.get();
-        } catch (ExecutionException | InterruptedException e) {
-            error.postValue(e.getMessage());
-            return false;
-        }
-    }
-
     @Override
     protected void onCleared() {
         super.onCleared();
         repository.shutdown();
     }
 }
-
-
-
