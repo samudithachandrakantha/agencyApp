@@ -13,6 +13,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.hfad.agencyapp.databinding.ActivityCreateInvoiceBinding;
+import com.hfad.agencyapp.data.entities.Product;
 import com.hfad.agencyapp.ui.adapters.InvoiceItemsAdapter;
 import com.hfad.agencyapp.ui.models.Customer;
 import com.hfad.agencyapp.ui.models.PaymentType;
@@ -258,36 +259,48 @@ public class CreateInvoiceActivity extends AppCompatActivity {
     }
 
     private void openProductPicker() {
-        String[] products = {
-                "Flour (1kg)",
-                "Sugar (1kg)",
-                "Butter (500g)",
-                "Eggs (dozen)",
-                "Baking Powder (100g)"
-        };
-        double[] prices = {150.0, 200.0, 350.0, 180.0, 45.0};
+        com.hfad.agencyapp.data.ProductRepository repo = new com.hfad.agencyapp.data.ProductRepository(this);
+        try {
+            List<Product> list = repo.searchAsync("%").get();
+            if (list == null || list.isEmpty()) {
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("No products")
+                        .setMessage("No products found. Please add a product first.")
+                        .setPositiveButton("OK", null)
+                        .show();
+                return;
+            }
 
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Add Product")
-                .setItems(products, (dialog, which) -> {
-                    viewModel.addItem("prod_" + which, products[which], prices[which]);
-                    Snackbar.make(binding.getRoot(), products[which] + " added", Snackbar.LENGTH_SHORT).show();
-                })
-                .show();
+            CharSequence[] labels = new CharSequence[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                Product p = list.get(i);
+                labels[i] = p.name + " - Rs. " + currencyFormat.format(p.sellingPrice);
+            }
+
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Add Product")
+                    .setItems(labels, (dialog, which) -> {
+                        Product selected = list.get(which);
+                        viewModel.addItem(String.valueOf(selected.id), selected.name, selected.sellingPrice);
+                        Snackbar.make(binding.getRoot(), selected.name + " added", Snackbar.LENGTH_SHORT).show();
+                    })
+                    .show();
+        } catch (Exception e) {
+            Snackbar.make(binding.getRoot(), "Failed to load products", Snackbar.LENGTH_SHORT).show();
+        } finally {
+            repo.shutdown();
+        }
     }
 
     private void openDatePicker() {
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().build();
-
         datePicker.addOnPositiveButtonClickListener(selection -> {
             Date selectedDate = new Date(selection);
             viewModel.setChequeDate(selectedDate);
             binding.etChequeDate.setText(dateFormat.format(selectedDate));
             binding.tilChequeDate.setError(null);
-            binding.tvChequeError.setVisibility(View.GONE);
         });
-
-        datePicker.show(getSupportFragmentManager(), "cheque_date_picker");
+        datePicker.show(getSupportFragmentManager(), "date_picker");
     }
 
     private void saveInvoice() {

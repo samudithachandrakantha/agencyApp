@@ -76,22 +76,44 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
      * Add a new item to the invoice.
      */
     public void addItem(String productId, String productName, double unitPrice) {
-        List<InvoiceItem> items = itemsLiveData.getValue();
-        if (items != null) {
-            items.add(new InvoiceItem(productId, productName, 1, unitPrice));
-            itemsLiveData.setValue(new ArrayList<>(items));
-            calculateTotals();
+        List<InvoiceItem> current = itemsLiveData.getValue();
+        List<InvoiceItem> next = current != null ? new ArrayList<>(current) : new ArrayList<>();
+
+        // If product already exists in invoice, increase quantity instead of duplicating row.
+        int existingIndex = -1;
+        for (int i = 0; i < next.size(); i++) {
+            InvoiceItem row = next.get(i);
+            if (row.getProductId() != null && row.getProductId().equals(productId)) {
+                existingIndex = i;
+                break;
+            }
         }
+
+        if (existingIndex >= 0) {
+            InvoiceItem existing = next.get(existingIndex);
+            next.set(existingIndex, new InvoiceItem(
+                    existing.getProductId(),
+                    existing.getProductName(),
+                    existing.getQuantity() + 1,
+                    existing.getUnitPrice()
+            ));
+        } else {
+            next.add(new InvoiceItem(productId, productName, 1, unitPrice));
+        }
+
+        itemsLiveData.setValue(next);
+        calculateTotals();
     }
 
     /**
      * Remove an item from the invoice by index.
      */
     public void removeItem(int position) {
-        List<InvoiceItem> items = itemsLiveData.getValue();
-        if (items != null && position >= 0 && position < items.size()) {
-            items.remove(position);
-            itemsLiveData.setValue(new ArrayList<>(items));
+        List<InvoiceItem> current = itemsLiveData.getValue();
+        if (current != null && position >= 0 && position < current.size()) {
+            List<InvoiceItem> next = new ArrayList<>(current);
+            next.remove(position);
+            itemsLiveData.setValue(next);
             calculateTotals();
         }
     }
@@ -100,10 +122,17 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
      * Update the quantity of an item.
      */
     public void updateQuantity(int position, int newQuantity) {
-        List<InvoiceItem> items = itemsLiveData.getValue();
-        if (items != null && position >= 0 && position < items.size()) {
-            items.get(position).setQuantity(newQuantity);
-            itemsLiveData.setValue(new ArrayList<>(items));
+        List<InvoiceItem> current = itemsLiveData.getValue();
+        if (current != null && position >= 0 && position < current.size()) {
+            List<InvoiceItem> next = new ArrayList<>(current);
+            InvoiceItem old = next.get(position);
+            next.set(position, new InvoiceItem(
+                    old.getProductId(),
+                    old.getProductName(),
+                    newQuantity,
+                    old.getUnitPrice()
+            ));
+            itemsLiveData.setValue(next);
             calculateTotals();
         }
     }
