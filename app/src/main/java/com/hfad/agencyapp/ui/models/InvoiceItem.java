@@ -8,12 +8,18 @@ public class InvoiceItem {
     private String productName;
     private int quantity;
     private double unitPrice;
+    private double discountPercent;
 
     public InvoiceItem(String productId, String productName, int quantity, double unitPrice) {
+        this(productId, productName, quantity, unitPrice, 0.0);
+    }
+
+    public InvoiceItem(String productId, String productName, int quantity, double unitPrice, double discountPercent) {
         this.productId = productId;
         this.productName = productName;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
+        this.discountPercent = Math.max(0, discountPercent);
     }
 
     // Getters & Setters
@@ -38,7 +44,7 @@ public class InvoiceItem {
     }
 
     public void setQuantity(int quantity) {
-        this.quantity = Math.max(1, quantity); // Ensure quantity is at least 1
+        this.quantity = Math.max(1, quantity);
     }
 
     public double getUnitPrice() {
@@ -49,8 +55,23 @@ public class InvoiceItem {
         this.unitPrice = unitPrice;
     }
 
+    public double getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(double discountPercent) {
+        this.discountPercent = Math.max(0, discountPercent);
+    }
+
+    public double getDiscount() {
+        double subtotal = quantity * unitPrice;
+        return (subtotal * discountPercent) / 100.0;
+    }
+
     public double getLineTotal() {
-        return quantity * unitPrice;
+        double subtotal = quantity * unitPrice;
+        double discount = (subtotal * discountPercent) / 100.0;
+        return Math.max(0, subtotal - discount);
     }
 }
 

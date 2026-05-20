@@ -76,6 +76,13 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
      * Add a new item to the invoice.
      */
     public void addItem(String productId, String productName, double unitPrice) {
+        addItem(productId, productName, unitPrice, 0.0);
+    }
+
+    /**
+     * Add a new item to the invoice with discount percentage.
+     */
+    public void addItem(String productId, String productName, double unitPrice, double discountPercent) {
         List<InvoiceItem> current = itemsLiveData.getValue();
         List<InvoiceItem> next = current != null ? new ArrayList<>(current) : new ArrayList<>();
 
@@ -95,10 +102,11 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
                     existing.getProductId(),
                     existing.getProductName(),
                     existing.getQuantity() + 1,
-                    existing.getUnitPrice()
+                    existing.getUnitPrice(),
+                    existing.getDiscountPercent()
             ));
         } else {
-            next.add(new InvoiceItem(productId, productName, 1, unitPrice));
+            next.add(new InvoiceItem(productId, productName, 1, unitPrice, discountPercent));
         }
 
         itemsLiveData.setValue(next);
@@ -130,7 +138,28 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
                     old.getProductId(),
                     old.getProductName(),
                     newQuantity,
-                    old.getUnitPrice()
+                    old.getUnitPrice(),
+                    old.getDiscountPercent()
+            ));
+            itemsLiveData.setValue(next);
+            calculateTotals();
+        }
+    }
+
+    /**
+     * Update the discount percentage of an item.
+     */
+    public void updateDiscount(int position, double newDiscountPercent) {
+        List<InvoiceItem> current = itemsLiveData.getValue();
+        if (current != null && position >= 0 && position < current.size()) {
+            List<InvoiceItem> next = new ArrayList<>(current);
+            InvoiceItem old = next.get(position);
+            next.set(position, new InvoiceItem(
+                    old.getProductId(),
+                    old.getProductName(),
+                    old.getQuantity(),
+                    old.getUnitPrice(),
+                    newDiscountPercent
             ));
             itemsLiveData.setValue(next);
             calculateTotals();
@@ -143,18 +172,20 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
     private void calculateTotals() {
         List<InvoiceItem> items = itemsLiveData.getValue();
         double subtotal = 0.0;
+        double totalDiscount = 0.0;
         
         if (items != null) {
             for (InvoiceItem item : items) {
-                subtotal += item.getLineTotal();
+                subtotal += item.getQuantity() * item.getUnitPrice();
+                totalDiscount += item.getDiscount();
             }
         }
         
-        double discount = discountLiveData.getValue() != null ? discountLiveData.getValue() : 0.0;
-        double total = subtotal - discount;
+        double total = subtotal - totalDiscount;
         
         subtotalLiveData.setValue(subtotal);
-        totalLiveData.setValue(Math.max(0, total)); // Ensure total is not negative
+        discountLiveData.setValue(totalDiscount);
+        totalLiveData.setValue(Math.max(0, total));
     }
 
     // ===== Customer Management =====

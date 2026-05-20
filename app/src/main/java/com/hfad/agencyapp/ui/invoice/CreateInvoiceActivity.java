@@ -281,7 +281,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                     .setTitle("Add Product")
                     .setItems(labels, (dialog, which) -> {
                         Product selected = list.get(which);
-                        viewModel.addItem(String.valueOf(selected.id), selected.name, selected.sellingPrice);
+                        viewModel.addItem(String.valueOf(selected.id), selected.name, selected.sellingPrice, selected.discountPercent);
                         Snackbar.make(binding.getRoot(), selected.name + " added", Snackbar.LENGTH_SHORT).show();
                     })
                     .show();

@@ -70,7 +70,7 @@ public class InvoiceItemsAdapter extends ListAdapter<InvoiceItem, InvoiceItemsAd
             binding.tvUnitPrice.setText("Rs. " + currencyFormat.format(item.getUnitPrice()) + 
                     " × " + item.getQuantity());
 
-            // Line Total
+            // Line Total (with discount applied)
             binding.tvLineTotal.setText("Rs. " + currencyFormat.format(item.getLineTotal()));
 
             // Minus Button
@@ -105,7 +105,8 @@ public class InvoiceItemsAdapter extends ListAdapter<InvoiceItem, InvoiceItemsAd
         public boolean areContentsTheSame(@NonNull InvoiceItem oldItem, @NonNull InvoiceItem newItem) {
             return oldItem.getProductId().equals(newItem.getProductId()) &&
                     oldItem.getQuantity() == newItem.getQuantity() &&
-                    Double.compare(oldItem.getUnitPrice(), newItem.getUnitPrice()) == 0;
+                    Double.compare(oldItem.getUnitPrice(), newItem.getUnitPrice()) == 0 &&
+                    Double.compare(oldItem.getDiscountPercent(), newItem.getDiscountPercent()) == 0;
         }
     }
 }
