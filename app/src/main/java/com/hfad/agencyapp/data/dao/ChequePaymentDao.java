@@ -21,6 +21,9 @@ public interface ChequePaymentDao {
     @Delete
     int delete(ChequePayment chequePayment);
 
+    @Query("DELETE FROM cheque_payments WHERE paymentId = :paymentId")
+    void deleteByPaymentId(long paymentId);
+
     @Query("SELECT * FROM cheque_payments WHERE paymentId = :paymentId LIMIT 1")
     ChequePayment getByPaymentId(long paymentId);
 

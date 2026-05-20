@@ -5,6 +5,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 import androidx.room.Delete;
+import androidx.lifecycle.LiveData;
 
 import com.hfad.agencyapp.data.entities.Customer;
 
@@ -22,7 +23,7 @@ public interface CustomerDao {
     int delete(Customer customer);
 
     @Query("SELECT * FROM customers ORDER BY name ASC")
-    List<Customer> getAll();
+    LiveData<List<Customer>> getAll();
 
     @Query("SELECT * FROM customers WHERE id = :id LIMIT 1")
     Customer getById(long id);

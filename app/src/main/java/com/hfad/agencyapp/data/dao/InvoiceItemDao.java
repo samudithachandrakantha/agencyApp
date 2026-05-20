@@ -5,6 +5,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 import androidx.room.Delete;
+import androidx.lifecycle.LiveData;
 
 import com.hfad.agencyapp.data.entities.InvoiceItem;
 
@@ -22,7 +23,10 @@ public interface InvoiceItemDao {
     int delete(InvoiceItem item);
 
     @Query("SELECT * FROM invoice_items WHERE invoiceId = :invoiceId ORDER BY id ASC")
-    List<InvoiceItem> getByInvoiceId(long invoiceId);
+    LiveData<List<InvoiceItem>> getByInvoiceId(long invoiceId);
+
+    @Query("SELECT * FROM invoice_items WHERE invoiceId = :invoiceId ORDER BY id ASC")
+    List<InvoiceItem> getByInvoiceIdOnce(long invoiceId);
 
     @Query("SELECT * FROM invoice_items WHERE id = :id LIMIT 1")
     InvoiceItem getById(long id);

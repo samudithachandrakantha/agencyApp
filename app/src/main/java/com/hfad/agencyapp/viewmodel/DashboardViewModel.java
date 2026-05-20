@@ -11,9 +11,12 @@ import com.hfad.agencyapp.data.Repository;
 import com.hfad.agencyapp.data.entities.Category;
 import com.hfad.agencyapp.data.entities.Product;
 import com.hfad.agencyapp.data.entities.Invoice;
+import com.hfad.agencyapp.data.entities.InvoiceItem;
 import com.hfad.agencyapp.data.entities.Customer;
 
 import java.util.List;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class DashboardViewModel extends AndroidViewModel {
 
@@ -22,6 +25,8 @@ public class DashboardViewModel extends AndroidViewModel {
     public final LiveData<List<Category>> categories;
     public final LiveData<List<Invoice>> invoices;
     public final LiveData<List<Customer>> customers;
+    public final LiveData<Double> todaySales;
+    public final LiveData<Integer> todayInvoiceCount;
     public final MutableLiveData<Integer> loadingCount = new MutableLiveData<>(0);
 
     public DashboardViewModel(@NonNull Application application) {
@@ -31,11 +36,34 @@ public class DashboardViewModel extends AndroidViewModel {
         categories = repository.getAllCategories();
         invoices = repository.getAllInvoices();
         customers = repository.getAllCustomers();
+        long[] dayBounds = getTodayBounds();
+        todaySales = repository.getTodaySales(dayBounds[0], dayBounds[1]);
+        todayInvoiceCount = repository.getTodayInvoiceCount(dayBounds[0], dayBounds[1]);
         loadData();
+    }
+
+    public LiveData<Invoice> getInvoiceByIdLive(long id) {
+        return repository.getInvoiceById(id);
+    }
+
+    public LiveData<List<InvoiceItem>> getInvoiceItemsLive(long invoiceId) {
+        return repository.getInvoiceItems(invoiceId);
     }
 
     public void loadData() {
         // Data auto-loads via LiveData from Repository
+    }
+
+    private long[] getTodayBounds() {
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        long startOfDay = calendar.getTimeInMillis();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        long endOfDay = calendar.getTimeInMillis();
+        return new long[]{startOfDay, endOfDay};
     }
 
     public void insertProduct(String name, String sku, long categoryId, double price, int stock) {
@@ -57,7 +85,6 @@ public class DashboardViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        repository.shutdown();
     }
 }
 

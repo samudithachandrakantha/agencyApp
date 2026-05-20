@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.hfad.agencyapp.data.entities.Category;
@@ -26,6 +25,8 @@ public class Repository {
     private final AppDatabase db;
     private final FirebaseFirestore firestore;
     private final ExecutorService executor;
+    // Toggle to enable/disable remote Firestore sync (useful for local development/emulator)
+    private static final boolean REMOTE_SYNC_ENABLED = false;
 
     private Repository(Context context) {
         db = AppDatabase.getInstance(context);
@@ -54,9 +55,7 @@ public class Repository {
     }
 
     public LiveData<List<Category>> getAllCategories() {
-        MutableLiveData<List<Category>> result = new MutableLiveData<>();
-        executor.execute(() -> result.postValue(db.categoryDao().getAll()));
-        return result;
+        return db.categoryDao().getAll();
     }
 
     // Product operations
@@ -82,9 +81,7 @@ public class Repository {
     }
 
     public LiveData<List<Customer>> getAllCustomers() {
-        MutableLiveData<List<Customer>> result = new MutableLiveData<>();
-        executor.execute(() -> result.postValue(db.customerDao().getAll()));
-        return result;
+        return db.customerDao().getAll();
     }
 
     // Invoice operations
@@ -96,16 +93,75 @@ public class Repository {
         });
     }
 
+    public void updateInvoice(Invoice invoice) {
+        executor.execute(() -> {
+            db.invoiceDao().update(invoice);
+            syncToFirestore("invoices", String.valueOf(invoice.id), invoice);
+        });
+    }
+
+    public void deleteInvoiceCascade(long invoiceId) {
+        executor.execute(() -> {
+            // Restore stock levels from invoice items before deleting
+            List<InvoiceItem> items = db.invoiceItemDao().getByInvoiceIdOnce(invoiceId);
+            if (items != null) {
+                for (InvoiceItem item : items) {
+                    com.hfad.agencyapp.data.entities.Product p = db.productDao().getById(item.productId);
+                    if (p != null) {
+                        p.stock = p.stock + item.quantity;
+                        db.productDao().update(p);
+                    }
+                }
+            }
+
+            List<Payment> payments = db.paymentDao().getByInvoiceIdOnce(invoiceId);
+            for (Payment payment : payments) {
+                db.chequePaymentDao().deleteByPaymentId(payment.id);
+            }
+            db.paymentDao().deleteByInvoiceId(invoiceId);
+            db.invoiceItemDao().deleteByInvoiceId(invoiceId);
+            db.invoiceDao().deleteById(invoiceId);
+            syncToFirestore("invoices", String.valueOf(invoiceId), null);
+        });
+    }
+
+    public void deleteInvoiceChildren(long invoiceId) {
+        executor.execute(() -> {
+            // Restore stock levels from invoice items before deleting children
+            List<InvoiceItem> items = db.invoiceItemDao().getByInvoiceIdOnce(invoiceId);
+            if (items != null) {
+                for (InvoiceItem item : items) {
+                    com.hfad.agencyapp.data.entities.Product p = db.productDao().getById(item.productId);
+                    if (p != null) {
+                        p.stock = p.stock + item.quantity;
+                        db.productDao().update(p);
+                    }
+                }
+            }
+
+            List<Payment> payments = db.paymentDao().getByInvoiceIdOnce(invoiceId);
+            for (Payment payment : payments) {
+                db.chequePaymentDao().deleteByPaymentId(payment.id);
+            }
+            db.paymentDao().deleteByInvoiceId(invoiceId);
+            db.invoiceItemDao().deleteByInvoiceId(invoiceId);
+        });
+    }
+
     public LiveData<List<Invoice>> getAllInvoices() {
-        MutableLiveData<List<Invoice>> result = new MutableLiveData<>();
-        executor.execute(() -> result.postValue(db.invoiceDao().getAll()));
-        return result;
+        return db.invoiceDao().getAll();
+    }
+
+    public LiveData<Double> getTodaySales(long startOfDay, long endOfDay) {
+        return db.invoiceDao().getTodaySales(startOfDay, endOfDay);
+    }
+
+    public LiveData<Integer> getTodayInvoiceCount(long startOfDay, long endOfDay) {
+        return db.invoiceDao().getTodayInvoiceCount(startOfDay, endOfDay);
     }
 
     public LiveData<Invoice> getInvoiceById(long id) {
-        MutableLiveData<Invoice> result = new MutableLiveData<>();
-        executor.execute(() -> result.postValue(db.invoiceDao().getById(id)));
-        return result;
+        return db.invoiceDao().getById(id);
     }
 
     // Invoice Item operations
@@ -113,14 +169,19 @@ public class Repository {
         executor.execute(() -> {
             long id = db.invoiceItemDao().insert(item);
             item.id = id;
+            // Decrease stock for the product
+            com.hfad.agencyapp.data.entities.Product p = db.productDao().getById(item.productId);
+            if (p != null) {
+                int newStock = p.stock - item.quantity;
+                p.stock = Math.max(0, newStock);
+                db.productDao().update(p);
+            }
             syncToFirestore("invoiceItems", String.valueOf(id), item);
         });
     }
 
     public LiveData<List<InvoiceItem>> getInvoiceItems(long invoiceId) {
-        MutableLiveData<List<InvoiceItem>> result = new MutableLiveData<>();
-        executor.execute(() -> result.postValue(db.invoiceItemDao().getByInvoiceId(invoiceId)));
-        return result;
+        return db.invoiceItemDao().getByInvoiceId(invoiceId);
     }
 
     // Payment operations
@@ -133,9 +194,7 @@ public class Repository {
     }
 
     public LiveData<List<Payment>> getPaymentsByInvoice(long invoiceId) {
-        MutableLiveData<List<Payment>> result = new MutableLiveData<>();
-        executor.execute(() -> result.postValue(db.paymentDao().getByInvoiceId(invoiceId)));
-        return result;
+        return db.paymentDao().getByInvoiceId(invoiceId);
     }
 
     // Cheque Payment operations
@@ -149,6 +208,10 @@ public class Repository {
 
     // Firebase Sync
     private void syncToFirestore(String collection, String documentId, Object data) {
+        if (!REMOTE_SYNC_ENABLED) {
+            Log.d(TAG, "Remote sync disabled; skipping sync for: " + collection + "/" + documentId);
+            return;
+        }
         firestore.collection(collection).document(documentId)
                 .set(data)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Synced to Firestore: " + collection + "/" + documentId))

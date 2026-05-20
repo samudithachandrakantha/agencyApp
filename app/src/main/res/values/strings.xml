@@ -73,6 +73,13 @@
     <string name="error_stock_level_required">Stock level is required</string>
     <string name="hint_buy_qty_for_free_optional">Buy quantity for free issue (optional)</string>
     <string name="hint_free_issue_qty">Free issue units allowed</string>
+    <string name="invoice_preview_title">Invoice Preview</string>
+    <string name="invoice_items_count">%1$d items</string>
+    <string name="unknown_value">Unknown</string>
+    <string name="delete_invoice_title">Delete Invoice</string>
+    <string name="delete_invoice_message">This will permanently delete the invoice and all linked items and payments.</string>
+    <string name="invoice_deleted">Invoice deleted</string>
+    <string name="delete">Delete</string>
     <string name="error_product_name_required">Product name is required</string>
     <string name="error_cost_price_required">Cost price is required</string>
     <string name="error_selling_price_required">Selling price is required</string>

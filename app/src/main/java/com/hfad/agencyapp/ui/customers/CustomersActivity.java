@@ -99,6 +99,14 @@ public class CustomersActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (viewModel != null) {
+            viewModel.refresh();
+        }
+    }
+
     private void showContextMenu(Customer c, View anchor) {
         PopupMenu popup = new PopupMenu(this, anchor);
         popup.getMenu().add("Edit");

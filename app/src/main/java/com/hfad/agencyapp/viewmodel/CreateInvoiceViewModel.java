@@ -6,9 +6,12 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.hfad.agencyapp.data.Repository;
+import com.hfad.agencyapp.data.entities.Invoice;
+import com.hfad.agencyapp.data.entities.InvoiceItem;
+import com.hfad.agencyapp.data.entities.Payment;
+import com.hfad.agencyapp.data.entities.ChequePayment;
 import com.hfad.agencyapp.ui.models.ChequeDetails;
 import com.hfad.agencyapp.ui.models.Customer;
-import com.hfad.agencyapp.ui.models.InvoiceItem;
 import com.hfad.agencyapp.ui.models.PaymentType;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +22,10 @@ import java.util.List;
  */
 public class CreateInvoiceViewModel extends AndroidViewModel {
 
+    private final Repository repository;
+    
     // ...existing LiveData fields...
-    private final MutableLiveData<List<InvoiceItem>> itemsLiveData = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<com.hfad.agencyapp.ui.models.InvoiceItem>> itemsLiveData = new MutableLiveData<>(new ArrayList<>());
     
     // LiveData for financial summaries
     private final MutableLiveData<Double> subtotalLiveData = new MutableLiveData<>(0.0);
@@ -38,11 +43,12 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
 
     public CreateInvoiceViewModel(@NonNull Application application) {
         super(application);
+        this.repository = Repository.getInstance(application);
     }
 
     // ===== Getters for LiveData =====
     
-    public LiveData<List<InvoiceItem>> getItems() {
+    public LiveData<List<com.hfad.agencyapp.ui.models.InvoiceItem>> getItems() {
         return itemsLiveData;
     }
 
@@ -70,6 +76,11 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         return chequeDetailsLiveData;
     }
 
+    public void setItems(List<com.hfad.agencyapp.ui.models.InvoiceItem> items) {
+        itemsLiveData.setValue(items != null ? new ArrayList<>(items) : new ArrayList<>());
+        calculateTotals();
+    }
+
     // ===== Item Management Methods =====
 
     /**
@@ -83,13 +94,13 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
      * Add a new item to the invoice with discount percentage.
      */
     public void addItem(String productId, String productName, double unitPrice, double discountPercent) {
-        List<InvoiceItem> current = itemsLiveData.getValue();
-        List<InvoiceItem> next = current != null ? new ArrayList<>(current) : new ArrayList<>();
+        List<com.hfad.agencyapp.ui.models.InvoiceItem> current = itemsLiveData.getValue();
+        List<com.hfad.agencyapp.ui.models.InvoiceItem> next = current != null ? new ArrayList<>(current) : new ArrayList<>();
 
         // If product already exists in invoice, increase quantity instead of duplicating row.
         int existingIndex = -1;
         for (int i = 0; i < next.size(); i++) {
-            InvoiceItem row = next.get(i);
+            com.hfad.agencyapp.ui.models.InvoiceItem row = next.get(i);
             if (row.getProductId() != null && row.getProductId().equals(productId)) {
                 existingIndex = i;
                 break;
@@ -97,8 +108,8 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         }
 
         if (existingIndex >= 0) {
-            InvoiceItem existing = next.get(existingIndex);
-            next.set(existingIndex, new InvoiceItem(
+            com.hfad.agencyapp.ui.models.InvoiceItem existing = next.get(existingIndex);
+            next.set(existingIndex, new com.hfad.agencyapp.ui.models.InvoiceItem(
                     existing.getProductId(),
                     existing.getProductName(),
                     existing.getQuantity() + 1,
@@ -106,7 +117,7 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
                     existing.getDiscountPercent()
             ));
         } else {
-            next.add(new InvoiceItem(productId, productName, 1, unitPrice, discountPercent));
+            next.add(new com.hfad.agencyapp.ui.models.InvoiceItem(productId, productName, 1, unitPrice, discountPercent));
         }
 
         itemsLiveData.setValue(next);
@@ -117,9 +128,9 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
      * Remove an item from the invoice by index.
      */
     public void removeItem(int position) {
-        List<InvoiceItem> current = itemsLiveData.getValue();
+        List<com.hfad.agencyapp.ui.models.InvoiceItem> current = itemsLiveData.getValue();
         if (current != null && position >= 0 && position < current.size()) {
-            List<InvoiceItem> next = new ArrayList<>(current);
+            List<com.hfad.agencyapp.ui.models.InvoiceItem> next = new ArrayList<>(current);
             next.remove(position);
             itemsLiveData.setValue(next);
             calculateTotals();
@@ -130,11 +141,11 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
      * Update the quantity of an item.
      */
     public void updateQuantity(int position, int newQuantity) {
-        List<InvoiceItem> current = itemsLiveData.getValue();
+        List<com.hfad.agencyapp.ui.models.InvoiceItem> current = itemsLiveData.getValue();
         if (current != null && position >= 0 && position < current.size()) {
-            List<InvoiceItem> next = new ArrayList<>(current);
-            InvoiceItem old = next.get(position);
-            next.set(position, new InvoiceItem(
+            List<com.hfad.agencyapp.ui.models.InvoiceItem> next = new ArrayList<>(current);
+            com.hfad.agencyapp.ui.models.InvoiceItem old = next.get(position);
+            next.set(position, new com.hfad.agencyapp.ui.models.InvoiceItem(
                     old.getProductId(),
                     old.getProductName(),
                     newQuantity,
@@ -150,11 +161,11 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
      * Update the discount percentage of an item.
      */
     public void updateDiscount(int position, double newDiscountPercent) {
-        List<InvoiceItem> current = itemsLiveData.getValue();
+        List<com.hfad.agencyapp.ui.models.InvoiceItem> current = itemsLiveData.getValue();
         if (current != null && position >= 0 && position < current.size()) {
-            List<InvoiceItem> next = new ArrayList<>(current);
-            InvoiceItem old = next.get(position);
-            next.set(position, new InvoiceItem(
+            List<com.hfad.agencyapp.ui.models.InvoiceItem> next = new ArrayList<>(current);
+            com.hfad.agencyapp.ui.models.InvoiceItem old = next.get(position);
+            next.set(position, new com.hfad.agencyapp.ui.models.InvoiceItem(
                     old.getProductId(),
                     old.getProductName(),
                     old.getQuantity(),
@@ -170,12 +181,12 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
      * Calculate subtotal, discount, and total.
      */
     private void calculateTotals() {
-        List<InvoiceItem> items = itemsLiveData.getValue();
+        List<com.hfad.agencyapp.ui.models.InvoiceItem> items = itemsLiveData.getValue();
         double subtotal = 0.0;
         double totalDiscount = 0.0;
         
         if (items != null) {
-            for (InvoiceItem item : items) {
+            for (com.hfad.agencyapp.ui.models.InvoiceItem item : items) {
                 subtotal += item.getQuantity() * item.getUnitPrice();
                 totalDiscount += item.getDiscount();
             }
@@ -254,7 +265,7 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         }
 
         // Check at least one item
-        List<InvoiceItem> items = itemsLiveData.getValue();
+        List<com.hfad.agencyapp.ui.models.InvoiceItem> items = itemsLiveData.getValue();
         if (items == null || items.isEmpty()) {
             return "At least one item is required";
         }
@@ -271,16 +282,102 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
     }
 
     /**
-     * Save invoice (placeholder for repository call).
+     * Save invoice to database with all items and payment information.
      */
     public void saveInvoice() {
+        saveInvoice(null, null);
+    }
+
+    public void saveInvoice(Long existingInvoiceId) {
+        saveInvoice(existingInvoiceId, null);
+    }
+
+    public void saveInvoice(Long existingInvoiceId, String existingInvoiceNumber) {
         String validation = validateInvoice();
         if (!validation.isEmpty()) {
             // Return error - handled in Activity
             return;
         }
-        // Call repository to save invoice in production
-        // repository.saveInvoice(...)
+
+        // Get invoice data from current state
+        Customer customer = selectedCustomerLiveData.getValue();
+        List<com.hfad.agencyapp.ui.models.InvoiceItem> uiItems = itemsLiveData.getValue();
+        Double total = totalLiveData.getValue();
+        PaymentType paymentType = paymentTypeLiveData.getValue();
+        ChequeDetails chequeDetails = chequeDetailsLiveData.getValue();
+
+        if (customer == null || uiItems == null || uiItems.isEmpty() || total == null) {
+            return;
+        }
+
+        long timestamp = System.currentTimeMillis();
+        String invoiceNumber = existingInvoiceNumber != null && !existingInvoiceNumber.isEmpty()
+            ? existingInvoiceNumber
+            : "INV-" + (timestamp / 1000);
+
+        // Try to parse customer ID as long, otherwise use 0
+        long customerId = 0;
+        try {
+            customerId = Long.parseLong(customer.getId());
+        } catch (NumberFormatException | NullPointerException e) {
+            // If customer ID is a UUID string, leave customerId as 0
+            // The customerName will be used for display instead
+        }
+
+        // Get customer name/business name
+        String customerName = customer.getBusinessName() != null ? customer.getBusinessName() : customer.getContactPerson();
+
+        // Create Invoice entity
+        Invoice invoice = new Invoice(
+                customerId,
+                customerName,
+                invoiceNumber,
+                timestamp,
+                total,
+                0,  // paidAmount - will be updated when payment is made
+                "",  // note
+                "PENDING",  // status
+                paymentType != null ? paymentType.name() : "CASH"
+        );
+
+        if (existingInvoiceId != null && existingInvoiceId > 0) {
+            invoice.id = existingInvoiceId;
+            repository.updateInvoice(invoice);
+            repository.deleteInvoiceChildren(existingInvoiceId);
+        } else {
+            repository.insertInvoice(invoice);
+        }
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(existingInvoiceId != null && existingInvoiceId > 0 ? 300 : 500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            for (com.hfad.agencyapp.ui.models.InvoiceItem uiItem : uiItems) {
+                double totalPrice = uiItem.getQuantity() * uiItem.getUnitPrice() - uiItem.getDiscount();
+                InvoiceItem dbItem = new InvoiceItem(
+                        invoice.id,
+                        Long.parseLong(uiItem.getProductId()),
+                        uiItem.getQuantity(),
+                        uiItem.getUnitPrice(),
+                        totalPrice
+                );
+                repository.insertInvoiceItem(dbItem);
+            }
+
+            Payment payment = new Payment(
+                    invoice.id,
+                    total,
+                    timestamp,
+                    paymentType != null ? paymentType.name() : "CASH"
+            );
+            repository.insertPayment(payment);
+        }).start();
+
+        // Clear invoice for next entry
+        clearInvoice();
     }
 
     /**
