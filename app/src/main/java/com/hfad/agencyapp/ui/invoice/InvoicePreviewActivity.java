@@ -68,7 +68,6 @@ public class InvoicePreviewActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(null);
             getSupportActionBar().setTitle(getString(R.string.invoice_preview_title));
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
@@ -148,24 +147,35 @@ public class InvoicePreviewActivity extends AppCompatActivity {
         binding.tvBalanceDue.setText(getString(R.string.amount_format, currencyFormat.format(balance)));
 
         double subtotal = 0.0;
+        double discount = 0.0;
         List<InvoicePreviewLineItem> previewItems = new ArrayList<>();
         for (InvoiceItem item : invoiceItems) {
-            double lineTotal = item.totalPrice > 0 ? item.totalPrice : item.quantity * item.unitPrice;
-            subtotal += lineTotal;
+            double lineSubtotal = item.quantity * item.unitPrice;
+            double lineTotal = item.totalPrice > 0 ? item.totalPrice : lineSubtotal;
+            double lineDiscount = Math.max(0.0, lineSubtotal - lineTotal);
+            subtotal += lineSubtotal;
+            discount += lineDiscount;
             String productName = productNames.containsKey(item.productId)
                     ? productNames.get(item.productId)
                     : getString(R.string.unknown_value);
+                String freeIssueText = "";
+                if (item.freeIssueUnits > 0) {
+                freeIssueText = "Free issue: +" + item.freeIssueUnits + " (Buy " + item.freeIssueBuyQty + " get " + item.freeIssueBonusQty + " free)";
+                }
             previewItems.add(new InvoicePreviewLineItem(
                     productName,
                     "#" + item.productId,
                     item.quantity,
                     item.unitPrice,
-                    lineTotal
+                    lineTotal,
+                    freeIssueText
             ));
         }
         adapter.submitList(previewItems);
         binding.tvItemCount.setText(getString(R.string.invoice_items_count, previewItems.size()));
         binding.tvSubtotal.setText(getString(R.string.amount_format, currencyFormat.format(subtotal)));
+        binding.tvDiscount.setText(getString(R.string.amount_format, currencyFormat.format(discount)));
+        binding.tvTotalAmount.setText(getString(R.string.amount_format, currencyFormat.format(Math.max(0.0, subtotal - discount))));
 
         if (invoice.note != null && !invoice.note.trim().isEmpty()) {
             binding.noteCard.setVisibility(View.VISIBLE);

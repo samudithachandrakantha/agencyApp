@@ -1,12 +1,18 @@
 package com.hfad.agencyapp.ui.invoice;
 
+import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.databinding.ActivityInvoicesBinding;
+import com.hfad.agencyapp.ui.customers.CustomersActivity;
 import com.hfad.agencyapp.ui.adapters.RecentInvoiceAdapter;
+import com.hfad.agencyapp.ui.insights.InsightsActivity;
+import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.DashboardViewModel;
 
 import java.util.ArrayList;
@@ -27,7 +33,6 @@ public class InvoicesActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(null);
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
 
@@ -36,6 +41,30 @@ public class InvoicesActivity extends AppCompatActivity {
         adapter = new RecentInvoiceAdapter();
         binding.recyclerAllInvoices.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerAllInvoices.setAdapter(adapter);
+
+        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_invoices);
+        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
+                finish();
+                return true;
+            }
+            if (id == R.id.nav_invoices) {
+                return true;
+            }
+            if (id == R.id.nav_customers) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_CUSTOMERS));
+                finish();
+                return true;
+            }
+            if (id == R.id.nav_insights) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
+                finish();
+                return true;
+            }
+            return false;
+        });
 
         viewModel.invoices.observe(this, invoices -> {
             java.util.List<com.hfad.agencyapp.ui.models.RecentInvoiceUiModel> ui = new ArrayList<>();

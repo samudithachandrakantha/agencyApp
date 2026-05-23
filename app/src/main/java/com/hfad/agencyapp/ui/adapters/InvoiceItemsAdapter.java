@@ -70,6 +70,14 @@ public class InvoiceItemsAdapter extends ListAdapter<InvoiceItem, InvoiceItemsAd
             binding.tvUnitPrice.setText("Rs. " + currencyFormat.format(item.getUnitPrice()) + 
                     " × " + item.getQuantity());
 
+            String freeIssueSummary = item.getFreeIssueSummary();
+            if (!freeIssueSummary.isEmpty()) {
+                binding.tvFreeIssueInfo.setVisibility(android.view.View.VISIBLE);
+                binding.tvFreeIssueInfo.setText(freeIssueSummary);
+            } else {
+                binding.tvFreeIssueInfo.setVisibility(android.view.View.GONE);
+            }
+
             // Line Total (with discount applied)
             binding.tvLineTotal.setText("Rs. " + currencyFormat.format(item.getLineTotal()));
 
@@ -106,7 +114,9 @@ public class InvoiceItemsAdapter extends ListAdapter<InvoiceItem, InvoiceItemsAd
             return oldItem.getProductId().equals(newItem.getProductId()) &&
                     oldItem.getQuantity() == newItem.getQuantity() &&
                     Double.compare(oldItem.getUnitPrice(), newItem.getUnitPrice()) == 0 &&
-                    Double.compare(oldItem.getDiscountPercent(), newItem.getDiscountPercent()) == 0;
+                    Double.compare(oldItem.getDiscountPercent(), newItem.getDiscountPercent()) == 0 &&
+                    oldItem.getFreeIssueBuyQty() == newItem.getFreeIssueBuyQty() &&
+                    oldItem.getFreeIssueBonusQty() == newItem.getFreeIssueBonusQty();
         }
     }
 }

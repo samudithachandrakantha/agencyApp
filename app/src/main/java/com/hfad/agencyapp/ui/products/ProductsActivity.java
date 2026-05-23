@@ -21,7 +21,12 @@ import com.google.android.material.snackbar.Snackbar;
 import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.data.entities.Product;
 import com.hfad.agencyapp.databinding.ActivityProductsBinding;
+import com.hfad.agencyapp.ui.customers.CustomersActivity;
+import com.hfad.agencyapp.ui.dashboard.DashboardActivity;
 import com.hfad.agencyapp.ui.adapters.ProductAdapter;
+import com.hfad.agencyapp.ui.insights.InsightsActivity;
+import com.hfad.agencyapp.ui.invoice.InvoicesActivity;
+import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.ProductViewModel;
 
 import java.util.HashMap;
@@ -54,6 +59,7 @@ public class ProductsActivity extends AppCompatActivity {
         setupObservers();
         setupSearch();
         setupStockFilters();
+        setupBottomNavigation();
 
         binding.fabAddProduct.setOnClickListener(v -> openAddEditProduct(null));
     }
@@ -124,6 +130,34 @@ public class ProductsActivity extends AppCompatActivity {
                 viewModel.setStockFilter(ProductViewModel.StockFilter.ALL);
             }
             updateChipStyles(checkedIds.get(0));
+        });
+    }
+
+    private void setupBottomNavigation() {
+        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_home);
+        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
+                finish();
+                return true;
+            }
+            if (id == R.id.nav_invoices) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INVOICES));
+                finish();
+                return true;
+            }
+            if (id == R.id.nav_customers) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_CUSTOMERS));
+                finish();
+                return true;
+            }
+            if (id == R.id.nav_insights) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
+                finish();
+                return true;
+            }
+            return false;
         });
     }
 

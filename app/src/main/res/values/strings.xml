@@ -96,6 +96,9 @@
     <string name="product_detail_discount">Discount: %1$.1f%%</string>
     <string name="product_detail_free_issue_none">Free issue: not set</string>
     <string name="product_detail_free_issue_format">Free issue: buy %1$d, get %2$d free</string>
+    <string name="product_detail_sales_history">Sales History</string>
+    <string name="product_detail_sales_empty">No sales recorded yet</string>
+    <string name="product_sale_quantity_value">Qty: %1$d</string>
     <string name="brand_not_set">No brand</string>
     <string name="filter_all">All</string>
     <string name="filter_low_stock">Low Stock</string>

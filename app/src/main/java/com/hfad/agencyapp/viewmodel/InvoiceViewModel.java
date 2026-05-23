@@ -64,7 +64,13 @@ public class InvoiceViewModel extends AndroidViewModel {
     }
 
     public void addInvoiceItem(long invoiceId, long productId, int quantity, double unitPrice, double totalPrice) {
-        InvoiceItem item = new InvoiceItem(invoiceId, productId, quantity, unitPrice, totalPrice);
+        addInvoiceItem(invoiceId, productId, quantity, unitPrice, totalPrice, 0, 0, 0);
+    }
+
+    public void addInvoiceItem(long invoiceId, long productId, int quantity, double unitPrice, double totalPrice,
+                               int freeIssueBuyQty, int freeIssueBonusQty, int freeIssueUnits) {
+        InvoiceItem item = new InvoiceItem(invoiceId, productId, quantity, unitPrice, totalPrice,
+                freeIssueBuyQty, freeIssueBonusQty, freeIssueUnits);
         repository.insertInvoiceItem(item);
     }
 

@@ -48,6 +48,14 @@
             android:text="Subtotal" />
 
         <TextView
+            android:id="@+id/tvPreviewDiscount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            android:text="Discount" />
+
+        <TextView
             android:id="@+id/tvPreviewTotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

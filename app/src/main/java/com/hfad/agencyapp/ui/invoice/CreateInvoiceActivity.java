@@ -44,6 +44,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
     private SimpleDateFormat dateFormat;
     private long editingInvoiceId = -1L;
     private String editingInvoiceNumber;
+    private boolean customerSelectionLocked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +76,6 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(null);
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
     }
@@ -129,11 +129,24 @@ public class CreateInvoiceActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        binding.customerRow.setOnClickListener(v -> openCustomerPicker());
+        binding.customerRow.setOnClickListener(v -> {
+            if (!customerSelectionLocked) {
+                openCustomerPicker();
+            }
+        });
         binding.btnAddItem.setOnClickListener(v -> openProductPicker());
         binding.etChequeDate.setOnClickListener(v -> openDatePicker());
         binding.tilChequeDate.setEndIconOnClickListener(v -> openDatePicker());
         binding.btnSaveInvoice.setOnClickListener(v -> showPreview());
+    }
+
+    private void setCustomerSelectionLocked(boolean locked) {
+        customerSelectionLocked = locked;
+        binding.customerRow.setEnabled(!locked);
+        binding.customerRow.setClickable(!locked);
+        binding.customerRow.setFocusable(!locked);
+        binding.customerRow.setAlpha(locked ? 0.75f : 1.0f);
+        binding.ivChevron.setVisibility(locked ? View.GONE : View.VISIBLE);
     }
 
     private void showPreview() {
@@ -160,6 +173,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         TextView tvInvoiceNumber = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewInvoiceNumber);
         TextView tvItems = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewItems);
         TextView tvSubtotal = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewSubtotal);
+        TextView tvDiscount = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewDiscount);
         TextView tvTotal = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewTotal);
         TextView tvPayment = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewPayment);
 
@@ -171,24 +185,42 @@ public class CreateInvoiceActivity extends AppCompatActivity {
 
         StringBuilder sb = new StringBuilder();
         java.util.List<com.hfad.agencyapp.ui.models.InvoiceItem> items = viewModel.getItems().getValue();
+        double subtotal = 0.0;
+        double totalDiscount = 0.0;
         if (items != null) {
             for (com.hfad.agencyapp.ui.models.InvoiceItem it : items) {
-                double lineTotal = it.getQuantity() * it.getUnitPrice() - it.getDiscount();
+                double lineSubtotal = it.getQuantity() * it.getUnitPrice();
+                double lineDiscount = it.getDiscount();
+                double lineTotal = it.getLineTotal();
+                subtotal += lineSubtotal;
+                totalDiscount += lineDiscount;
                 sb.append(it.getProductName())
-                        .append(" x ")
+                        .append("\nQty: ")
                         .append(it.getQuantity())
-                        .append(" — Rs. ")
+                        .append(" x Rs. ")
                         .append(currencyFormat.format(it.getUnitPrice()))
                         .append(" = Rs. ")
+                        .append(currencyFormat.format(lineSubtotal))
+                        .append("\nDiscount: Rs. ")
+                        .append(currencyFormat.format(lineDiscount))
+                        .append(" (")
+                        .append(currencyFormat.format(it.getDiscountPercent()))
+                        .append("% of Rs. ")
+                        .append(currencyFormat.format(lineSubtotal))
+                        .append(")\nLine total: Rs. ")
                         .append(currencyFormat.format(lineTotal))
                         .append("\n");
+                String freeIssueSummary = it.getFreeIssueSummary();
+                if (!freeIssueSummary.isEmpty()) {
+                    sb.append(freeIssueSummary).append("\n");
+                }
             }
         }
         tvItems.setText(sb.toString());
 
-        Double subtotal = viewModel.getSubtotal().getValue();
         Double total = viewModel.getTotal().getValue();
-        tvSubtotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(subtotal != null ? subtotal : 0.0)));
+        tvSubtotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(subtotal)));
+        tvDiscount.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(totalDiscount)));
         tvTotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(total != null ? total : 0.0)));
 
         tvPayment.setText(viewModel.getPaymentType().getValue().name());
@@ -363,8 +395,19 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                     .setTitle("Add Product")
                     .setItems(labels, (dialog, which) -> {
                         Product selected = list.get(which);
-                        viewModel.addItem(String.valueOf(selected.id), selected.name, selected.sellingPrice, selected.discountPercent);
-                        Snackbar.make(binding.getRoot(), selected.name + " added", Snackbar.LENGTH_SHORT).show();
+                        viewModel.addItem(
+                                String.valueOf(selected.id),
+                                selected.name,
+                                selected.sellingPrice,
+                                selected.discountPercent,
+                                selected.buyQtyForFreeIssue,
+                                selected.freeIssueQty
+                        );
+                        String message = selected.name + " added";
+                        if (selected.buyQtyForFreeIssue > 0 && selected.freeIssueQty > 0) {
+                            message += " • Free issue: buy " + selected.buyQtyForFreeIssue + " get " + selected.freeIssueQty + " free";
+                        }
+                        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
                     })
                     .show();
         } catch (Exception e) {
@@ -418,16 +461,45 @@ public class CreateInvoiceActivity extends AppCompatActivity {
             }
 
             editingInvoiceNumber = invoice.invoiceNumber;
+            setCustomerSelectionLocked(true);
 
-            if (invoice.customerId > 0) {
-                com.hfad.agencyapp.data.CustomerRepository customerRepository = new com.hfad.agencyapp.data.CustomerRepository(this);
-                try {
-                    com.hfad.agencyapp.ui.models.Customer customer = customerRepository.getByIdAsync(String.valueOf(invoice.customerId)).get();
-                    if (customer != null) {
-                        viewModel.setSelectedCustomer(customer);
-                    }
-                } catch (Exception ignored) {
+            com.hfad.agencyapp.data.CustomerRepository customerRepository = new com.hfad.agencyapp.data.CustomerRepository(this);
+            try {
+                com.hfad.agencyapp.ui.models.Customer customer = null;
+
+                if (invoice.customerId > 0) {
+                    customer = customerRepository.getByIdAsync(String.valueOf(invoice.customerId)).get();
                 }
+
+                if (customer == null && invoice.customerName != null && !invoice.customerName.trim().isEmpty()) {
+                    java.util.List<com.hfad.agencyapp.ui.models.Customer> customers = customerRepository.getAllCustomersAsync().get();
+                    if (customers != null) {
+                        String targetName = normalizeCustomerName(invoice.customerName);
+                        for (com.hfad.agencyapp.ui.models.Customer candidate : customers) {
+                            if (candidate == null) {
+                                continue;
+                            }
+
+                            if (matchesInvoiceCustomer(targetName, candidate.getBusinessName())
+                                    || matchesInvoiceCustomer(targetName, candidate.getContactPerson())) {
+                                customer = candidate;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (customer == null) {
+                    customer = new com.hfad.agencyapp.ui.models.Customer(
+                            String.valueOf(invoice.customerId > 0 ? invoice.customerId : 0),
+                            invoice.customerName != null ? invoice.customerName : "",
+                            invoice.customerName != null ? invoice.customerName : "",
+                            ""
+                    );
+                }
+
+                viewModel.setSelectedCustomer(customer);
+            } catch (Exception ignored) {
             }
 
             if (invoice.paymentMethod != null) {
@@ -456,7 +528,9 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                                     productName,
                                     item.quantity,
                                     item.unitPrice,
-                                    0.0
+                                    0.0,
+                                    item.freeIssueBuyQty,
+                                    item.freeIssueBonusQty
                             ));
                         }
                     }
@@ -464,5 +538,19 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                 });
             });
         });
+    }
+
+    private String normalizeCustomerName(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.trim().replaceAll("\\s+", " ").toLowerCase(Locale.US);
+    }
+
+    private boolean matchesInvoiceCustomer(String invoiceName, String customerField) {
+        if (invoiceName.isEmpty() || customerField == null || customerField.trim().isEmpty()) {
+            return false;
+        }
+        return invoiceName.equals(normalizeCustomerName(customerField));
     }
 }
