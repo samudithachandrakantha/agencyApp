@@ -20,7 +20,10 @@ import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.hfad.agencyapp.databinding.ActivityCustomersBinding;
 import com.hfad.agencyapp.ui.adapters.CustomersAdapter;
+import com.hfad.agencyapp.ui.invoice.InvoicesActivity;
+import com.hfad.agencyapp.ui.insights.InsightsActivity;
 import com.hfad.agencyapp.ui.models.Customer;
+import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.CustomerViewModel;
 
 /**
@@ -49,6 +52,7 @@ public class CustomersActivity extends AppCompatActivity {
         setupRecyclerView();
         setupObservers();
         setupListeners();
+        setupBottomNavigation();
     }
 
     private void setupRecyclerView() {
@@ -96,6 +100,32 @@ public class CustomersActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void setupBottomNavigation() {
+        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_customers);
+        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
+                finish();
+                return true;
+            }
+            if (id == R.id.nav_invoices) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INVOICES));
+                finish();
+                return true;
+            }
+            if (id == R.id.nav_customers) {
+                return true;
+            }
+            if (id == R.id.nav_insights) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
+                finish();
+                return true;
+            }
+            return false;
         });
     }
 

@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.hfad.agencyapp.databinding.ActivityLoginBinding;
-import com.hfad.agencyapp.ui.dashboard.DashboardActivity;
+import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.utils.ValidationUtils;
 import com.hfad.agencyapp.viewmodel.AuthViewModel;
 
@@ -30,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Check if already logged in
         if (viewModel.getCurrentUser() != null) {
-            startActivity(new Intent(this, DashboardActivity.class));
+            startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
             finish();
             return;
         }
@@ -43,14 +43,14 @@ public class LoginActivity extends AppCompatActivity {
         binding.btnSignUp.setOnClickListener(v -> {
             // Skip Firebase auth and go directly to dashboard for testing
             Toast.makeText(this, "Entering demo mode...", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, DashboardActivity.class));
+            startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
             finish();
         });
 
         viewModel.userLive.observe(this, user -> {
             binding.progress.setVisibility(View.GONE);
             if (user != null) {
-                startActivity(new Intent(this, DashboardActivity.class));
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
                 finish();
             }
         });
@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         // DEMO MODE: Skip validation and go to dashboard
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Demo Mode: Entering Dashboard...", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, DashboardActivity.class));
+            startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
             finish();
             return;
         }

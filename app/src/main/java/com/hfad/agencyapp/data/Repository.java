@@ -108,7 +108,7 @@ public class Repository {
                 for (InvoiceItem item : items) {
                     com.hfad.agencyapp.data.entities.Product p = db.productDao().getById(item.productId);
                     if (p != null) {
-                        p.stock = p.stock + item.quantity;
+                        p.stock = p.stock + item.quantity + item.freeIssueUnits;
                         db.productDao().update(p);
                     }
                 }
@@ -133,7 +133,7 @@ public class Repository {
                 for (InvoiceItem item : items) {
                     com.hfad.agencyapp.data.entities.Product p = db.productDao().getById(item.productId);
                     if (p != null) {
-                        p.stock = p.stock + item.quantity;
+                        p.stock = p.stock + item.quantity + item.freeIssueUnits;
                         db.productDao().update(p);
                     }
                 }
@@ -172,7 +172,7 @@ public class Repository {
             // Decrease stock for the product
             com.hfad.agencyapp.data.entities.Product p = db.productDao().getById(item.productId);
             if (p != null) {
-                int newStock = p.stock - item.quantity;
+                int newStock = p.stock - item.quantity - item.freeIssueUnits;
                 p.stock = Math.max(0, newStock);
                 db.productDao().update(p);
             }

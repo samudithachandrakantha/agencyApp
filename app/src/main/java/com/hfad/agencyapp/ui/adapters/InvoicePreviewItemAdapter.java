@@ -51,6 +51,7 @@ public class InvoicePreviewItemAdapter extends RecyclerView.Adapter<InvoicePrevi
         private final TextView tvQuantity;
         private final TextView tvUnitPrice;
         private final TextView tvLineTotal;
+        private final TextView tvFreeIssue;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -59,6 +60,7 @@ public class InvoicePreviewItemAdapter extends RecyclerView.Adapter<InvoicePrevi
             tvQuantity = itemView.findViewById(R.id.tv_preview_quantity);
             tvUnitPrice = itemView.findViewById(R.id.tv_preview_unit_price);
             tvLineTotal = itemView.findViewById(R.id.tv_preview_line_total);
+            tvFreeIssue = itemView.findViewById(R.id.tv_preview_free_issue);
         }
 
         void bind(InvoicePreviewLineItem item, DecimalFormat currencyFormat) {
@@ -67,6 +69,12 @@ public class InvoicePreviewItemAdapter extends RecyclerView.Adapter<InvoicePrevi
             tvQuantity.setText("Qty: " + item.quantity);
             tvUnitPrice.setText("Unit: Rs. " + currencyFormat.format(item.unitPrice));
             tvLineTotal.setText("Rs. " + currencyFormat.format(item.lineTotal));
+            if (item.freeIssueText != null && !item.freeIssueText.trim().isEmpty()) {
+                tvFreeIssue.setVisibility(View.VISIBLE);
+                tvFreeIssue.setText(item.freeIssueText);
+            } else {
+                tvFreeIssue.setVisibility(View.GONE);
+            }
         }
     }
 }

@@ -87,13 +87,18 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
      * Add a new item to the invoice.
      */
     public void addItem(String productId, String productName, double unitPrice) {
-        addItem(productId, productName, unitPrice, 0.0);
+        addItem(productId, productName, unitPrice, 0.0, 0, 0);
     }
 
     /**
      * Add a new item to the invoice with discount percentage.
      */
     public void addItem(String productId, String productName, double unitPrice, double discountPercent) {
+        addItem(productId, productName, unitPrice, discountPercent, 0, 0);
+    }
+
+    public void addItem(String productId, String productName, double unitPrice, double discountPercent,
+                        int freeIssueBuyQty, int freeIssueBonusQty) {
         List<com.hfad.agencyapp.ui.models.InvoiceItem> current = itemsLiveData.getValue();
         List<com.hfad.agencyapp.ui.models.InvoiceItem> next = current != null ? new ArrayList<>(current) : new ArrayList<>();
 
@@ -114,10 +119,20 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
                     existing.getProductName(),
                     existing.getQuantity() + 1,
                     existing.getUnitPrice(),
-                    existing.getDiscountPercent()
+                    existing.getDiscountPercent(),
+                    existing.getFreeIssueBuyQty(),
+                    existing.getFreeIssueBonusQty()
             ));
         } else {
-            next.add(new com.hfad.agencyapp.ui.models.InvoiceItem(productId, productName, 1, unitPrice, discountPercent));
+                next.add(new com.hfad.agencyapp.ui.models.InvoiceItem(
+                    productId,
+                    productName,
+                    1,
+                    unitPrice,
+                    discountPercent,
+                    freeIssueBuyQty,
+                    freeIssueBonusQty
+                ));
         }
 
         itemsLiveData.setValue(next);
@@ -150,7 +165,9 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
                     old.getProductName(),
                     newQuantity,
                     old.getUnitPrice(),
-                    old.getDiscountPercent()
+                    old.getDiscountPercent(),
+                    old.getFreeIssueBuyQty(),
+                    old.getFreeIssueBonusQty()
             ));
             itemsLiveData.setValue(next);
             calculateTotals();
@@ -170,7 +187,9 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
                     old.getProductName(),
                     old.getQuantity(),
                     old.getUnitPrice(),
-                    newDiscountPercent
+                    newDiscountPercent,
+                    old.getFreeIssueBuyQty(),
+                    old.getFreeIssueBonusQty()
             ));
             itemsLiveData.setValue(next);
             calculateTotals();
@@ -357,12 +376,16 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
 
             for (com.hfad.agencyapp.ui.models.InvoiceItem uiItem : uiItems) {
                 double totalPrice = uiItem.getQuantity() * uiItem.getUnitPrice() - uiItem.getDiscount();
+                int freeIssueUnits = uiItem.getFreeIssueUnits();
                 InvoiceItem dbItem = new InvoiceItem(
                         invoice.id,
                         Long.parseLong(uiItem.getProductId()),
                         uiItem.getQuantity(),
                         uiItem.getUnitPrice(),
-                        totalPrice
+                    totalPrice,
+                    uiItem.getFreeIssueBuyQty(),
+                    uiItem.getFreeIssueBonusQty(),
+                    freeIssueUnits
                 );
                 repository.insertInvoiceItem(dbItem);
             }

@@ -14,7 +14,9 @@ import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.ui.adapters.RecentInvoiceAdapter;
 import com.hfad.agencyapp.ui.auth.LoginActivity;
 import com.hfad.agencyapp.ui.invoice.CreateInvoiceActivity;
+import com.hfad.agencyapp.ui.insights.InsightsActivity;
 import com.hfad.agencyapp.ui.products.ProductsActivity;
+import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.DashboardViewModel;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -117,18 +119,22 @@ public class DashboardActivity extends AppCompatActivity {
         binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
+                finish();
                 return true;
             }
             if (id == R.id.nav_invoices) {
-                startActivity(new android.content.Intent(DashboardActivity.this, com.hfad.agencyapp.ui.invoice.InvoicesActivity.class));
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INVOICES));
+                finish();
                 return true;
             }
             if (id == R.id.nav_customers) {
-                showFeatureToast("Customers");
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_CUSTOMERS));
+                finish();
                 return true;
             }
-            if (id == R.id.nav_more) {
-                startActivity(new Intent(this, LoginActivity.class));
+            if (id == R.id.nav_insights) {
+                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
                 finish();
                 return true;
             }

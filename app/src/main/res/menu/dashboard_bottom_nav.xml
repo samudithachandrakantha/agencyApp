@@ -13,8 +13,8 @@
         android:icon="@android:drawable/ic_menu_myplaces"
         android:title="Customers" />
     <item
-        android:id="@+id/nav_more"
-        android:icon="@android:drawable/ic_menu_more"
-        android:title="More" />
+        android:id="@+id/nav_insights"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="Insights" />
 </menu>
 

@@ -42,17 +42,35 @@ public class InvoiceGenerator {
         sb.append("Item Details:\n");
         sb.append("----------------------------------------\n");
 
+        double subtotal = 0.0;
+        double total = 0.0;
+
         for (InvoiceItem item : items) {
             Product product = findProductById(products, item.productId);
             String productName = product != null ? product.name : "Unknown";
+            double lineSubtotal = item.quantity * item.unitPrice;
+            double lineTotal = item.totalPrice > 0 ? item.totalPrice : lineSubtotal;
+            double lineDiscount = Math.max(0.0, lineSubtotal - lineTotal);
+            subtotal += lineSubtotal;
+            total += lineTotal;
             sb.append(String.format("%s\n", productName));
-            sb.append(String.format("Qty: %d x %.2f = %.2f\n", item.quantity, item.unitPrice, item.totalPrice));
+            sb.append(String.format("Qty: %d x %.2f = %.2f\n", item.quantity, item.unitPrice, lineSubtotal));
+            sb.append(String.format("Discount: %.2f\n", lineDiscount));
+            sb.append(String.format("Line Total: %.2f\n", lineTotal));
+            if (item.freeIssueUnits > 0) {
+                sb.append(String.format("Free issue: +%d (Buy %d get %d free)\n",
+                        item.freeIssueUnits,
+                        item.freeIssueBuyQty,
+                        item.freeIssueBonusQty));
+            }
         }
 
         sb.append("----------------------------------------\n");
-        sb.append(String.format("Subtotal: %.2f\n", invoice.totalAmount));
+        sb.append(String.format("Subtotal: %.2f\n", subtotal));
+        sb.append(String.format("Discount: %.2f\n", Math.max(0.0, subtotal - total)));
+        sb.append(String.format("Total: %.2f\n", total));
         sb.append(String.format("Paid: %.2f\n", invoice.paidAmount));
-        sb.append(String.format("Outstanding: %.2f\n", invoice.totalAmount - invoice.paidAmount));
+        sb.append(String.format("Outstanding: %.2f\n", total - invoice.paidAmount));
         sb.append("\n");
 
         if (!TextUtils.isEmpty(invoice.note)) {
@@ -79,17 +97,34 @@ public class InvoiceGenerator {
         sb.append("\n");
 
         sb.append("Items:\n");
+        double subtotal = 0.0;
+        double total = 0.0;
         for (InvoiceItem item : items) {
             Product product = findProductById(products, item.productId);
             String productName = product != null ? product.name : "Unknown";
+            double lineSubtotal = item.quantity * item.unitPrice;
+            double lineTotal = item.totalPrice > 0 ? item.totalPrice : lineSubtotal;
+            double lineDiscount = Math.max(0.0, lineSubtotal - lineTotal);
+            subtotal += lineSubtotal;
+            total += lineTotal;
             sb.append(String.format("%-20s %d x %.2f\n", productName, item.quantity, item.unitPrice));
-            sb.append(String.format("                        Total: %.2f\n", item.totalPrice));
+            sb.append(String.format("                        Subtotal: %.2f\n", lineSubtotal));
+            sb.append(String.format("                        Discount: %.2f\n", lineDiscount));
+            sb.append(String.format("                        Total: %.2f\n", lineTotal));
+            if (item.freeIssueUnits > 0) {
+                sb.append(String.format("                        Free: +%d (Buy %d get %d free)\n",
+                        item.freeIssueUnits,
+                        item.freeIssueBuyQty,
+                        item.freeIssueBonusQty));
+            }
         }
 
         sb.append("\n");
-        sb.append(String.format("Total Amount: %.2f\n", invoice.totalAmount));
+        sb.append(String.format("Subtotal: %.2f\n", subtotal));
+        sb.append(String.format("Discount: %.2f\n", Math.max(0.0, subtotal - total)));
+        sb.append(String.format("Total Amount: %.2f\n", total));
         sb.append(String.format("Paid Amount: %.2f\n", invoice.paidAmount));
-        sb.append(String.format("Balance: %.2f\n", invoice.totalAmount - invoice.paidAmount));
+        sb.append(String.format("Balance: %.2f\n", total - invoice.paidAmount));
 
         sb.append("\n");
         sb.append("Thank You!\n");

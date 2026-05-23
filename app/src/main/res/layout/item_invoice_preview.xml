@@ -68,6 +68,18 @@
             app:layout_constraintStart_toEndOf="@id/tv_preview_quantity"
             app:layout_constraintTop_toBottomOf="@id/tv_preview_product_code" />
 
+        <TextView
+            android:id="@+id/tv_preview_free_issue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/navy_900"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_preview_quantity" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

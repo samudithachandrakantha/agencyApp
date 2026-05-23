@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import com.hfad.agencyapp.data.dao.ProductDao;
 import com.hfad.agencyapp.data.entities.Category;
 import com.hfad.agencyapp.data.entities.Product;
+import com.hfad.agencyapp.data.models.ProductSaleRecord;
 
 import java.util.Arrays;
 import java.util.List;
@@ -88,6 +89,10 @@ public class ProductRepository {
 
     public Future<Product> getByIdAsync(final long productId) {
         return executor.submit(() -> productDao.getById(productId));
+    }
+
+    public Future<List<ProductSaleRecord>> getProductSalesHistoryAsync(final long productId) {
+        return executor.submit(() -> db.invoiceItemDao().getSalesByProductId(productId));
     }
 
     public Future<List<Product>> searchAsync(final String query) {

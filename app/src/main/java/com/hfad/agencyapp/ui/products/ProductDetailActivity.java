@@ -5,19 +5,27 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.data.ProductRepository;
 import com.hfad.agencyapp.data.entities.Product;
+import com.hfad.agencyapp.data.models.ProductSaleRecord;
 import com.hfad.agencyapp.databinding.ActivityProductDetailBinding;
+import com.hfad.agencyapp.ui.adapters.ProductSalesAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class ProductDetailActivity extends AppCompatActivity {
 
     private ActivityProductDetailBinding binding;
     private ProductRepository repository;
+    private ProductSalesAdapter salesAdapter;
     private long productId = -1;
     private Product product;
 
@@ -29,12 +37,16 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         productId = getIntent().getLongExtra(ProductsActivity.EXTRA_PRODUCT_ID, -1);
         repository = new ProductRepository(this);
+        salesAdapter = new ProductSalesAdapter();
 
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
+
+        binding.recyclerSalesHistory.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerSalesHistory.setAdapter(salesAdapter);
 
         binding.btnEditProduct.setOnClickListener(v -> openEdit());
     }
@@ -49,11 +61,22 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void loadProduct() {
         new Thread(() -> {
+            Product loadedProduct;
+            List<ProductSaleRecord> salesHistory = new ArrayList<>();
             try {
-                product = repository.getByIdAsync(productId).get();
-            } catch (Exception e) {
-                product = null;
+                Future<Product> productFuture = repository.getByIdAsync(productId);
+                Future<List<ProductSaleRecord>> salesFuture = repository.getProductSalesHistoryAsync(productId);
+                loadedProduct = productFuture.get();
+                List<ProductSaleRecord> loadedSales = salesFuture.get();
+                if (loadedSales != null) {
+                    salesHistory = loadedSales;
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                loadedProduct = null;
             }
+            product = loadedProduct;
+            List<ProductSaleRecord> finalSalesHistory = salesHistory;
+
             if (product == null) {
                 runOnUiThread(() -> {
                     Snackbar.make(binding.getRoot(), "Product not found", Snackbar.LENGTH_SHORT).show();
@@ -64,8 +87,18 @@ public class ProductDetailActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 binding.toolbar.setTitle(product.name);
                 binding.tvCurrentStock.setText(String.valueOf(product.stock));
-                binding.tvTotalSold.setText("0");
-                binding.tvRevenue.setText(String.format(Locale.getDefault(), "Rs. %.2f", 0.0));
+
+                int totalSold = 0;
+                double totalRevenue = 0.0;
+                for (ProductSaleRecord record : finalSalesHistory) {
+                    totalSold += record.quantity;
+                    totalRevenue += record.revenue;
+                }
+                binding.tvTotalSold.setText(String.valueOf(totalSold));
+                binding.tvRevenue.setText(String.format(Locale.getDefault(), "Rs. %.2f", totalRevenue));
+                salesAdapter.submitList(finalSalesHistory);
+                binding.tvSalesEmpty.setVisibility(finalSalesHistory.isEmpty() ? android.view.View.VISIBLE : android.view.View.GONE);
+                binding.recyclerSalesHistory.setVisibility(finalSalesHistory.isEmpty() ? android.view.View.GONE : android.view.View.VISIBLE);
 
                 binding.tvBrand.setText(getString(R.string.product_detail_brand, safe(product.brand)));
                 binding.tvCostPrice.setText(getString(R.string.product_detail_cost, product.costPrice));
