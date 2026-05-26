@@ -45,14 +45,14 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata:2.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime:2.6.1")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     // Room (Java)
     implementation("androidx.room:room-runtime:2.5.2")
     annotationProcessor("androidx.room:room-compiler:2.5.2")
 
-    // Firebase BOM + core libs
+    // Firebase BOM + remote data libs
     implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
-    implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
 

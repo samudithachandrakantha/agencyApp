@@ -26,7 +26,6 @@ import com.hfad.agencyapp.ui.dashboard.DashboardActivity;
 import com.hfad.agencyapp.ui.adapters.ProductAdapter;
 import com.hfad.agencyapp.ui.insights.InsightsActivity;
 import com.hfad.agencyapp.ui.invoice.InvoicesActivity;
-import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.ProductViewModel;
 
 import java.util.HashMap;
@@ -59,7 +58,6 @@ public class ProductsActivity extends AppCompatActivity {
         setupObservers();
         setupSearch();
         setupStockFilters();
-        setupBottomNavigation();
 
         binding.fabAddProduct.setOnClickListener(v -> openAddEditProduct(null));
     }
@@ -133,33 +131,6 @@ public class ProductsActivity extends AppCompatActivity {
         });
     }
 
-    private void setupBottomNavigation() {
-        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_home);
-        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_invoices) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INVOICES));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_customers) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_CUSTOMERS));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_insights) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
-                finish();
-                return true;
-            }
-            return false;
-        });
-    }
 
     private void updateChipStyles(int selectedChipId) {
         for (int i = 0; i < binding.chipGroupFilters.getChildCount(); i++) {
@@ -256,13 +227,18 @@ public class ProductsActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_search) {
-            binding.etSearch.requestFocus();
-            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            if (imm != null) {
-                imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT);
-            }
+            showSearchBar();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showSearchBar() {
+        binding.tilSearch.setVisibility(View.VISIBLE);
+        binding.etSearch.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
 }

@@ -523,12 +523,19 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                         for (com.hfad.agencyapp.data.entities.InvoiceItem item : items) {
                             Product product = productMap.get(item.productId);
                             String productName = product != null && product.name != null ? product.name : String.valueOf(item.productId);
+                            double lineSubtotal = item.quantity * item.unitPrice;
+                            double discountPercent = 0.0;
+                            if (lineSubtotal > 0.0 && item.totalPrice >= 0.0 && item.totalPrice < lineSubtotal) {
+                                discountPercent = ((lineSubtotal - item.totalPrice) * 100.0) / lineSubtotal;
+                            } else if (product != null && product.discountPercent > 0.0) {
+                                discountPercent = product.discountPercent;
+                            }
                             uiItems.add(new com.hfad.agencyapp.ui.models.InvoiceItem(
                                     String.valueOf(item.productId),
                                     productName,
                                     item.quantity,
                                     item.unitPrice,
-                                    0.0,
+                                    Math.max(0.0, discountPercent),
                                     item.freeIssueBuyQty,
                                     item.freeIssueBonusQty
                             ));

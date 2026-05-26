@@ -70,6 +70,20 @@ public class InvoiceItemsAdapter extends ListAdapter<InvoiceItem, InvoiceItemsAd
             binding.tvUnitPrice.setText("Rs. " + currencyFormat.format(item.getUnitPrice()) + 
                     " × " + item.getQuantity());
 
+            // Discount percentage (visible only when discount is applied)
+            if (item.getDiscountPercent() > 0.0) {
+                binding.tvDiscountPercent.setVisibility(android.view.View.VISIBLE);
+                binding.tvDiscountPercent.setText(
+                        "Discount: "
+                                + currencyFormat.format(item.getDiscountPercent())
+                                + "% (Rs. "
+                                + currencyFormat.format(item.getDiscount())
+                                + ")"
+                );
+            } else {
+                binding.tvDiscountPercent.setVisibility(android.view.View.GONE);
+            }
+
             String freeIssueSummary = item.getFreeIssueSummary();
             if (!freeIssueSummary.isEmpty()) {
                 binding.tvFreeIssueInfo.setVisibility(android.view.View.VISIBLE);

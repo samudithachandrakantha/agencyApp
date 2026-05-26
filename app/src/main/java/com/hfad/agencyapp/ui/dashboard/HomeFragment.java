@@ -2,67 +2,78 @@ package com.hfad.agencyapp.ui.dashboard;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.hfad.agencyapp.databinding.ActivityDashboardBinding;
 import com.hfad.agencyapp.R;
+import com.hfad.agencyapp.databinding.ActivityDashboardBinding;
 import com.hfad.agencyapp.ui.adapters.RecentInvoiceAdapter;
 import com.hfad.agencyapp.ui.invoice.CreateInvoiceActivity;
-import com.hfad.agencyapp.ui.insights.InsightsActivity;
 import com.hfad.agencyapp.ui.products.ProductsActivity;
 import com.hfad.agencyapp.ui.profile.ProfileActivity;
 import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.DashboardViewModel;
 
-public class DashboardActivity extends AppCompatActivity {
+public class HomeFragment extends Fragment {
 
     private ActivityDashboardBinding binding;
     private RecentInvoiceAdapter invoiceAdapter;
     private DashboardViewModel viewModel;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityDashboardBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.navy_900));
+    public static HomeFragment newInstance() {
+        return new HomeFragment();
+    }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = ActivityDashboardBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
+
+        if (binding.includeBottomNav != null) {
+            binding.includeBottomNav.getRoot().setVisibility(View.GONE);
+        }
 
         setupRecyclerView();
         setupObservers();
         setupQuickActions();
-        setupBottomNavigation();
         setupProfileEntry();
     }
 
     private void setupRecyclerView() {
-        binding.recyclerRecentInvoices.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerRecentInvoices.setLayoutManager(new LinearLayoutManager(requireContext()));
         invoiceAdapter = new RecentInvoiceAdapter();
         binding.recyclerRecentInvoices.setAdapter(invoiceAdapter);
     }
 
     private void setupObservers() {
-        viewModel.todaySales.observe(this, sales -> {
+        viewModel.todaySales.observe(getViewLifecycleOwner(), sales -> {
             double value = sales != null ? sales : 0.0;
             binding.tvTodaySales.setText(getString(R.string.amount_format, new java.text.DecimalFormat("#,##0.00").format(value)));
         });
 
-        viewModel.todayInvoiceCount.observe(this, count -> {
+        viewModel.todayInvoiceCount.observe(getViewLifecycleOwner(), count -> {
             int value = count != null ? count : 0;
             binding.tvInvoiceCount.setText(String.valueOf(value));
         });
 
-        viewModel.invoices.observe(this, invoices -> {
+        viewModel.invoices.observe(getViewLifecycleOwner(), invoices -> {
             java.util.List<com.hfad.agencyapp.ui.models.RecentInvoiceUiModel> uiModels = new java.util.ArrayList<>();
             if (invoices != null && !invoices.isEmpty()) {
                 java.text.DecimalFormat currencyFormat = new java.text.DecimalFormat("#,##0.00");
-
                 for (com.hfad.agencyapp.data.entities.Invoice invoice : invoices) {
                     String customerName = invoice.customerName != null && !invoice.customerName.isEmpty()
                             ? invoice.customerName
@@ -96,61 +107,19 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             invoiceAdapter.submitList(uiModels);
-            invoiceAdapter.setOnInvoiceClickListener(invoiceDbId -> com.hfad.agencyapp.utils.PreviewUtils.showInvoicePreview(DashboardActivity.this, invoiceDbId));
+            invoiceAdapter.setOnInvoiceClickListener(invoiceDbId -> com.hfad.agencyapp.utils.PreviewUtils.showInvoicePreview(requireContext(), invoiceDbId));
         });
     }
 
     private void setupQuickActions() {
-        binding.cardTodaySales.setOnClickListener(v -> {
-            startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
-            finish();
-        });
-
-        binding.actionNewInvoice.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CreateInvoiceActivity.class);
-            startActivity(intent);
-        });
+        binding.actionNewInvoice.setOnClickListener(v -> startActivity(new Intent(requireContext(), CreateInvoiceActivity.class)));
         // Customers quick-action removed
-        binding.actionProducts.setOnClickListener(v -> startActivity(new Intent(this, ProductsActivity.class)));
-        binding.actionSync.setOnClickListener(v -> showFeatureToast("Sync"));
-
-        binding.tvViewAll.setOnClickListener(v -> startActivity(new android.content.Intent(this, com.hfad.agencyapp.ui.invoice.InvoicesActivity.class)));
+        binding.actionProducts.setOnClickListener(v -> startActivity(new Intent(requireContext(), ProductsActivity.class)));
+        binding.actionSync.setOnClickListener(v -> android.widget.Toast.makeText(requireContext(), "Sync coming soon", android.widget.Toast.LENGTH_SHORT).show());
+        binding.tvViewAll.setOnClickListener(v -> startActivity(MainTabsActivity.createIntent(requireContext(), MainTabsActivity.TAB_INVOICES)));
     }
 
     private void setupProfileEntry() {
-        binding.tvAvatar.setOnClickListener(v -> startActivity(new Intent(this, ProfileActivity.class)));
-    }
-
-    private void setupBottomNavigation() {
-        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_home);
-        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_invoices) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INVOICES));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_customers) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_CUSTOMERS));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_insights) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
-                finish();
-                return true;
-            }
-            return false;
-        });
-    }
-
-    private void showFeatureToast(String feature) {
-        Toast.makeText(this, feature + " coming soon", Toast.LENGTH_SHORT).show();
+        binding.tvAvatar.setOnClickListener(v -> startActivity(new Intent(requireContext(), ProfileActivity.class)));
     }
 }
-

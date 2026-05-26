@@ -184,6 +184,10 @@ public class Repository {
         return db.invoiceItemDao().getByInvoiceId(invoiceId);
     }
 
+    public List<InvoiceItem> getInvoiceItemsOnce(long invoiceId) {
+        return db.invoiceItemDao().getByInvoiceIdOnce(invoiceId);
+    }
+
     // Payment operations
     public void insertPayment(Payment payment) {
         executor.execute(() -> {

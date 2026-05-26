@@ -52,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_xs"
-                    android:text="Samuditha"
+                    android:text="Shanka Distributors"
                     android:textColor="@color/white"
                     android:textSize="28sp"
                     android:textStyle="bold"
@@ -65,7 +65,10 @@
                     android:layout_height="@dimen/avatar_size"
                     android:background="@drawable/bg_avatar_circle"
                     android:gravity="center"
-                    android:text="SR"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:text="SD"
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -81,8 +84,10 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_today_sales"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:minHeight="@dimen/dashboard_stat_card_height"
                     android:layout_marginEnd="@dimen/space_sm"
                     android:layout_weight="1"
                     app:cardBackgroundColor="@color/blur_white"
@@ -98,13 +103,13 @@
                         <TextView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            android:background="@color/soft_green"
                             android:gravity="center"
                             android:text="$"
                             android:textColor="@color/soft_green_icon"
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tv_today_sales_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_sm"
@@ -135,6 +140,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:minHeight="@dimen/dashboard_stat_card_height"
                     android:layout_marginStart="@dimen/space_sm"
                     android:layout_weight="1"
                     app:cardBackgroundColor="@color/blur_white"
@@ -150,7 +156,6 @@
                         <ImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            android:background="@color/soft_blue"
                             android:padding="6dp"
                             android:src="@android:drawable/ic_menu_agenda"
                             app:tint="@color/soft_blue_icon" />
@@ -214,7 +219,6 @@
                         <ImageView
                             android:layout_width="34dp"
                             android:layout_height="34dp"
-                            android:background="@color/soft_blue"
                             android:padding="8dp"
                             android:src="@android:drawable/ic_input_add"
                             app:tint="@color/soft_blue_icon" />
@@ -229,41 +233,7 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/action_customers"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/space_sm"
-                    android:layout_marginEnd="@dimen/space_sm"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@color/blur_white"
-                    app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="2dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="@dimen/space_sm">
-
-                        <ImageView
-                            android:layout_width="34dp"
-                            android:layout_height="34dp"
-                            android:background="@color/soft_green"
-                            android:padding="8dp"
-                            android:src="@android:drawable/ic_menu_myplaces"
-                            app:tint="@color/soft_green_icon" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_xs"
-                            android:text="Customers"
-                            android:textColor="@color/text_primary"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                <!-- Customers quick-action removed -->
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/action_products"
@@ -286,7 +256,6 @@
                         <ImageView
                             android:layout_width="34dp"
                             android:layout_height="34dp"
-                            android:background="@color/soft_orange"
                             android:padding="8dp"
                             android:src="@android:drawable/ic_menu_sort_by_size"
                             app:tint="@color/soft_orange_icon" />
@@ -321,7 +290,6 @@
                         <ImageView
                             android:layout_width="34dp"
                             android:layout_height="34dp"
-                            android:background="@color/soft_blue"
                             android:padding="8dp"
                             android:src="@android:drawable/ic_popup_sync"
                             app:tint="@color/soft_blue_icon" />
