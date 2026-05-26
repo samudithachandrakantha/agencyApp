@@ -19,6 +19,7 @@ import java.util.Locale;
 public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdapter.InvoiceViewHolder> {
 
     private final List<RecentInvoiceUiModel> items = new ArrayList<>();
+    private final List<RecentInvoiceUiModel> originalItems = new ArrayList<>();
     private OnInvoiceClickListener listener;
 
     public interface OnInvoiceClickListener {
@@ -54,8 +55,27 @@ public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdap
 
     public void submitList(List<RecentInvoiceUiModel> data) {
         items.clear();
+        originalItems.clear();
         if (data != null) {
             items.addAll(data);
+            originalItems.addAll(data);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void filter(String query) {
+        items.clear();
+        if (query == null || query.trim().isEmpty()) {
+            items.addAll(originalItems);
+        } else {
+            String queryLower = query.toLowerCase(Locale.US).trim();
+            for (RecentInvoiceUiModel item : originalItems) {
+                if (item.customerName.toLowerCase(Locale.US).contains(queryLower)
+                        || item.invoiceId.toLowerCase(Locale.US).contains(queryLower)
+                        || item.totalAmount.toLowerCase(Locale.US).contains(queryLower)) {
+                    items.add(item);
+                }
+            }
         }
         notifyDataSetChanged();
     }

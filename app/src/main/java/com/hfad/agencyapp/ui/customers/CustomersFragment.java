@@ -2,67 +2,121 @@ package com.hfad.agencyapp.ui.customers;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.hfad.agencyapp.R;
-import androidx.appcompat.app.AlertDialog;
 import com.google.android.material.snackbar.Snackbar;
+import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.databinding.ActivityCustomersBinding;
 import com.hfad.agencyapp.ui.adapters.CustomersAdapter;
-import com.hfad.agencyapp.ui.invoice.InvoicesActivity;
-import com.hfad.agencyapp.ui.insights.InsightsActivity;
 import com.hfad.agencyapp.ui.models.Customer;
 import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.CustomerViewModel;
 
-/**
- * Activity that shows list of customers and allows add/edit/delete.
- */
-public class CustomersActivity extends AppCompatActivity {
+public class CustomersFragment extends Fragment {
     private ActivityCustomersBinding binding;
     private CustomerViewModel viewModel;
     private CustomersAdapter adapter;
 
+    public static CustomersFragment newInstance() {
+        return new CustomersFragment();
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityCustomersBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = ActivityCustomersBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
 
-        setSupportActionBar(binding.toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Customers");
-        }
-        binding.toolbar.setNavigationOnClickListener(v -> finish());
-
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(CustomerViewModel.class);
-
+        if (binding.includeBottomNav != null) {
+            binding.includeBottomNav.getRoot().setVisibility(View.GONE);
+        }
+        if (binding.toolbar != null) {
+            binding.toolbar.inflateMenu(R.menu.menu_products);
+            binding.toolbar.setNavigationOnClickListener(v -> {
+                if (getActivity() instanceof com.hfad.agencyapp.ui.tabs.MainTabsActivity) {
+                    ((com.hfad.agencyapp.ui.tabs.MainTabsActivity) getActivity()).switchToTab(com.hfad.agencyapp.ui.tabs.MainTabsActivity.TAB_HOME);
+                } else {
+                    startActivity(com.hfad.agencyapp.ui.tabs.MainTabsActivity.createIntent(requireContext(), com.hfad.agencyapp.ui.tabs.MainTabsActivity.TAB_HOME));
+                    requireActivity().finish();
+                }
+            });
+            binding.toolbar.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == com.hfad.agencyapp.R.id.action_search) {
+                    showSearchBar();
+                    return true;
+                }
+                return false;
+            });
+            try { binding.toolbar.setTitleTextColor(requireContext().getColor(com.hfad.agencyapp.R.color.white)); } catch (Exception ignored) {}
+            binding.toolbar.setTitle("Customers");
+        }
         setupRecyclerView();
         setupObservers();
         setupListeners();
-        setupBottomNavigation();
+        setupSearch();
         binding.tilSearch.setEndIconOnClickListener(v -> hideSearchBar());
+    }
+
+    private void setupSearch() {
+        binding.etSearch.addTextChangedListener(new android.text.TextWatcher() {
+            private Runnable pending;
+
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                binding.etSearch.removeCallbacks(pending);
+                pending = () -> viewModel.filter(s.toString());
+                binding.etSearch.postDelayed(pending, 300);
+            }
+
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        });
+    }
+
+    private void showSearchBar() {
+        binding.tilSearch.setVisibility(View.VISIBLE);
+        binding.etSearch.requestFocus();
+        InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
+
+    private void hideSearchBar() {
+        binding.tilSearch.setVisibility(View.GONE);
+        binding.etSearch.setText("");
+        viewModel.filter("");
+        InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(binding.etSearch.getWindowToken(), 0);
+        }
     }
 
     private void setupRecyclerView() {
         adapter = new CustomersAdapter(new CustomersAdapter.OnCustomerActionListener() {
             @Override
             public void onClick(Customer customer) {
-                // Open detail
-                Intent intent = new Intent(CustomersActivity.this, CustomerDetailActivity.class);
+                Intent intent = new Intent(requireContext(), CustomerDetailActivity.class);
                 intent.putExtra("customer_id", customer.getId());
                 startActivity(intent);
             }
@@ -72,13 +126,13 @@ public class CustomersActivity extends AppCompatActivity {
                 showContextMenu(customer, anchor);
             }
         });
-        binding.rvCustomers.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvCustomers.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        binding.rvCustomers.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.rvCustomers.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
         binding.rvCustomers.setAdapter(adapter);
     }
 
     private void setupObservers() {
-        viewModel.getCustomers().observe(this, list -> {
+        viewModel.getCustomers().observe(getViewLifecycleOwner(), list -> {
             adapter.submitList(list);
             binding.emptyState.getRoot().setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
         });
@@ -86,129 +140,16 @@ public class CustomersActivity extends AppCompatActivity {
 
     private void setupListeners() {
         binding.fabAddCustomer.setOnClickListener(v -> showAddEditCustomerDialog(null));
-
-        binding.etSearch.addTextChangedListener(new TextWatcher() {
-            private Runnable lastTask;
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Debounce 300ms
-                binding.etSearch.removeCallbacks(lastTask);
-                lastTask = () -> viewModel.filter(s.toString());
-                binding.etSearch.postDelayed(lastTask, 300);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_products, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            finish();
-            return true;
-        }
-        if (id == R.id.action_search) {
-            showSearchBar();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void showSearchBar() {
-        binding.tilSearch.setVisibility(View.VISIBLE);
-        binding.etSearch.requestFocus();
-        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            imm.showSoftInput(binding.etSearch, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
-        }
-    }
-
-    private void hideSearchBar() {
-        binding.tilSearch.setVisibility(View.GONE);
-        binding.etSearch.setText("");
-        viewModel.filter("");
-        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            imm.hideSoftInputFromWindow(binding.etSearch.getWindowToken(), 0);
-        }
-    }
-
-    private void setupBottomNavigation() {
-        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_customers);
-        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_invoices) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INVOICES));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_customers) {
-                return true;
-            }
-            if (id == R.id.nav_insights) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
-                finish();
-                return true;
-            }
-            return false;
-        });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (viewModel != null) {
-            viewModel.refresh();
-        }
     }
 
     private void showContextMenu(Customer c, View anchor) {
-        PopupMenu popup = new PopupMenu(this, anchor);
-        popup.getMenu().add("Edit");
-        popup.getMenu().add("Delete");
-        popup.setOnMenuItemClickListener(item -> {
-            CharSequence title = item.getTitle();
-            if ("Edit".contentEquals(title)) {
-                showAddEditCustomerDialog(c);
-                return true;
-            } else if ("Delete".contentEquals(title)) {
-                new MaterialAlertDialogBuilder(this)
-                        .setTitle("Delete Customer")
-                        .setMessage("Are you sure you want to delete " + c.getBusinessName() + "?")
-                        .setPositiveButton("Delete", (dialog, which) -> {
-                            boolean ok = viewModel.deleteCustomer(c.getId());
-                            Toast.makeText(this, ok ? "Deleted" : "Delete failed", Toast.LENGTH_SHORT).show();
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
-                return true;
-            }
-            return false;
-        });
-        popup.show();
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Customer")
+                .setMessage(c.getBusinessName())
+                .setPositiveButton("OK", null)
+                .show();
     }
 
-    /**
-     * Show a compact add/edit dialog for customer with a 3-step flow:
-     * required fields -> optional fields -> payment methods.
-     * If customer is null -> add mode. Else edit mode.
-     */
     private void showAddEditCustomerDialog(Customer customer) {
         showRequiredFieldsDialog(customer, null, null, null, null, null, null, null);
     }
@@ -243,7 +184,7 @@ public class CustomersActivity extends AppCompatActivity {
             etAddress.setText(address);
         }
 
-        final AlertDialog dialog = new MaterialAlertDialogBuilder(this).setView(firstView).create();
+        final AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext()).setView(firstView).create();
         btnCancel.setOnClickListener(v -> dialog.dismiss());
         btnNext.setOnClickListener(v -> {
             String businessValue = etBusiness.getText() != null ? etBusiness.getText().toString().trim() : "";
@@ -294,7 +235,7 @@ public class CustomersActivity extends AppCompatActivity {
         }
 
         final String finalPaymentMethods = paymentMethods;
-        final AlertDialog dialog = new MaterialAlertDialogBuilder(this).setView(dialogView).create();
+        final AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext()).setView(dialogView).create();
 
         btnBack.setOnClickListener(v -> {
             dialog.dismiss();
@@ -332,7 +273,7 @@ public class CustomersActivity extends AppCompatActivity {
         final String methodsForBack = initialMethods;
         applyPaymentMethods(cbCash, cbCredit, cbCheque, methodsForBack);
 
-        final AlertDialog dialog = new MaterialAlertDialogBuilder(this).setView(dialogView).create();
+        final AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext()).setView(dialogView).create();
 
         btnBack.setOnClickListener(v -> {
             dialog.dismiss();
@@ -342,7 +283,7 @@ public class CustomersActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> {
             String methods = collectPaymentMethods(cbCash, cbCredit, cbCheque);
             if (methods.isEmpty()) {
-                Toast.makeText(this, "Select at least one payment method", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Select at least one payment method", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -355,7 +296,7 @@ public class CustomersActivity extends AppCompatActivity {
 
             new Thread(() -> {
                 boolean ok = viewModel.saveCustomer(c);
-                runOnUiThread(() -> {
+                requireActivity().runOnUiThread(() -> {
                     if (ok) {
                         Snackbar.make(binding.getRoot(), "Customer saved", Snackbar.LENGTH_SHORT).show();
                         dialog.dismiss();
@@ -412,11 +353,4 @@ public class CustomersActivity extends AppCompatActivity {
         }
         return methods;
     }
-
 }
-
-
-
-
-
-

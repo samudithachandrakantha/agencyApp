@@ -111,6 +111,21 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tv_discount_percent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_md"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/navy_900"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btn_plus"
+            app:layout_constraintTop_toBottomOf="@id/tv_unit_price" />
+
+        <TextView
             android:id="@+id/tv_free_issue_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -123,7 +138,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_plus"
-            app:layout_constraintTop_toBottomOf="@id/tv_unit_price" />
+            app:layout_constraintTop_toBottomOf="@id/tv_discount_percent" />
 
         <!-- Line Total (Right-Aligned) -->
         <TextView

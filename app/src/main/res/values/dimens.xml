@@ -14,5 +14,6 @@
     <dimen name="header_height">210dp</dimen>
     <dimen name="avatar_size">52dp</dimen>
     <dimen name="quick_action_size">64dp</dimen>
+    <dimen name="dashboard_stat_card_height">124dp</dimen>
 </resources>
 

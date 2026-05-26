@@ -4,23 +4,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.datepicker.MaterialDatePicker;
 
-import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.databinding.ActivityInvoicesBinding;
-import com.hfad.agencyapp.ui.customers.CustomersActivity;
 import com.hfad.agencyapp.ui.adapters.RecentInvoiceAdapter;
-import com.hfad.agencyapp.ui.insights.InsightsActivity;
-import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.DashboardViewModel;
 
 import java.util.ArrayList;
@@ -31,7 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class InvoicesActivity extends AppCompatActivity {
+public class InvoicesFragment extends Fragment {
 
     private ActivityInvoicesBinding binding;
     private RecentInvoiceAdapter adapter;
@@ -43,66 +41,72 @@ public class InvoicesActivity extends AppCompatActivity {
     private boolean hasDateRangeFilter = false;
     private final SimpleDateFormat dateRangeDisplayFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
+    public static InvoicesFragment newInstance() {
+        return new InvoicesFragment();
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityInvoicesBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = ActivityInvoicesBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
 
-        // Set up toolbar with back button and navy styling to match app
-        setSupportActionBar(binding.toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        binding.toolbar.setNavigationOnClickListener(v -> {
-            startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
-            finish();
-        });
-
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
+        if (binding.includeBottomNav != null) {
+            binding.includeBottomNav.getRoot().setVisibility(View.GONE);
+        }
+
+        if (binding.toolbar != null) {
+            binding.toolbar.setNavigationOnClickListener(v -> {
+                if (getActivity() instanceof com.hfad.agencyapp.ui.tabs.MainTabsActivity) {
+                    ((com.hfad.agencyapp.ui.tabs.MainTabsActivity) getActivity()).switchToTab(com.hfad.agencyapp.ui.tabs.MainTabsActivity.TAB_HOME);
+                } else {
+                    startActivity(com.hfad.agencyapp.ui.tabs.MainTabsActivity.createIntent(requireContext(), com.hfad.agencyapp.ui.tabs.MainTabsActivity.TAB_HOME));
+                    requireActivity().finish();
+                }
+            });
+            binding.toolbar.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == com.hfad.agencyapp.R.id.action_search) {
+                    showSearchBar();
+                    return true;
+                }
+                if (item.getItemId() == com.hfad.agencyapp.R.id.action_date_filter) {
+                    showDateRangePicker();
+                    return true;
+                }
+                return false;
+            });
+            try { binding.toolbar.setTitleTextColor(requireContext().getColor(com.hfad.agencyapp.R.color.white)); } catch (Exception ignored) {}
+            binding.toolbar.setTitle("Invoices");
+        }
+
         adapter = new RecentInvoiceAdapter();
-        binding.recyclerAllInvoices.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerAllInvoices.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerAllInvoices.setAdapter(adapter);
 
         binding.filtersContainer.setVisibility(View.GONE);
         binding.cardDateRangeFilter.setVisibility(View.GONE);
         binding.btnClearDateRangeFilter.setOnClickListener(v -> clearDateRangeFilter());
 
-        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_invoices);
-        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_invoices) {
-                return true;
-            }
-            if (id == R.id.nav_customers) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_CUSTOMERS));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_insights) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
-                finish();
-                return true;
-            }
-            return false;
-        });
+        setupSearch();
+        binding.tilSearch.setEndIconOnClickListener(v -> hideSearchBar());
 
-        viewModel.invoices.observe(this, invoices -> {
+        viewModel.invoices.observe(getViewLifecycleOwner(), invoices -> {
             invoicesCache = invoices == null ? new ArrayList<>() : invoices;
             renderInvoices();
-            adapter.setOnInvoiceClickListener(invoiceDbId -> com.hfad.agencyapp.utils.PreviewUtils.showInvoicePreview(InvoicesActivity.this, invoiceDbId));
+            adapter.setOnInvoiceClickListener(invoiceDbId -> com.hfad.agencyapp.utils.PreviewUtils.showInvoicePreview(requireContext(), invoiceDbId));
         });
-        
-        // Add search text change listener
+    }
+
+    private void setupSearch() {
+        if (binding.etSearch == null) return;
         binding.etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -110,44 +114,15 @@ public class InvoicesActivity extends AppCompatActivity {
                 renderInvoices();
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void afterTextChanged(Editable s) {}
         });
-        
-        // Add end icon click listener to close search bar
-        binding.tilSearch.setEndIconOnClickListener(v -> hideSearchBar());
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_invoice_search, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
-            finish();
-            return true;
-        }
-        if (id == R.id.action_search) {
-            showSearchBar();
-            return true;
-        }
-        if (id == R.id.action_date_filter) {
-            showDateRangePicker();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void showSearchBar() {
         binding.filtersContainer.setVisibility(View.VISIBLE);
         binding.tilSearch.setVisibility(View.VISIBLE);
         binding.etSearch.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT);
         }
@@ -161,7 +136,7 @@ public class InvoicesActivity extends AppCompatActivity {
             binding.filtersContainer.setVisibility(View.GONE);
         }
         renderInvoices();
-        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(binding.etSearch.getWindowToken(), 0);
         }
@@ -181,7 +156,7 @@ public class InvoicesActivity extends AppCompatActivity {
             renderInvoices();
         });
 
-        picker.show(getSupportFragmentManager(), "invoice_date_range_picker");
+        picker.show(getParentFragmentManager(), "invoice_date_range_picker");
     }
 
     private void clearDateRangeFilter() {
@@ -211,10 +186,10 @@ public class InvoicesActivity extends AppCompatActivity {
 
     private void renderInvoices() {
         java.util.List<com.hfad.agencyapp.ui.models.RecentInvoiceUiModel> ui = new ArrayList<>();
-        List<com.hfad.agencyapp.data.entities.Invoice> filtered = filterInvoices(invoicesCache, currentQuery, hasDateRangeFilter, dateRangeStartMillis, dateRangeEndMillis);
-        if (filtered != null && !filtered.isEmpty()) {
+        List<com.hfad.agencyapp.data.entities.Invoice> toShow = filterInvoices(invoicesCache, currentQuery, hasDateRangeFilter, dateRangeStartMillis, dateRangeEndMillis);
+        if (toShow != null && !toShow.isEmpty()) {
             java.text.DecimalFormat fmt = new java.text.DecimalFormat("#,##0.00");
-            for (com.hfad.agencyapp.data.entities.Invoice inv : filtered) {
+            for (com.hfad.agencyapp.data.entities.Invoice inv : toShow) {
                 String customer = inv.customerName != null && !inv.customerName.isEmpty() ? inv.customerName : "Unknown";
                 String status = "Pending";
                 if (inv.paidAmount >= inv.totalAmount) status = "Paid";
@@ -225,21 +200,20 @@ public class InvoicesActivity extends AppCompatActivity {
     }
 
     private List<com.hfad.agencyapp.data.entities.Invoice> filterInvoices(List<com.hfad.agencyapp.data.entities.Invoice> source,
-                                                                         String q,
-                                                                         boolean useDateRange,
-                                                                         long startMillis,
-                                                                         long endMillis) {
-        if (source == null) return new ArrayList<>();
-        String qq = q == null ? "" : q.trim().toLowerCase(Locale.US);
+                                                                        String q,
+                                                                        boolean useDateRange,
+                                                                        long startMillis,
+                                                                        long endMillis) {
+        if (q == null) q = "";
+        String qq = q.trim().toLowerCase();
         List<com.hfad.agencyapp.data.entities.Invoice> out = new ArrayList<>();
+        if (source == null) return out;
         for (com.hfad.agencyapp.data.entities.Invoice inv : source) {
             if (inv == null) continue;
             if (useDateRange && (inv.createdAt < startMillis || inv.createdAt > endMillis)) continue;
-            String customer = inv.customerName == null ? "" : inv.customerName.toLowerCase(Locale.US);
-            String number = inv.invoiceNumber == null ? "" : inv.invoiceNumber.toLowerCase(Locale.US);
-            if (qq.isEmpty() || customer.contains(qq) || number.contains(qq)) {
-                out.add(inv);
-            }
+            String customer = inv.customerName == null ? "" : inv.customerName.toLowerCase();
+            String num = inv.invoiceNumber == null ? "" : inv.invoiceNumber.toLowerCase();
+            if (qq.isEmpty() || customer.contains(qq) || num.contains(qq)) out.add(inv);
         }
         return out;
     }

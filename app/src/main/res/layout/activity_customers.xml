@@ -14,7 +14,6 @@
         app:titleTextColor="@color/white"
         app:navigationIconTint="@color/white"
         app:navigationIcon="@drawable/ic_arrow_back_black_24"
-        app:menu="@menu/menu_products"
         android:contentDescription="Back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,6 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:visibility="gone"
             app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
