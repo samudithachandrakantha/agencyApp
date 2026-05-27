@@ -80,6 +80,14 @@
     <string name="delete_invoice_message">This will permanently delete the invoice and all linked items and payments.</string>
     <string name="invoice_deleted">Invoice deleted</string>
     <string name="delete">Delete</string>
+    <string name="settle">Settle</string>
+    <string name="settle_invoice_title">Settle Credit Invoice</string>
+    <string name="settle_full_payment">Full Payment</string>
+    <string name="settle_amount_hint">Paid Amount</string>
+    <string name="mark_paid">Paid</string>
+    <string name="settlement_saved">Payment recorded</string>
+    <string name="settle_invalid_amount">Enter a valid amount</string>
+    <string name="settle_amount_exceeds_due">Amount cannot exceed balance due</string>
     <string name="error_product_name_required">Product name is required</string>
     <string name="error_cost_price_required">Cost price is required</string>
     <string name="error_selling_price_required">Selling price is required</string>

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hfad.agencyapp.databinding.ItemCustomerBinding;
 import com.hfad.agencyapp.ui.models.Customer;
 
+import java.text.DecimalFormat;
 import java.util.Objects;
 
 /**
@@ -39,7 +40,8 @@ public class CustomersAdapter extends ListAdapter<Customer, RecyclerView.ViewHol
                         && Objects.equals(oldItem.getContactPerson(), newItem.getContactPerson())
                         && Objects.equals(oldItem.getAddress(), newItem.getAddress())
                         && Objects.equals(oldItem.getPaymentMethods(), newItem.getPaymentMethods())
-                        && oldItem.isBlocked() == newItem.isBlocked();
+                        && oldItem.isBlocked() == newItem.isBlocked()
+                        && Double.compare(oldItem.getOutstandingAmount(), newItem.getOutstandingAmount()) == 0;
             }
         });
         this.listener = listener;
@@ -71,9 +73,15 @@ public class CustomersAdapter extends ListAdapter<Customer, RecyclerView.ViewHol
             binding.tvContactPerson.setText(c.getContactPerson());
             binding.tvAddress.setText(c.getAddress());
 
-            // Outstanding placeholder: 0.00
             binding.tvOutstandingLabel.setText(com.hfad.agencyapp.R.string.outstanding_label);
-            binding.tvOutstandingAmount.setText(com.hfad.agencyapp.R.string.zero_amount);
+            DecimalFormat amountFormat = new DecimalFormat("#,##0.00");
+            binding.tvOutstandingAmount.setText(itemView.getContext().getString(
+                    com.hfad.agencyapp.R.string.amount_format,
+                    amountFormat.format(c.getOutstandingAmount())
+            ));
+            binding.tvOutstandingAmount.setTextColor(c.getOutstandingAmount() > 0
+                    ? itemView.getContext().getColor(com.hfad.agencyapp.R.color.error_red)
+                    : itemView.getContext().getColor(com.hfad.agencyapp.R.color.soft_green_icon));
 
             // Apply blocked styling if customer is blocked
             if (c.isBlocked()) {

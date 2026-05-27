@@ -40,6 +40,7 @@ public class InvoicesFragment extends Fragment {
     private long dateRangeEndMillis = 0L;
     private boolean hasDateRangeFilter = false;
     private final SimpleDateFormat dateRangeDisplayFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+    private final SimpleDateFormat invoiceCardDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
     public static InvoicesFragment newInstance() {
         return new InvoicesFragment();
@@ -189,11 +190,43 @@ public class InvoicesFragment extends Fragment {
         List<com.hfad.agencyapp.data.entities.Invoice> toShow = filterInvoices(invoicesCache, currentQuery, hasDateRangeFilter, dateRangeStartMillis, dateRangeEndMillis);
         if (toShow != null && !toShow.isEmpty()) {
             java.text.DecimalFormat fmt = new java.text.DecimalFormat("#,##0.00");
+            java.text.SimpleDateFormat chequeDisplayFormat = new java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault());
             for (com.hfad.agencyapp.data.entities.Invoice inv : toShow) {
                 String customer = inv.customerName != null && !inv.customerName.isEmpty() ? inv.customerName : "Unknown";
-                String status = "Pending";
-                if (inv.paidAmount >= inv.totalAmount) status = "Paid";
-                ui.add(new com.hfad.agencyapp.ui.models.RecentInvoiceUiModel(customer, inv.invoiceNumber, inv.id, "Rs. " + fmt.format(inv.totalAmount), status));
+                String invoiceNumber = inv.invoiceNumber != null && !inv.invoiceNumber.isEmpty() ? inv.invoiceNumber : "-";
+                String invoiceDate = inv.createdAt > 0 ? invoiceCardDateFormat.format(new Date(inv.createdAt)) : "-";
+                String invoiceCardSubtitle = invoiceNumber + " | " + invoiceDate;
+                String status = "";
+                boolean isPending = false;
+                String dueAmount = "0.00";
+                String chequeDate = "";
+                
+                if (inv.status != null && inv.status.equals("CANCELLED")) {
+                    status = "Cancelled";
+                } else if ((inv.status != null && (inv.status.equals("COMPLETED") || inv.status.equals("PAID")))
+                        || inv.paidAmount >= inv.totalAmount) {
+                    status = "Paid";
+                } else if (inv.paymentMethod != null && inv.paymentMethod.equals("CASH")) {
+                    status = "Cash";
+                } else if (inv.paymentMethod != null && inv.paymentMethod.equals("CHEQUE")) {
+                    status = "Pending";
+                    isPending = true;
+                    // For cheque, show cheque date instead of due amount
+                    if (inv.chequeDate > 0) {
+                        chequeDate = chequeDisplayFormat.format(new Date(inv.chequeDate));
+                    }
+                } else if (inv.paymentMethod != null && inv.paymentMethod.equals("CREDIT")) {
+                    status = "Pending";
+                    isPending = true;
+                    double due = inv.totalAmount - inv.paidAmount;
+                    dueAmount = fmt.format(Math.max(0, due));
+                } else if (inv.paidAmount > 0) {
+                    status = "Partial";
+                    isPending = true;
+                    double due = inv.totalAmount - inv.paidAmount;
+                    dueAmount = fmt.format(Math.max(0, due));
+                }
+                ui.add(new com.hfad.agencyapp.ui.models.RecentInvoiceUiModel(customer, invoiceCardSubtitle, inv.id, "Rs. " + fmt.format(inv.totalAmount), status, dueAmount, isPending, chequeDate));
             }
         }
         adapter.submitList(ui);

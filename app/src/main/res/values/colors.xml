@@ -19,6 +19,8 @@
 
     <color name="badge_paid_bg">#E8F7EF</color>
     <color name="badge_paid_text">#1D8E58</color>
+    <color name="badge_cash_bg">#E8F7EF</color>
+    <color name="badge_cash_text">#1D8E58</color>
     <color name="badge_credit_bg">#FFF3E6</color>
     <color name="badge_credit_text">#C66A1D</color>
     <color name="badge_cheque_bg">#EAF0FF</color>

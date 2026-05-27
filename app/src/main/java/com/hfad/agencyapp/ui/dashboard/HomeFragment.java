@@ -21,11 +21,16 @@ import com.hfad.agencyapp.ui.profile.ProfileActivity;
 import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.DashboardViewModel;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class HomeFragment extends Fragment {
 
     private ActivityDashboardBinding binding;
     private RecentInvoiceAdapter invoiceAdapter;
     private DashboardViewModel viewModel;
+    private final SimpleDateFormat invoiceCardDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -43,9 +48,7 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
-        if (binding.includeBottomNav != null) {
-            binding.includeBottomNav.getRoot().setVisibility(View.GONE);
-        }
+        binding.includeBottomNav.getRoot().setVisibility(View.GONE);
 
         setupRecyclerView();
         setupObservers();
@@ -74,34 +77,55 @@ public class HomeFragment extends Fragment {
             java.util.List<com.hfad.agencyapp.ui.models.RecentInvoiceUiModel> uiModels = new java.util.ArrayList<>();
             if (invoices != null && !invoices.isEmpty()) {
                 java.text.DecimalFormat currencyFormat = new java.text.DecimalFormat("#,##0.00");
+                java.text.SimpleDateFormat chequeDisplayFormat = new java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault());
                 for (com.hfad.agencyapp.data.entities.Invoice invoice : invoices) {
                     String customerName = invoice.customerName != null && !invoice.customerName.isEmpty()
                             ? invoice.customerName
                             : "Unknown";
+                    String invoiceNumber = invoice.invoiceNumber != null && !invoice.invoiceNumber.isEmpty() ? invoice.invoiceNumber : "-";
+                    String invoiceDate = invoice.createdAt > 0 ? invoiceCardDateFormat.format(new Date(invoice.createdAt)) : "-";
+                    String invoiceCardSubtitle = invoiceNumber + " | " + invoiceDate;
 
-                    String paymentStatus = "Pending";
-                    if (invoice.paidAmount >= invoice.totalAmount) {
-                        paymentStatus = "Paid";
-                    } else if (invoice.status != null && invoice.status.equals("CANCELLED")) {
+                    String paymentStatus = "";
+                    boolean isPending = false;
+                    String dueAmount = "0.00";
+                    String chequeDate = "";
+                    
+                    if (invoice.status != null && invoice.status.equals("CANCELLED")) {
                         paymentStatus = "Cancelled";
+                    } else if ((invoice.status != null && (invoice.status.equals("COMPLETED") || invoice.status.equals("PAID")))
+                            || invoice.paidAmount >= invoice.totalAmount) {
+                        paymentStatus = "Paid";
+                    } else if (invoice.paymentMethod != null && invoice.paymentMethod.equals("CASH")) {
+                        paymentStatus = "Cash";
+                    } else if (invoice.paymentMethod != null && invoice.paymentMethod.equals("CHEQUE")) {
+                        paymentStatus = "Pending";
+                        isPending = true;
+                        // For cheque, show cheque date instead of due amount
+                        if (invoice.chequeDate > 0) {
+                            chequeDate = chequeDisplayFormat.format(new Date(invoice.chequeDate));
+                        }
+                    } else if (invoice.paymentMethod != null && invoice.paymentMethod.equals("CREDIT")) {
+                        paymentStatus = "Pending";
+                        isPending = true;
+                        double due = invoice.totalAmount - invoice.paidAmount;
+                        dueAmount = currencyFormat.format(Math.max(0, due));
                     } else if (invoice.paidAmount > 0) {
                         paymentStatus = "Partial";
-                    }
-
-                    if (invoice.paymentMethod != null && !invoice.paymentMethod.isEmpty() && paymentStatus.equals("Pending")) {
-                        if (invoice.paymentMethod.equals("CHEQUE")) {
-                            paymentStatus = "Cheque";
-                        } else if (invoice.paymentMethod.equals("CREDIT")) {
-                            paymentStatus = "Credit";
-                        }
+                        isPending = true;
+                        double due = invoice.totalAmount - invoice.paidAmount;
+                        dueAmount = currencyFormat.format(Math.max(0, due));
                     }
 
                     uiModels.add(new com.hfad.agencyapp.ui.models.RecentInvoiceUiModel(
                             customerName,
-                            invoice.invoiceNumber,
+                            invoiceCardSubtitle,
                             invoice.id,
                             "Rs. " + currencyFormat.format(invoice.totalAmount),
-                            paymentStatus
+                            paymentStatus,
+                            dueAmount,
+                            isPending,
+                            chequeDate
                     ));
                 }
             }
@@ -112,6 +136,14 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupQuickActions() {
+        binding.cardTodaySales.setOnClickListener(v -> {
+            if (getActivity() instanceof MainTabsActivity) {
+                ((MainTabsActivity) getActivity()).switchToTab(MainTabsActivity.TAB_INSIGHTS);
+            } else {
+                startActivity(MainTabsActivity.createIntent(requireContext(), MainTabsActivity.TAB_INSIGHTS));
+            }
+        });
+
         binding.actionNewInvoice.setOnClickListener(v -> startActivity(new Intent(requireContext(), CreateInvoiceActivity.class)));
         // Customers quick-action removed
         binding.actionProducts.setOnClickListener(v -> startActivity(new Intent(requireContext(), ProductsActivity.class)));
@@ -121,5 +153,19 @@ public class HomeFragment extends Fragment {
 
     private void setupProfileEntry() {
         binding.tvAvatar.setOnClickListener(v -> startActivity(new Intent(requireContext(), ProfileActivity.class)));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // update avatar badge from prefs
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("cheque_prefs", android.content.Context.MODE_PRIVATE);
+        int count = prefs.getInt(com.hfad.agencyapp.workers.ChequeNotificationWorker.KEY_COUNT, 0);
+        if (count > 0) {
+            binding.tvAvatarBadge.setVisibility(View.VISIBLE);
+            binding.tvAvatarBadge.setText(String.valueOf(count));
+        } else {
+            binding.tvAvatarBadge.setVisibility(View.GONE);
+        }
     }
 }

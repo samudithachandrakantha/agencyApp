@@ -9,12 +9,21 @@ import com.hfad.agencyapp.data.Repository;
 import com.hfad.agencyapp.data.entities.Invoice;
 import com.hfad.agencyapp.data.entities.InvoiceItem;
 import com.hfad.agencyapp.data.entities.Payment;
-import com.hfad.agencyapp.data.entities.ChequePayment;
 import com.hfad.agencyapp.ui.models.ChequeDetails;
 import com.hfad.agencyapp.ui.models.Customer;
 import com.hfad.agencyapp.ui.models.PaymentType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Calendar;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 /**
  * ViewModel for Create Invoice screen.
@@ -346,6 +355,15 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         // Get customer name/business name
         String customerName = customer.getBusinessName() != null ? customer.getBusinessName() : customer.getContactPerson();
 
+        String paymentMethodName = paymentType != null ? paymentType.name() : "CASH";
+        boolean isCashPayment = "CASH".equals(paymentMethodName);
+        
+        // Get cheque date if it's a cheque payment
+        long chequeMillis = 0;
+        if (chequeDetails != null && chequeDetails.getChequeDate() != null) {
+            chequeMillis = chequeDetails.getChequeDate().getTime();
+        }
+
         // Create Invoice entity
         Invoice invoice = new Invoice(
                 customerId,
@@ -353,10 +371,11 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
                 invoiceNumber,
                 timestamp,
                 total,
-                0,  // paidAmount - will be updated when payment is made
+                isCashPayment ? total : 0,  // cash is paid immediately
                 "",  // note
-                "PENDING",  // status
-                paymentType != null ? paymentType.name() : "CASH"
+                isCashPayment ? "COMPLETED" : "PENDING",  // status
+                paymentMethodName,
+                chequeMillis
         );
 
         if (existingInvoiceId != null && existingInvoiceId > 0) {
@@ -366,6 +385,11 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         } else {
             repository.insertInvoice(invoice);
         }
+
+        // Capture values for background thread (must be effectively final)
+        final String _paymentMethodName = paymentMethodName;
+        final long _chequeMillis = chequeMillis;
+        final String _invoiceNumber = invoiceNumber;
 
         new Thread(() -> {
             try {
@@ -397,6 +421,12 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
                     paymentType != null ? paymentType.name() : "CASH"
             );
             repository.insertPayment(payment);
+            // Schedule cheque notification if applicable
+            if ("CHEQUE".equalsIgnoreCase(_paymentMethodName) && _chequeMillis > 0) {
+                try {
+                    scheduleChequeNotification(getApplication(), _chequeMillis, _invoiceNumber);
+                } catch (Exception ignored) { }
+            }
         }).start();
 
         // Clear invoice for next entry
@@ -414,6 +444,42 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         selectedCustomerLiveData.setValue(null);
         paymentTypeLiveData.setValue(PaymentType.CASH);
         chequeDetailsLiveData.setValue(new ChequeDetails());
+    }
+
+    private void scheduleChequeNotification(Context context, long chequeMillis, String invoiceNumber) {
+        // Compute desired notification date/time
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(chequeMillis);
+
+        int dow = cal.get(Calendar.DAY_OF_WEEK);
+        int addDays = 1;
+        // If cheque date is Friday or Saturday, use +3 days (per user's rules)
+        if (dow == Calendar.FRIDAY || dow == Calendar.SATURDAY) {
+            addDays = 3;
+        }
+
+        cal.add(Calendar.DATE, addDays);
+        // Set time to 14:30
+        cal.set(Calendar.HOUR_OF_DAY, 14);
+        cal.set(Calendar.MINUTE, 30);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        long triggerAt = cal.getTimeInMillis();
+        long now = System.currentTimeMillis();
+        long delay = Math.max(1000L, triggerAt - now);
+
+        // Persist a friendly text for profile UI
+        SimpleDateFormat fmt = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
+        String friendly = "Cheque reminder scheduled on " + fmt.format(cal.getTime());
+        SharedPreferences prefs = context.getSharedPreferences("cheque_prefs", Context.MODE_PRIVATE);
+        prefs.edit().putString("next_cheque_notification_text", friendly).apply();
+
+        // Enqueue WorkManager one-time request
+        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(com.hfad.agencyapp.workers.ChequeNotificationWorker.class)
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                .build();
+        WorkManager.getInstance(context).enqueue(req);
     }
 }
 

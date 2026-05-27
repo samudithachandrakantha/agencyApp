@@ -28,6 +28,9 @@ public interface InvoiceDao {
     @Query("SELECT * FROM invoices ORDER BY createdAt DESC")
     LiveData<List<Invoice>> getAll();
 
+    @Query("SELECT * FROM invoices ORDER BY createdAt DESC")
+    List<Invoice> getAllOnce();
+
     @Query("SELECT COALESCE(SUM(totalAmount), 0) FROM invoices WHERE createdAt >= :startOfDay AND createdAt < :endOfDay")
     LiveData<Double> getTodaySales(long startOfDay, long endOfDay);
 
