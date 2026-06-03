@@ -1,5 +1,6 @@
 package com.hfad.agencyapp.ui.invoice;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -77,6 +79,13 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+        
+        // Set navigation icon color to white
+        android.graphics.drawable.Drawable navIcon = binding.toolbar.getNavigationIcon();
+        if (navIcon != null) {
+            DrawableCompat.setTint(navIcon, Color.WHITE);
+        }
+        
         binding.toolbar.setNavigationOnClickListener(v -> finish());
     }
 
