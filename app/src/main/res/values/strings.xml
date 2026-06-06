@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Shanka Distributors</string>
+    <string name="loading_title">SHANKA DISTRIBUTORS</string>
+    <string name="loading_subtitle">Delivering Quality, Baking Success</string>
 
     <!-- Create Invoice Activity Strings -->
     <string name="create_invoice_title">Create Invoice</string>
