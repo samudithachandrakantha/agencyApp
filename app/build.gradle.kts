@@ -59,6 +59,8 @@ dependencies {
     // Utilities
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains:annotations:24.0.1")
+    // WorkManager for scheduling cheque notifications
+    implementation("androidx.work:work-runtime:2.8.1")
 
     // Bluetooth printing: using Android Bluetooth APIs directly (no external placeholder dependency)
     testImplementation(libs.junit)

@@ -152,6 +152,10 @@ public class Repository {
         return db.invoiceDao().getAll();
     }
 
+    public List<Invoice> getAllInvoicesOnce() {
+        return db.invoiceDao().getAllOnce();
+    }
+
     public LiveData<Double> getTodaySales(long startOfDay, long endOfDay) {
         return db.invoiceDao().getTodaySales(startOfDay, endOfDay);
     }

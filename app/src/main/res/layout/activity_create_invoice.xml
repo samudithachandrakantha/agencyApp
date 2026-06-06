@@ -145,16 +145,23 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add_item"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="44dp"
                             android:text="@string/add_item_button"
-                            android:textColor="@color/soft_blue_icon"
-                            app:backgroundTint="@android:color/transparent"
-                            app:cornerRadius="4dp"
+                            android:textColor="@color/white"
+                            android:textAllCaps="false"
+                            android:textStyle="bold"
+                            app:backgroundTint="@color/navy_900"
+                            app:cornerRadius="10dp"
                             app:elevation="0dp"
+                            app:icon="@android:drawable/ic_input_add"
+                            app:iconGravity="textStart"
+                            app:iconPadding="6dp"
+                            app:iconTint="@color/white"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:rippleColor="@color/soft_blue"
-                            app:strokeColor="@android:color/transparent" />
+                            app:strokeColor="@color/navy_900"
+                            app:strokeWidth="0dp" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <!-- Items RecyclerView -->
@@ -329,8 +336,11 @@
                             android:layout_weight="1"
                             android:text="@string/payment_cash"
                             android:textSize="13sp"
+                            android:textColor="@color/payment_toggle_text"
+                            app:backgroundTint="@color/payment_toggle_background"
                             app:cornerRadius="6dp"
-                            app:strokeColor="@color/text_secondary" />
+                            app:strokeColor="@color/payment_toggle_stroke"
+                            app:strokeWidth="1dp" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_credit"
@@ -339,8 +349,11 @@
                             android:layout_weight="1"
                             android:text="@string/payment_credit"
                             android:textSize="13sp"
+                            android:textColor="@color/payment_toggle_text"
+                            app:backgroundTint="@color/payment_toggle_background"
                             app:cornerRadius="6dp"
-                            app:strokeColor="@color/text_secondary" />
+                            app:strokeColor="@color/payment_toggle_stroke"
+                            app:strokeWidth="1dp" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_cheque"
@@ -349,8 +362,11 @@
                             android:layout_weight="1"
                             android:text="@string/payment_cheque"
                             android:textSize="13sp"
+                            android:textColor="@color/payment_toggle_text"
+                            app:backgroundTint="@color/payment_toggle_background"
                             app:cornerRadius="6dp"
-                            app:strokeColor="@color/text_secondary" />
+                            app:strokeColor="@color/payment_toggle_stroke"
+                            app:strokeWidth="1dp" />
                     </com.google.android.material.button.MaterialButtonToggleGroup>
 
                     <!-- Cheque Details Section (initially hidden) -->
@@ -426,7 +442,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:clickable="true"
-                                android:focusable="false"
+                                android:focusable="true"
                                 android:inputType="text"
                                 android:maxLines="1" />
                         </com.google.android.material.textfield.TextInputLayout>

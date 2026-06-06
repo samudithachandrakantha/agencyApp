@@ -18,6 +18,7 @@ public class Customer {
     private String idNumber; // national ID / tax id etc.
     private String paymentMethods; // CSV of allowed methods e.g. CASH,CHEQUE
     private boolean isBlocked; // temporary block status
+    private double outstandingAmount;
 
     public Customer() {
     }
@@ -103,5 +104,8 @@ public class Customer {
 
     public boolean isBlocked() { return isBlocked; }
     public void setBlocked(boolean blocked) { isBlocked = blocked; }
+
+    public double getOutstandingAmount() { return outstandingAmount; }
+    public void setOutstandingAmount(double outstandingAmount) { this.outstandingAmount = outstandingAmount; }
 }
 

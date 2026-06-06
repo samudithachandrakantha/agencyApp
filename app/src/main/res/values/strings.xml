@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">agencyApp</string>
+    <string name="app_name">Shanka Distributors</string>
 
     <!-- Create Invoice Activity Strings -->
     <string name="create_invoice_title">Create Invoice</string>
@@ -7,8 +7,8 @@
     <string name="select_customer">Select Customer</string>
     <string name="customer_required_error">Customer is required</string>
     <string name="items_title">Items</string>
-    <string name="add_item_button">+ Add Item</string>
-    <string name="no_items_message">No items added yet. Tap \'+ Add Item\' to begin.</string>
+    <string name="add_item_button">Add Item</string>
+    <string name="no_items_message">No items added yet. Tap Add Item to begin.</string>
     <string name="subtotal_label">Subtotal</string>
     <string name="discount_label">Discount</string>
     <string name="total_label">Total</string>
@@ -25,6 +25,26 @@
     <string name="save_invoice_button">Preview &amp; Save</string>
     <string name="chevron_icon">Chevron icon</string>
     <string name="currency_icon">Currency icon</string>
+
+    <!-- Invoice preview dialog -->
+    <string name="invoice_preview_header">Invoice Preview</string>
+    <string name="invoice_preview_number_label">Invoice #</string>
+    <string name="invoice_preview_date_label">Date</string>
+    <string name="invoice_preview_customer_label">Customer</string>
+    <string name="invoice_preview_contact_label">Contact</string>
+    <string name="invoice_preview_address_label">Address</string>
+    <string name="invoice_preview_items_label">Items</string>
+    <string name="invoice_preview_summary_label">Summary</string>
+    <string name="invoice_preview_subtotal_label">Subtotal</string>
+    <string name="invoice_preview_paid_label">Paid</string>
+    <string name="invoice_preview_balance_due_label">Balance Due</string>
+    <string name="invoice_preview_cheque_details_label">Cheque Details</string>
+    <string name="invoice_preview_cheque_number_label">Cheque No</string>
+    <string name="invoice_preview_bank_name_label">Bank</string>
+    <string name="invoice_preview_cheque_date_label">Cheque Date</string>
+    <string name="invoice_preview_payment_label">Payment</string>
+    <string name="invoice_preview_item_count_empty">0 items</string>
+
     <!-- Customers -->
     <string name="customers_title">Customers</string>
     <string name="search_customers_hint">Search customers…</string>
@@ -80,6 +100,14 @@
     <string name="delete_invoice_message">This will permanently delete the invoice and all linked items and payments.</string>
     <string name="invoice_deleted">Invoice deleted</string>
     <string name="delete">Delete</string>
+    <string name="settle">Settle</string>
+    <string name="settle_invoice_title">Settle Credit Invoice</string>
+    <string name="settle_full_payment">Full Payment</string>
+    <string name="settle_amount_hint">Paid Amount</string>
+    <string name="mark_paid">Paid</string>
+    <string name="settlement_saved">Payment recorded</string>
+    <string name="settle_invalid_amount">Enter a valid amount</string>
+    <string name="settle_amount_exceeds_due">Amount cannot exceed balance due</string>
     <string name="error_product_name_required">Product name is required</string>
     <string name="error_cost_price_required">Cost price is required</string>
     <string name="error_selling_price_required">Selling price is required</string>

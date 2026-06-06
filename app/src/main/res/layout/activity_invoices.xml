@@ -71,12 +71,12 @@
                     android:textStyle="bold" />
 
                 <ImageView
-                    android:id="@+id/btn_clear_date_range_filter"
+                    android:id="@+id/btnClearDateRangeFilter"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:contentDescription="Clear date range filter"
                     android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    android:tint="@color/text_secondary" />
+                    app:tint="@color/text_secondary" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
