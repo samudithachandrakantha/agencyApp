@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.LayoutInflater;
 import android.widget.TextView;
+import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -18,8 +19,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.hfad.agencyapp.databinding.ActivityCreateInvoiceBinding;
 import com.hfad.agencyapp.data.entities.Product;
+import com.hfad.agencyapp.ui.adapters.InvoicePreviewItemAdapter;
 import com.hfad.agencyapp.ui.adapters.InvoiceItemsAdapter;
+import com.hfad.agencyapp.ui.models.ChequeDetails;
 import com.hfad.agencyapp.ui.models.Customer;
+import com.hfad.agencyapp.ui.models.InvoicePreviewLineItem;
 import com.hfad.agencyapp.ui.models.PaymentType;
 import com.hfad.agencyapp.viewmodel.CreateInvoiceViewModel;
 
@@ -42,6 +46,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
     private ActivityCreateInvoiceBinding binding;
     private CreateInvoiceViewModel viewModel;
     private InvoiceItemsAdapter adapter;
+    private final InvoicePreviewItemAdapter previewAdapter = new InvoicePreviewItemAdapter();
     private DecimalFormat currencyFormat;
     private SimpleDateFormat dateFormat;
     private long editingInvoiceId = -1L;
@@ -71,6 +76,17 @@ public class CreateInvoiceActivity extends AppCompatActivity {
 
         if (editingInvoiceId > 0) {
             loadInvoiceForEdit(editingInvoiceId);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 9876 && resultCode == RESULT_OK) {
+            // User tapped Save in the full-screen preview
+            viewModel.saveInvoice(editingInvoiceId > 0 ? editingInvoiceId : null, editingInvoiceNumber);
+            Snackbar.make(binding.getRoot(), "Invoice saved successfully", Snackbar.LENGTH_SHORT).show();
+            finish();
         }
     }
 
@@ -177,23 +193,9 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         binding.tvItemsError.setVisibility(View.GONE);
         binding.tvChequeError.setVisibility(View.GONE);
 
-        View previewView = LayoutInflater.from(this).inflate(com.hfad.agencyapp.R.layout.dialog_invoice_preview, null);
-        TextView tvCustomer = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewCustomer);
-        TextView tvInvoiceNumber = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewInvoiceNumber);
-        TextView tvItems = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewItems);
-        TextView tvSubtotal = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewSubtotal);
-        TextView tvDiscount = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewDiscount);
-        TextView tvTotal = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewTotal);
-        TextView tvPayment = previewView.findViewById(com.hfad.agencyapp.R.id.tvPreviewPayment);
-
-        com.hfad.agencyapp.ui.models.Customer customer = viewModel.getSelectedCustomer().getValue();
-        tvCustomer.setText(customer != null ? customer.getBusinessName() : "Unknown");
-
-        String invoiceNumber = "INV-" + (System.currentTimeMillis() / 1000);
-        tvInvoiceNumber.setText(invoiceNumber);
-
-        StringBuilder sb = new StringBuilder();
-        java.util.List<com.hfad.agencyapp.ui.models.InvoiceItem> items = viewModel.getItems().getValue();
+        // Build preview list & launch full-screen preview activity instead of showing a dialog
+        List<com.hfad.agencyapp.ui.models.InvoiceItem> items = viewModel.getItems().getValue();
+        List<InvoicePreviewLineItem> previewItems = new java.util.ArrayList<>();
         double subtotal = 0.0;
         double totalDiscount = 0.0;
         if (items != null) {
@@ -203,48 +205,70 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                 double lineTotal = it.getLineTotal();
                 subtotal += lineSubtotal;
                 totalDiscount += lineDiscount;
-                sb.append(it.getProductName())
-                        .append("\nQty: ")
-                        .append(it.getQuantity())
-                        .append(" x Rs. ")
-                        .append(currencyFormat.format(it.getUnitPrice()))
-                        .append(" = Rs. ")
-                        .append(currencyFormat.format(lineSubtotal))
-                        .append("\nDiscount: Rs. ")
-                        .append(currencyFormat.format(lineDiscount))
-                        .append(" (")
-                        .append(currencyFormat.format(it.getDiscountPercent()))
-                        .append("% of Rs. ")
-                        .append(currencyFormat.format(lineSubtotal))
-                        .append(")\nLine total: Rs. ")
-                        .append(currencyFormat.format(lineTotal))
-                        .append("\n");
-                String freeIssueSummary = it.getFreeIssueSummary();
-                if (!freeIssueSummary.isEmpty()) {
-                    sb.append(freeIssueSummary).append("\n");
-                }
+                previewItems.add(new InvoicePreviewLineItem(
+                        it.getProductName(),
+                        "#" + it.getProductId(),
+                        it.getQuantity(),
+                        it.getUnitPrice(),
+                        lineTotal,
+                        lineDiscount,
+                        it.getFreeIssueSummary()
+                ));
             }
         }
-        tvItems.setText(sb.toString());
+
+        org.json.JSONArray arr = new org.json.JSONArray();
+        for (InvoicePreviewLineItem li : previewItems) {
+            org.json.JSONObject o = new org.json.JSONObject();
+            try {
+                o.put("productName", li.productName);
+                o.put("productCode", li.productCode);
+                o.put("quantity", li.quantity);
+                o.put("unitPrice", li.unitPrice);
+                o.put("lineTotal", li.lineTotal);
+                o.put("discountAmount", li.discountAmount);
+                o.put("freeIssueText", li.freeIssueText != null ? li.freeIssueText : "");
+            } catch (org.json.JSONException ignored) {
+            }
+            arr.put(o);
+        }
 
         Double total = viewModel.getTotal().getValue();
-        tvSubtotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(subtotal)));
-        tvDiscount.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(totalDiscount)));
-        tvTotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(total != null ? total : 0.0)));
+        double invoiceTotal = total != null ? total : 0.0;
+        PaymentType paymentType = viewModel.getPaymentType().getValue() != null ? viewModel.getPaymentType().getValue() : PaymentType.CASH;
+        double paidAmount = paymentType == PaymentType.CASH ? invoiceTotal : 0.0;
+        double balanceDue = Math.max(0.0, invoiceTotal - paidAmount);
 
-        tvPayment.setText(viewModel.getPaymentType().getValue().name());
+        android.content.Intent intent = new android.content.Intent(this, InvoicePreviewDraftActivity.class);
+        com.hfad.agencyapp.ui.models.Customer customer = viewModel.getSelectedCustomer().getValue();
+        String customerName = customer != null && customer.getBusinessName() != null && !customer.getBusinessName().trim().isEmpty()
+                ? customer.getBusinessName()
+                : getString(com.hfad.agencyapp.R.string.unknown_value);
+        String contact = customer != null ? customer.getContactPerson() : null;
+        String address = customer != null ? customer.getAddress() : null;
 
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Invoice Preview")
-                .setView(previewView)
-                .setNegativeButton("Edit", (d, which) -> d.dismiss())
-                .setPositiveButton("Save", (d, which) -> {
-                    viewModel.saveInvoice(editingInvoiceId > 0 ? editingInvoiceId : null, editingInvoiceNumber);
-                    Snackbar.make(binding.getRoot(), "Invoice saved successfully", Snackbar.LENGTH_SHORT).show();
-                    d.dismiss();
-                    finish();
-                })
-                .show();
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_CUSTOMER_NAME, customerName);
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_CONTACT, contact);
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_ADDRESS, address);
+        String invoiceNumber = "INV-" + (System.currentTimeMillis() / 1000);
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_INVOICE_NUMBER, invoiceNumber);
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_INVOICE_DATE, "Date: " + dateFormat.format(new java.util.Date()));
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_ITEMS_JSON, arr.toString());
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_SUBTOTAL, subtotal);
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_DISCOUNT, totalDiscount);
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_TOTAL, invoiceTotal);
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_PAID_AMOUNT, paidAmount);
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_BALANCE_DUE, balanceDue);
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_PAYMENT, paymentType.name());
+
+        ChequeDetails chequeDetails = viewModel.getChequeDetails().getValue();
+        if (chequeDetails != null) {
+            intent.putExtra(InvoicePreviewDraftActivity.EXTRA_CHEQUE_NUMBER, chequeDetails.getChequeNumber());
+            intent.putExtra(InvoicePreviewDraftActivity.EXTRA_BANK_NAME, chequeDetails.getBankName());
+            intent.putExtra(InvoicePreviewDraftActivity.EXTRA_CHEQUE_DATE, chequeDetails.getChequeDate() != null ? dateFormat.format(chequeDetails.getChequeDate()) : null);
+        }
+
+        startActivityForResult(intent, 9876);
     }
 
     private void setupToggleGroup() {

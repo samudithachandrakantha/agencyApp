@@ -51,6 +51,7 @@ public class InvoicePreviewItemAdapter extends RecyclerView.Adapter<InvoicePrevi
         private final TextView tvQuantity;
         private final TextView tvUnitPrice;
         private final TextView tvLineTotal;
+        private final TextView tvDiscount;
         private final TextView tvFreeIssue;
 
         ViewHolder(@NonNull View itemView) {
@@ -60,6 +61,7 @@ public class InvoicePreviewItemAdapter extends RecyclerView.Adapter<InvoicePrevi
             tvQuantity = itemView.findViewById(R.id.tv_preview_quantity);
             tvUnitPrice = itemView.findViewById(R.id.tv_preview_unit_price);
             tvLineTotal = itemView.findViewById(R.id.tv_preview_line_total);
+            tvDiscount = itemView.findViewById(R.id.tv_preview_discount);
             tvFreeIssue = itemView.findViewById(R.id.tv_preview_free_issue);
         }
 
@@ -68,7 +70,13 @@ public class InvoicePreviewItemAdapter extends RecyclerView.Adapter<InvoicePrevi
             tvProductCode.setText(item.productCode);
             tvQuantity.setText("Qty: " + item.quantity);
             tvUnitPrice.setText("Unit: Rs. " + currencyFormat.format(item.unitPrice));
-            tvLineTotal.setText("Rs. " + currencyFormat.format(item.lineTotal));
+            tvLineTotal.setText("Total: Rs. " + currencyFormat.format(item.lineTotal));
+            if (item.discountAmount > 0.0) {
+                tvDiscount.setVisibility(View.VISIBLE);
+                tvDiscount.setText("Discount: Rs. " + currencyFormat.format(item.discountAmount));
+            } else {
+                tvDiscount.setVisibility(View.GONE);
+            }
             if (item.freeIssueText != null && !item.freeIssueText.trim().isEmpty()) {
                 tvFreeIssue.setVisibility(View.VISIBLE);
                 tvFreeIssue.setText(item.freeIssueText);

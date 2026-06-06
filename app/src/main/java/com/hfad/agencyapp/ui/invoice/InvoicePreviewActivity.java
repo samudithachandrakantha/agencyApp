@@ -288,6 +288,7 @@ public class InvoicePreviewActivity extends AppCompatActivity {
                     item.quantity,
                     item.unitPrice,
                     lineTotal,
+                    lineDiscount,
                     freeIssueText
             ));
         }
