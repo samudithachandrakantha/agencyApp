@@ -56,7 +56,7 @@ public class Product {
         p.categoryId = categoryId;
         p.sku = sku != null ? sku : "";
         p.stock = 0;
-        p.lowStockThreshold = 5;
+        p.lowStockThreshold = 10;
         long now = System.currentTimeMillis();
         p.createdAt = now;
         p.updatedAt = now;

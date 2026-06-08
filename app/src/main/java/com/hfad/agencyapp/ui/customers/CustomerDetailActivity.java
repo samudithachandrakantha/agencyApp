@@ -68,6 +68,14 @@ public class CustomerDetailActivity extends AppCompatActivity {
 
         // Update UI based on blocked status
         updateBlockedStatus();
+
+        binding.btnViewInvoices.setOnClickListener(v -> {
+            if (currentCustomer != null) {
+                android.content.Intent intent = new android.content.Intent(this, com.hfad.agencyapp.ui.invoice.InvoicesActivity.class);
+                intent.putExtra("filter_customer_name", currentCustomer.getBusinessName());
+                startActivity(intent);
+            }
+        });
     }
 
     private void updateBlockedStatus() {

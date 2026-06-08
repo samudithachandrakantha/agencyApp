@@ -110,10 +110,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:cardCornerRadius="@dimen/radius_md"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/slate_100"
+                    app:strokeColor="@color/zinc_100"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -125,7 +125,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Revenue"
+                            android:text="Sales"
                             android:textColor="@color/on_surface_variant"
                             android:textSize="12sp" />
 
@@ -146,10 +146,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:cardCornerRadius="@dimen/radius_md"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/slate_100"
+                    app:strokeColor="@color/zinc_100"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -161,7 +161,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Orders"
+                            android:text="Invoices"
                             android:textColor="@color/on_surface_variant"
                             android:textSize="12sp" />
 
@@ -189,10 +189,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:cardCornerRadius="@dimen/radius_md"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/slate_100"
+                    app:strokeColor="@color/zinc_100"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -225,10 +225,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="@color/surface"
+                    app:cardCornerRadius="@dimen/radius_md"
                     app:cardElevation="0dp"
-                    app:strokeColor="@color/slate_100"
+                    app:strokeColor="@color/zinc_100"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -262,8 +262,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 app:cardBackgroundColor="@color/primary"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -292,15 +292,15 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Revenue Trend Chart -->
+            <!-- Sales Trend Chart -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="@dimen/radius_md"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/slate_100"
+                app:strokeColor="@color/zinc_100"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -312,13 +312,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Revenue Trend"
+                        android:text="Sales Trend"
                         android:textColor="@color/on_surface"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <com.github.mikephil.charting.charts.BarChart
-                        android:id="@+id/bar_chart_revenue"
+                        android:id="@+id/bar_chart_sales"
                         android:layout_width="match_parent"
                         android:layout_height="240dp"
                         android:layout_marginTop="16dp" />
@@ -330,10 +330,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="@dimen/radius_md"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/slate_100"
+                app:strokeColor="@color/zinc_100"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -388,10 +388,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="@dimen/radius_md"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/slate_100"
+                app:strokeColor="@color/zinc_100"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -422,10 +422,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="@dimen/radius_md"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/slate_100"
+                app:strokeColor="@color/zinc_100"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -455,10 +455,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="@dimen/radius_md"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/slate_100"
+                app:strokeColor="@color/zinc_100"
                 app:strokeWidth="1dp">
 
                 <LinearLayout

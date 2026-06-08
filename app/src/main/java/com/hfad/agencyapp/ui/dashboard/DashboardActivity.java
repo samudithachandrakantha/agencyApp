@@ -42,6 +42,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         enableLayoutTransitions((ViewGroup) binding.getRoot());
 
+        binding.tvUserName.setText(R.string.business_name_shanka);
+
         viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
         setupRecyclerView();
@@ -66,6 +68,20 @@ public class DashboardActivity extends AppCompatActivity {
         viewModel.todayInvoiceCount.observe(this, count -> {
             int value = count != null ? count : 0;
             binding.tvInvoiceCount.setText(String.valueOf(value));
+        });
+
+        viewModel.lowStockProducts.observe(this, lowStockList -> {
+            if (lowStockList != null && !lowStockList.isEmpty()) {
+                binding.cardLowStockAlert.setVisibility(View.VISIBLE);
+                binding.tvLowStockCount.setText(getString(R.string.low_stock_warning_format, lowStockList.size()));
+                binding.btnViewLowStock.setOnClickListener(v -> {
+                    Intent intent = new Intent(this, ProductsActivity.class);
+                    intent.putExtra("filter_low_stock", true);
+                    startActivity(intent);
+                });
+            } else {
+                binding.cardLowStockAlert.setVisibility(View.GONE);
+            }
         });
 
         viewModel.invoices.observe(this, invoices -> {
@@ -126,6 +142,7 @@ public class DashboardActivity extends AppCompatActivity {
                 }
             }
 
+            binding.tvEmptyInvoices.setVisibility(uiModels.isEmpty() ? View.VISIBLE : View.GONE);
             invoiceAdapter.submitList(uiModels);
             invoiceAdapter.setOnInvoiceClickListener(invoiceDbId -> com.hfad.agencyapp.utils.PreviewUtils.showInvoicePreview(DashboardActivity.this, invoiceDbId));
         });

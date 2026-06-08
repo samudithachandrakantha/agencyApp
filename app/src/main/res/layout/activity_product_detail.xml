@@ -76,6 +76,21 @@
                             android:textColor="@color/primary"
                             android:textSize="18sp"
                             android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvLowStockBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_badge_red"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:text="@string/low_stock_badge"
+                            android:textColor="@color/white"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

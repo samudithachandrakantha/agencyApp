@@ -87,6 +87,12 @@ public class ProductDetailActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 binding.toolbar.setTitle(product.name);
                 binding.tvCurrentStock.setText(String.valueOf(product.stock));
+                
+                if (product.stock <= product.lowStockThreshold) {
+                    binding.tvLowStockBadge.setVisibility(android.view.View.VISIBLE);
+                } else {
+                    binding.tvLowStockBadge.setVisibility(android.view.View.GONE);
+                }
 
                 int totalSold = 0;
                 double totalRevenue = 0.0;

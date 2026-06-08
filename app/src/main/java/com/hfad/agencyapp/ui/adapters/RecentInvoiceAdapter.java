@@ -55,7 +55,7 @@ public class RecentInvoiceAdapter extends ListAdapter<RecentInvoiceUiModel, Rece
     @NonNull
     @Override
     public InvoiceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_invoice, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dashboard_invoice, parent, false);
         return new InvoiceViewHolder(view);
     }
 
@@ -108,10 +108,10 @@ public class RecentInvoiceAdapter extends ListAdapter<RecentInvoiceUiModel, Rece
 
         InvoiceViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvCustomer = itemView.findViewById(R.id.tvProductId);
-            tvInvoiceId = itemView.findViewById(R.id.tvQuantity);
-            tvAmount = itemView.findViewById(R.id.tvTotalPrice);
-            tvStatus = itemView.findViewById(R.id.tvUnitPrice);
+            tvCustomer = itemView.findViewById(R.id.tvCustomerName);
+            tvInvoiceId = itemView.findViewById(R.id.tvInvoiceNumberAndDate);
+            tvAmount = itemView.findViewById(R.id.tvTotalAmount);
+            tvStatus = itemView.findViewById(R.id.tvPaymentStatus);
             pendingContainer = itemView.findViewById(R.id.pendingContainer);
             tvDuePayment = itemView.findViewById(R.id.tvDuePayment);
             tvPendingLabel = itemView.findViewById(R.id.tvPendingLabel);

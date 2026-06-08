@@ -48,10 +48,11 @@
                     android:id="@+id/card_search"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
+                    app:cardBackgroundColor="@color/surface"
+                    app:cardCornerRadius="@dimen/radius_md"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/zinc_200"
+                    app:strokeWidth="1dp">
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/til_search"
@@ -76,10 +77,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    app:cardBackgroundColor="@color/info_container"
-                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="@color/zinc_100"
+                    app:cardCornerRadius="@dimen/radius_md"
                     app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
+                    app:strokeColor="@color/zinc_200"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -128,5 +130,16 @@
                 tools:listitem="@layout/item_invoice" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_invoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@android:drawable/ic_input_add"
+        app:tint="@color/white"
+        app:backgroundTint="@color/secondary"
+        app:elevation="6dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

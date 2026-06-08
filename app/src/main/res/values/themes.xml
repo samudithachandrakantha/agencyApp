@@ -4,7 +4,7 @@
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/on_primary</item>
-        <item name="colorPrimaryContainer">@color/slate_100</item>
+        <item name="colorPrimaryContainer">@color/zinc_100</item>
         <item name="colorOnPrimaryContainer">@color/primary</item>
 
         <!-- Secondary brand color. -->
@@ -24,10 +24,35 @@
         <item name="colorSurfaceVariant">@color/surface_variant</item>
         <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
 
+        <!-- Material 3 Dialog & Component Styling -->
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.AgencyApp.MaterialAlertDialog</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.AgencyApp.MediumComponent</item>
+        <item name="materialCardViewStyle">@style/Widget.AgencyApp.MaterialCardView</item>
+
         <!-- Typography -->
         <item name="textAppearanceHeadlineLarge">@style/TextAppearance.AgencyApp.HeadlineLarge</item>
         <item name="textAppearanceTitleMedium">@style/TextAppearance.AgencyApp.TitleMedium</item>
         <item name="textAppearanceBodyLarge">@style/TextAppearance.AgencyApp.BodyLarge</item>
+    </style>
+
+    <!-- Rounded Corners for Cards and Dialogs -->
+    <style name="ShapeAppearance.AgencyApp.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerSize">@dimen/radius_md</item>
+    </style>
+
+    <!-- Modern Dialog Theme -->
+    <style name="ThemeOverlay.AgencyApp.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearance">@style/ShapeAppearance.AgencyApp.MediumComponent</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/TextAppearance.AgencyApp.TitleMedium</item>
+    </style>
+
+    <!-- Global Card Style with Border and Shadow -->
+    <style name="Widget.AgencyApp.MaterialCardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardElevation">3dp</item>
+        <item name="strokeColor">@color/card_border</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.AgencyApp.MediumComponent</item>
     </style>
 
     <style name="Theme.AgencyApp" parent="Base.Theme.AgencyApp" />

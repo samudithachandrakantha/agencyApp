@@ -370,9 +370,12 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                 names[i] = activeCustomers.get(i).getBusinessName();
             }
 
+            android.widget.ListAdapter adapter = new android.widget.ArrayAdapter<>(
+                    this, R.layout.item_dialog_select, R.id.tv_item_text, names);
+
             new MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.select_customer_dialog_title)
-                    .setItems(names, (dialog, which) -> viewModel.setSelectedCustomer(activeCustomers.get(which)))
+                    .setAdapter(adapter, (dialog, which) -> viewModel.setSelectedCustomer(activeCustomers.get(which)))
                     .show();
         } catch (java.util.concurrent.ExecutionException | InterruptedException e) {
             Snackbar.make(binding.getRoot(), getString(R.string.failed_load_customers), Snackbar.LENGTH_SHORT).show();
@@ -430,26 +433,34 @@ public class CreateInvoiceActivity extends AppCompatActivity {
     private void openProductPicker() {
         com.hfad.agencyapp.data.ProductRepository repo = new com.hfad.agencyapp.data.ProductRepository(this);
         try {
-            List<Product> list = repo.searchAsync("%").get();
-            if (list == null || list.isEmpty()) {
-                new MaterialAlertDialogBuilder(this)
-                        .setTitle(R.string.no_products_title)
-                        .setMessage(R.string.no_products_message)
-                        .setPositiveButton(R.string.ok, null)
-                        .show();
+            List<Product> allProducts = repo.searchAsync("%").get();
+            if (allProducts == null || allProducts.isEmpty()) {
+                showNoProductsDialog();
                 return;
             }
 
-            CharSequence[] labels = new CharSequence[list.size()];
-            for (int i = 0; i < list.size(); i++) {
-                Product p = list.get(i);
-                labels[i] = p.name + " - " + getString(R.string.price_label_currency, currencyFormat.format(p.sellingPrice));
+            CharSequence[] labels = new CharSequence[allProducts.size()];
+            for (int i = 0; i < allProducts.size(); i++) {
+                Product p = allProducts.get(i);
+                String priceStr = getString(R.string.price_label_currency, currencyFormat.format(p.sellingPrice));
+                if (p.stock <= 0) {
+                    String text = p.name + " (Out of Stock) - " + priceStr;
+                    android.text.SpannableString spannable = new android.text.SpannableString(text);
+                    spannable.setSpan(new android.text.style.ForegroundColorSpan(android.graphics.Color.parseColor("#EF4444")), 
+                        0, text.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    labels[i] = spannable;
+                } else {
+                    labels[i] = p.name + " - " + priceStr;
+                }
             }
+
+            android.widget.ListAdapter adapter = new android.widget.ArrayAdapter<>(
+                    this, R.layout.item_dialog_select, R.id.tv_item_text, labels);
 
             new MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.add_product_title)
-                    .setItems(labels, (dialog, which) -> {
-                        Product selected = list.get(which);
+                    .setAdapter(adapter, (dialog, which) -> {
+                        Product selected = allProducts.get(which);
                         if (selected.stock <= 0) {
                             handleOutOfStockSelection(selected);
                         } else {
@@ -462,6 +473,14 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         } finally {
             repo.shutdown();
         }
+    }
+
+    private void showNoProductsDialog() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.no_products_title)
+                .setMessage(R.string.no_products_message)
+                .setPositiveButton(R.string.ok, null)
+                .show();
     }
 
     private void addSelectedProductToInvoice(Product selected) {
@@ -536,7 +555,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
 
     private String getOutOfStockBehavior() {
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_APP_SETTINGS, MODE_PRIVATE);
-        return prefs.getString(Constants.KEY_OUT_OF_STOCK_BEHAVIOR, Constants.OUT_OF_STOCK_PROMPT);
+        return prefs.getString(Constants.KEY_OUT_OF_STOCK_BEHAVIOR, Constants.OUT_OF_STOCK_AUTO_ALLOW);
     }
 
     private void setOutOfStockBehavior(String behavior) {
@@ -547,7 +566,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
     private void ensureDefaultInvoicePreferences() {
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_APP_SETTINGS, MODE_PRIVATE);
         if (!prefs.contains(Constants.KEY_OUT_OF_STOCK_BEHAVIOR)) {
-            prefs.edit().putString(Constants.KEY_OUT_OF_STOCK_BEHAVIOR, Constants.OUT_OF_STOCK_PROMPT).apply();
+            prefs.edit().putString(Constants.KEY_OUT_OF_STOCK_BEHAVIOR, Constants.OUT_OF_STOCK_AUTO_ALLOW).apply();
         }
     }
 

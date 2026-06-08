@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingHorizontal="24dp"
+    android:paddingVertical="16dp"
+    android:gravity="center_vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/tv_item_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/on_surface"
+        android:textSize="16sp"
+        android:textStyle="normal" />
+
+    <ImageView
+        android:id="@+id/iv_selection_arrow"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_dashboard_add"
+        android:layout_marginStart="12dp"
+        android:alpha="0.3"
+        android:contentDescription="@null"
+        app:tint="@color/on_surface"
+        xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+</LinearLayout>
