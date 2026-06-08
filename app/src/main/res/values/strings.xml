@@ -93,6 +93,7 @@
     <string name="hint_selling_price_required">Selling price *</string>
     <string name="hint_discount_percent">Discount % (0–100)</string>
     <string name="hint_stock_level_required">Stock level *</string>
+    <string name="hint_low_stock_threshold">Low stock threshold (Critical Level)</string>
     <string name="error_stock_level_required">Stock level is required</string>
     <string name="hint_buy_qty_for_free_optional">Buy quantity for free issue (optional)</string>
     <string name="hint_free_issue_qty">Free issue units allowed</string>
@@ -225,6 +226,19 @@
     <string name="invoice_generator_balance">Balance: %1$.2f</string>
     <string name="invoice_generator_thank_you_short">Thank You!</string>
 
+    <!-- Dashboard -->
+    <string name="welcome_back">Welcome back,</string>
+    <string name="business_name_shanka">Shanka Distributors</string>
+    <string name="today_sales">Today\'s Sales</string>
+    <string name="invoices_today">Invoices Today</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="new_invoice">New Invoice</string>
+    <string name="products">Products</string>
+    <string name="sync">Sync</string>
+    <string name="recent_invoices">Recent Invoices</string>
+    <string name="view_all">View All</string>
+    <string name="no_recent_invoices">No recent invoices</string>
+
     <!-- Shared UI defaults -->
     <string name="value_unknown">Unknown</string>
     <string name="value_not_available">-</string>
@@ -262,6 +276,10 @@
     <string name="customer_blocked">Customer blocked</string>
     <string name="customer_unblocked">Customer unblocked</string>
     <string name="customer_status_update_failed">Failed to update customer status</string>
+    <string name="view_customer_invoices">View Customer Invoices</string>
+    <string name="view">View</string>
+    <string name="low_stock_warning_format">%1$d items are running low on stock</string>
+    <string name="low_stock_badge">LOW STOCK</string>
     <string name="default_payment_methods">Cash, Credit, Cheque</string>
 
     <!-- Products -->
@@ -271,7 +289,7 @@
 
     <!-- Insights -->
     <string name="insights_no_product_sales_data">No product sales data for this period</string>
-    <string name="insights_revenue_label">Revenue</string>
+    <string name="insights_sales_label">Sales</string>
 
     <!-- Menu labels -->
     <string name="menu_search">Search</string>

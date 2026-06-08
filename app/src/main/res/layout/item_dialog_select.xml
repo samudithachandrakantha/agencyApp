@@ -26,6 +26,7 @@
         android:src="@drawable/ic_dashboard_add"
         android:layout_marginStart="12dp"
         android:alpha="0.3"
+        android:contentDescription="@null"
         app:tint="@color/on_surface"
         xmlns:app="http://schemas.android.com/apk/res-auto" />
 

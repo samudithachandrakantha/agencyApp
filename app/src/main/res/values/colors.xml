@@ -1,60 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary - Dynamic and Modern Navy -->
-    <color name="primary">#0F172A</color>
-    <color name="primary_light">#1E293B</color>
-    <color name="primary_dark">#020617</color>
+    <!-- Primary - Deep modern Zinc -->
+    <color name="primary">#18181b</color>
+    <color name="primary_light">#27272a</color>
+    <color name="primary_dark">#09090b</color>
     <color name="on_primary">#FFFFFF</color>
 
-    <!-- Secondary - Professional Blue -->
-    <color name="secondary">#2563EB</color>
-    <color name="secondary_light">#3B82F6</color>
-    <color name="secondary_dark">#1D4ED8</color>
+    <!-- Secondary - Vibrant Blue -->
+    <color name="secondary">#2563eb</color>
+    <color name="secondary_light">#3b82f6</color>
+    <color name="secondary_dark">#1d4ed8</color>
     <color name="on_secondary">#FFFFFF</color>
 
     <!-- Backgrounds & Surfaces -->
-    <color name="background">#F8FAFC</color>
+    <color name="background">#f4f4f5</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#F1F5F9</color>
-    <color name="on_background">#0F172A</color>
-    <color name="on_surface">#0F172A</color>
-    <color name="on_surface_variant">#64748B</color>
+    <color name="surface_variant">#e4e4e7</color>
+    <color name="on_background">#09090b</color>
+    <color name="on_surface">#09090b</color>
+    <color name="on_surface_variant">#52525b</color>
 
     <!-- Semantic Colors -->
-    <color name="success">#10B981</color>
-    <color name="success_container">#D1FAE5</color>
-    <color name="on_success_container">#064E3B</color>
+    <color name="success">#10b981</color>
+    <color name="success_container">#dcfce7</color>
+    <color name="on_success_container">#14532d</color>
 
-    <color name="error">#EF4444</color>
-    <color name="error_container">#FEE2E2</color>
-    <color name="on_error_container">#7F1D1D</color>
+    <color name="error">#ef4444</color>
+    <color name="error_container">#fee2e2</color>
+    <color name="on_error_container">#7f1d1d</color>
 
-    <color name="warning">#F59E0B</color>
-    <color name="warning_container">#FEF3C7</color>
-    <color name="on_warning_container">#78350F</color>
+    <color name="warning">#f59e0b</color>
+    <color name="warning_container">#fef3c7</color>
+    <color name="on_warning_container">#78350f</color>
 
-    <color name="info">#3B82F6</color>
-    <color name="info_container">#DBEAFE</color>
-    <color name="on_info_container">#1E3A8A</color>
+    <color name="info">#3b82f6</color>
+    <color name="info_container">#dbeafe</color>
+    <color name="on_info_container">#1e3a8a</color>
 
-    <!-- Neutrals -->
-    <color name="slate_50">#F8FAFC</color>
-    <color name="slate_100">#F1F5F9</color>
-    <color name="slate_200">#E2E8F0</color>
-    <color name="slate_300">#CBD5E1</color>
-    <color name="slate_400">#94A3B8</color>
-    <color name="slate_500">#64748B</color>
-    <color name="slate_600">#475569</color>
-    <color name="slate_700">#334155</color>
-    <color name="slate_800">#1E293B</color>
-    <color name="slate_900">#0F172A</color>
+    <!-- Neutrals (Zinc) -->
+    <color name="zinc_50">#fafafa</color>
+    <color name="zinc_100">#f4f4f5</color>
+    <color name="zinc_200">#e4e4e7</color>
+    <color name="zinc_300">#d4d4d8</color>
+    <color name="zinc_400">#a1a1aa</color>
+    <color name="zinc_500">#71717a</color>
+    <color name="zinc_600">#52525b</color>
+    <color name="zinc_700">#3f3f46</color>
+    <color name="zinc_800">#27272a</color>
+    <color name="zinc_900">#18181b</color>
 
-    <!-- Legacy Compatibility (Keeping names used in layouts but mapping to new palette) -->
-    <color name="navy_900">@color/slate_900</color>
-    <color name="navy_700">@color/slate_700</color>
+    <color name="slate_400">@color/zinc_400</color>
+    <color name="slate_500">@color/zinc_500</color>
+    <color name="slate_600">@color/zinc_600</color>
+
+    <!-- Compatibility mappings -->
+    <color name="navy_900">@color/zinc_900</color>
+    <color name="navy_700">@color/zinc_700</color>
     <color name="dashboard_bg">@color/background</color>
-    <color name="text_primary">@color/slate_900</color>
-    <color name="text_secondary">@color/slate_500</color>
+    <color name="text_primary">@color/on_surface</color>
+    <color name="text_secondary">@color/zinc_500</color>
+    <color name="slate_100">@color/zinc_100</color>
+    <color name="slate_200">@color/zinc_200</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="blur_white">#EEFFFFFF</color>

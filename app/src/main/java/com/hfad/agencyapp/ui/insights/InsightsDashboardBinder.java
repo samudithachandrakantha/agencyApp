@@ -191,7 +191,7 @@ public class InsightsDashboardBinder {
     }
 
     private void setupCharts() {
-        configureBarChart(binding.barChartRevenue);
+        configureBarChart(binding.barChartSales);
         configureHorizontalBarChart(binding.barChartTopProducts);
         configurePieChart(binding.pieChartBreakdown);
         configureBarChart(binding.barChartByCategory);
@@ -202,14 +202,14 @@ public class InsightsDashboardBinder {
         List<Invoice> selectedInvoices = filterInvoicesByPeriod(invoices, periodFilter);
         List<Invoice> comparisonInvoices = filterComparisonInvoices(invoices, periodFilter);
 
-        double revenue = sumRevenue(selectedInvoices);
-        int orderCount = selectedInvoices.size();
+        double sales = sumSales(selectedInvoices);
+        int invoiceCount = selectedInvoices.size();
         int customerCount = countDistinctCustomers(selectedInvoices);
         int productCount = products.size();
-        double averageOrder = orderCount > 0 ? revenue / orderCount : 0.0;
+        double averageInvoice = invoiceCount > 0 ? sales / invoiceCount : 0.0;
 
-        binding.tvInsightSales.setText(context.getString(R.string.amount_format, moneyFormat.format(revenue)));
-        binding.tvInsightInvoices.setText(String.valueOf(orderCount));
+        binding.tvInsightSales.setText(context.getString(R.string.amount_format, moneyFormat.format(sales)));
+        binding.tvInsightInvoices.setText(String.valueOf(invoiceCount));
         binding.tvInsightCustomers.setText(String.valueOf(customerCount));
         binding.tvInsightProducts.setText(String.valueOf(productCount));
 
@@ -219,7 +219,7 @@ public class InsightsDashboardBinder {
         renderTopProductsChart(selectedInvoices);
         renderCategoryChart(selectedInvoices);
         renderCustomerRankingChart(selectedInvoices);
-        renderSummary(selectedInvoices, comparisonInvoices, revenue, orderCount, averageOrder);
+        renderSummary(selectedInvoices, comparisonInvoices, sales, invoiceCount, averageInvoice);
     }
 
     private void renderCategoryChart(List<Invoice> selectedInvoices) {
@@ -270,8 +270,8 @@ public class InsightsDashboardBinder {
                 data.setBarWidth(0.7f);
                 data.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getBarLabel(com.github.mikephil.charting.data.BarEntry barEntry) {
-                        return moneyFormat.format(barEntry.getY());
+                    public String getFormattedValue(float value) {
+                        return moneyFormat.format(value);
                     }
                 });
 
@@ -317,7 +317,7 @@ public class InsightsDashboardBinder {
             labels.add(shortenLabel(e.getKey()));
         }
 
-        BarDataSet dataSet = new BarDataSet(entries, "Customer Revenue");
+        BarDataSet dataSet = new BarDataSet(entries, "Customer Sales");
         dataSet.setColor(context.getColor(R.color.navy_900));
         dataSet.setValueTextColor(context.getColor(R.color.text_primary));
         dataSet.setValueTextSize(10f);
@@ -326,8 +326,8 @@ public class InsightsDashboardBinder {
         data.setBarWidth(0.7f);
         data.setValueFormatter(new ValueFormatter() {
             @Override
-            public String getBarLabel(com.github.mikephil.charting.data.BarEntry barEntry) {
-                return moneyFormat.format(barEntry.getY());
+            public String getFormattedValue(float value) {
+                return moneyFormat.format(value);
             }
         });
 
@@ -363,9 +363,9 @@ public class InsightsDashboardBinder {
 
     private void renderSummary(List<Invoice> selectedInvoices,
                                List<Invoice> comparisonInvoices,
-                               double revenue,
-                               int orderCount,
-                               double averageOrder) {
+                               double sales,
+                               int invoiceCount,
+                               double averageInvoice) {
         // Summary card removed from layout; only update breakdown title now.
         binding.tvBreakdownTitle.setText(breakdownFilter == BreakdownFilter.PAYMENT_METHOD
             ? "Payment method mix"
@@ -378,18 +378,18 @@ public class InsightsDashboardBinder {
         List<String> labels = new ArrayList<>();
         for (int i = 0; i < buckets.size(); i++) {
             BuckeTable bucket = buckets.get(i);
-            entries.add(new BarEntry(i, (float) bucket.revenue));
+            entries.add(new BarEntry(i, (float) bucket.sales));
             labels.add(bucket.label);
         }
 
         if (entries.isEmpty()) {
-            binding.barChartRevenue.clear();
-            binding.barChartRevenue.setNoDataText("No revenue data for this period");
-            binding.barChartRevenue.invalidate();
+            binding.barChartSales.clear();
+            binding.barChartSales.setNoDataText("No sales data for this period");
+            binding.barChartSales.invalidate();
             return;
         }
 
-        BarDataSet dataSet = new BarDataSet(entries, "Revenue");
+        BarDataSet dataSet = new BarDataSet(entries, "Sales");
         dataSet.setColor(context.getColor(R.color.navy_900));
         dataSet.setDrawValues(true);
         dataSet.setValueTextColor(context.getColor(R.color.text_primary));
@@ -399,28 +399,28 @@ public class InsightsDashboardBinder {
         data.setBarWidth(0.6f);
         data.setValueFormatter(new ValueFormatter() {
             @Override
-            public String getBarLabel(com.github.mikephil.charting.data.BarEntry barEntry) {
-                return moneyFormat.format(barEntry.getY());
+            public String getFormattedValue(float value) {
+                return moneyFormat.format(value);
             }
         });
 
-        binding.barChartRevenue.setData(data);
-        binding.barChartRevenue.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
-        binding.barChartRevenue.getAxisRight().setEnabled(false);
-        binding.barChartRevenue.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        binding.barChartRevenue.getXAxis().setGranularity(1f);
-        binding.barChartRevenue.getXAxis().setDrawGridLines(false);
-        binding.barChartRevenue.getAxisLeft().setDrawGridLines(true);
-        binding.barChartRevenue.getAxisLeft().setAxisMinimum(0f);
-        binding.barChartRevenue.getDescription().setEnabled(false);
-        binding.barChartRevenue.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
-        binding.barChartRevenue.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
-        binding.barChartRevenue.animateY(600);
-        binding.barChartRevenue.invalidate();
+        binding.barChartSales.setData(data);
+        binding.barChartSales.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+        binding.barChartSales.getAxisRight().setEnabled(false);
+        binding.barChartSales.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        binding.barChartSales.getXAxis().setGranularity(1f);
+        binding.barChartSales.getXAxis().setDrawGridLines(false);
+        binding.barChartSales.getAxisLeft().setDrawGridLines(true);
+        binding.barChartSales.getAxisLeft().setAxisMinimum(0f);
+        binding.barChartSales.getDescription().setEnabled(false);
+        binding.barChartSales.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        binding.barChartSales.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        binding.barChartSales.animateY(600);
+        binding.barChartSales.invalidate();
     }
 
     private void renderPieChart(List<Invoice> selectedInvoices) {
-        Map<String, Double> revenueBuckets = new LinkedHashMap<>();
+        Map<String, Double> salesBuckets = new LinkedHashMap<>();
         Map<String, Double> countBuckets = new LinkedHashMap<>();
 
         for (Invoice invoice : selectedInvoices) {
@@ -432,7 +432,7 @@ public class InsightsDashboardBinder {
                     : 1.0;
 
             if (breakdownFilter == BreakdownFilter.PAYMENT_METHOD) {
-                revenueBuckets.put(key, revenueBuckets.getOrDefault(key, 0.0) + value);
+                salesBuckets.put(key, salesBuckets.getOrDefault(key, 0.0) + value);
             } else {
                 countBuckets.put(key, countBuckets.getOrDefault(key, 0.0) + value);
             }
@@ -440,7 +440,7 @@ public class InsightsDashboardBinder {
 
         List<PieEntry> entries = new ArrayList<>();
         if (breakdownFilter == BreakdownFilter.PAYMENT_METHOD) {
-            for (Map.Entry<String, Double> entry : revenueBuckets.entrySet()) {
+            for (Map.Entry<String, Double> entry : salesBuckets.entrySet()) {
                 entries.add(new PieEntry(entry.getValue().floatValue(), entry.getKey()));
             }
         } else {
@@ -456,13 +456,13 @@ public class InsightsDashboardBinder {
             return;
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, breakdownFilter == BreakdownFilter.PAYMENT_METHOD ? "Revenue" : "Invoices");
+        PieDataSet dataSet = new PieDataSet(entries, breakdownFilter == BreakdownFilter.PAYMENT_METHOD ? "Sales" : "Invoices");
         dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
         dataSet.setValueTextColor(Color.WHITE);
         dataSet.setValueTextSize(11f);
         dataSet.setValueFormatter(new ValueFormatter() {
             @Override
-            public String getPieLabel(float value, PieEntry pieEntry) {
+            public String getFormattedValue(float value) {
                 if (breakdownFilter == BreakdownFilter.PAYMENT_METHOD) {
                     return moneyFormat.format(value);
                 }
@@ -509,13 +509,13 @@ public class InsightsDashboardBinder {
                         topProducts.put(productName, stats);
                     }
                     double saleValue = item.totalPrice > 0.0 ? item.totalPrice : (item.quantity * item.unitPrice);
-                    stats.revenue += saleValue;
+                    stats.sales += saleValue;
                     stats.units += item.quantity;
                 }
             }
 
             List<ProductStats> ranking = new ArrayList<>(topProducts.values());
-            Collections.sort(ranking, (left, right) -> Double.compare(right.revenue, left.revenue));
+            Collections.sort(ranking, (left, right) -> Double.compare(right.sales, left.sales));
             if (ranking.size() > 5) {
                 ranking = ranking.subList(0, 5);
             }
@@ -524,7 +524,7 @@ public class InsightsDashboardBinder {
             List<String> labels = new ArrayList<>();
             for (int i = 0; i < ranking.size(); i++) {
                 ProductStats stats = ranking.get(i);
-                entries.add(new BarEntry(i, (float) stats.revenue));
+                entries.add(new BarEntry(i, (float) stats.sales));
                 labels.add(shortenLabel(stats.name));
             }
 
@@ -540,7 +540,7 @@ public class InsightsDashboardBinder {
                     return;
                 }
 
-                BarDataSet dataSet = new BarDataSet(entries, context.getString(R.string.insights_revenue_label));
+                BarDataSet dataSet = new BarDataSet(entries, context.getString(R.string.insights_sales_label));
                 dataSet.setColor(context.getColor(R.color.soft_blue_icon));
                 dataSet.setValueTextColor(context.getColor(R.color.text_primary));
                 dataSet.setValueTextSize(10f);
@@ -549,8 +549,8 @@ public class InsightsDashboardBinder {
                 data.setBarWidth(0.7f);
                 data.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getBarLabel(com.github.mikephil.charting.data.BarEntry barEntry) {
-                        return moneyFormat.format(barEntry.getY());
+                    public String getFormattedValue(float value) {
+                        return moneyFormat.format(value);
                     }
                 });
 
@@ -814,14 +814,14 @@ public class InsightsDashboardBinder {
                     bucket = new BuckeTable(label, monthStart(invoice.createdAt));
                     bucketMap.put(label, bucket);
                 }
-                bucket.revenue += invoice.totalAmount;
+                bucket.sales += invoice.totalAmount;
             }
         } else if (period == PeriodFilter.YESTERDAY) {
             String label = "Yesterday";
             BuckeTable bucket = new BuckeTable(label, start);
             bucketMap.put(label, bucket);
             for (Invoice invoice : selectedInvoices) {
-                bucket.revenue += invoice.totalAmount;
+                bucket.sales += invoice.totalAmount;
             }
         } else if (period == PeriodFilter.CUSTOM) {
             // For custom date range, create day-by-day buckets
@@ -836,7 +836,7 @@ public class InsightsDashboardBinder {
                 String label = dayLabel(startOfDay(invoice.createdAt));
                 BuckeTable bucket = bucketMap.get(label);
                 if (bucket != null) {
-                    bucket.revenue += invoice.totalAmount;
+                    bucket.sales += invoice.totalAmount;
                 }
             }
         } else {
@@ -855,7 +855,7 @@ public class InsightsDashboardBinder {
                         : dayLabel(startOfDay(invoice.createdAt));
                 BuckeTable bucket = bucketMap.get(label);
                 if (bucket != null) {
-                    bucket.revenue += invoice.totalAmount;
+                    bucket.sales += invoice.totalAmount;
                 }
             }
         }
@@ -884,7 +884,7 @@ public class InsightsDashboardBinder {
         return calendar.getTimeInMillis();
     }
 
-    private double sumRevenue(List<Invoice> list) {
+    private double sumSales(List<Invoice> list) {
         double total = 0.0;
         for (Invoice invoice : list) {
             if (invoice != null) {
@@ -959,18 +959,18 @@ public class InsightsDashboardBinder {
     private static final class BuckeTable {
         final String label;
         final long sortKey;
-        double revenue;
+        double sales;
 
         BuckeTable(String label, long sortKey) {
             this.label = label;
             this.sortKey = sortKey;
-            this.revenue = 0.0;
+            this.sales = 0.0;
         }
     }
 
     private static final class ProductStats {
         final String name;
-        double revenue;
+        double sales;
         int units;
 
         ProductStats(String name) {

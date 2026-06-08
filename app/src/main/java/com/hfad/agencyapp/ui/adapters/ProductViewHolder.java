@@ -24,9 +24,15 @@ public class ProductViewHolder extends RecyclerView.ViewHolder {
                 : binding.getRoot().getContext().getString(R.string.brand_not_set);
         binding.tvCategoryName.setText(brandLine);
         binding.tvPrice.setText(binding.getRoot().getContext().getString(R.string.price_label_currency, String.format(Locale.getDefault(), "%.2f", product.sellingPrice)));
-        binding.tvStockChip.setText(product.stock == 0
-                ? binding.getRoot().getContext().getString(R.string.stock_label_out_of_stock)
-                : binding.getRoot().getContext().getString(R.string.stock_label_in_stock, product.stock));
+        
+        if (product.stock == 0) {
+            binding.tvStockChip.setText(binding.getRoot().getContext().getString(R.string.stock_label_out_of_stock));
+        } else if (product.stock <= product.lowStockThreshold) {
+            binding.tvStockChip.setText(binding.getRoot().getContext().getString(R.string.stock_label_low_stock, product.stock));
+        } else {
+            binding.tvStockChip.setText(binding.getRoot().getContext().getString(R.string.stock_label_in_stock, product.stock));
+        }
+
         binding.tvStockChip.setBackgroundResource(getStockBackground(product.stock, product.lowStockThreshold));
 
         binding.getRoot().setOnClickListener(v -> listener.onClick(product));
@@ -39,7 +45,7 @@ public class ProductViewHolder extends RecyclerView.ViewHolder {
 
     private int getStockBackground(int stock, int threshold) {
         if (stock == 0) return R.drawable.bg_stock_chip_dark_red;
-        if (stock < threshold) return R.drawable.bg_stock_chip_red;
+        if (stock <= threshold) return R.drawable.bg_stock_chip_red;
         return R.drawable.bg_stock_chip_green;
     }
 }

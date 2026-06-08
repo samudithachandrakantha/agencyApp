@@ -92,6 +92,11 @@ public class InvoicesFragment extends Fragment {
         binding.cardDateRangeFilter.setVisibility(View.GONE);
         binding.btnClearDateRangeFilter.setOnClickListener(v -> clearDateRangeFilter());
 
+        binding.fabAddInvoice.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), CreateInvoiceActivity.class);
+            startActivity(intent);
+        });
+
         setupSearch();
         binding.tilSearch.setEndIconOnClickListener(v -> hideSearchBar());
 

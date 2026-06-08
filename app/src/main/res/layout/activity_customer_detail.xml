@@ -233,6 +233,17 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_view_invoices"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/view_customer_invoices"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_dashboard_invoices"
+                app:iconGravity="textEnd" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

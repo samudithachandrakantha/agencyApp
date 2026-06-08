@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:text="Customer Details"
-            android:textColor="@color/primary"
+            android:textColor="@color/on_surface"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -25,8 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Business Name *"
-            app:startIconDrawable="@android:drawable/ic_menu_my_calendar"
-            app:startIconTint="@color/slate_400">
+            app:startIconTint="@color/zinc_400">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etBusinessName"
                 android:layout_width="match_parent"
@@ -41,8 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Contact Person *"
-            app:startIconDrawable="@android:drawable/ic_menu_search"
-            app:startIconTint="@color/slate_400">
+            app:startIconTint="@color/zinc_400">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etContactPerson"
                 android:layout_width="match_parent"
@@ -57,8 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Phone Number"
-            app:startIconDrawable="@android:drawable/ic_menu_call"
-            app:startIconTint="@color/slate_400">
+            app:startIconTint="@color/zinc_400">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPhone"
                 android:layout_width="match_parent"
@@ -73,8 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Store Address *"
-            app:startIconDrawable="@android:drawable/ic_menu_directions"
-            app:startIconTint="@color/slate_400">
+            app:startIconTint="@color/zinc_400">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etAddress"
                 android:layout_width="match_parent"
@@ -86,7 +82,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="24dp"
-            android:background="@color/slate_100" />
+            android:background="@color/zinc_100" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -94,7 +90,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"
             android:text="Registration (Optional)"
-            android:textColor="@color/slate_500"
+            android:textColor="@color/zinc_500"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textAllCaps="true"
@@ -137,7 +133,8 @@
                 android:layout_width="0dp"
                 android:layout_height="52dp"
                 android:layout_weight="1"
-                android:text="Cancel" />
+                android:text="Cancel"
+                app:cornerRadius="@dimen/radius_sm" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveCustomer"
@@ -147,7 +144,8 @@
                 android:layout_weight="1.5"
                 android:text="Next"
                 android:textStyle="bold"
-                app:backgroundTint="@color/primary" />
+                app:backgroundTint="@color/primary"
+                app:cornerRadius="@dimen/radius_sm" />
         </LinearLayout>
 
     </LinearLayout>

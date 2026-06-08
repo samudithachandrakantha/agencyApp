@@ -47,6 +47,14 @@ public class InvoicesActivity extends AppCompatActivity {
         binding = ActivityInvoicesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Check for customer filter from Intent
+        String filterName = getIntent().getStringExtra("filter_customer_name");
+        if (filterName != null && !filterName.isEmpty()) {
+            currentQuery = filterName;
+            showSearchBar();
+            binding.etSearch.setText(filterName);
+        }
+
         // Set up toolbar with back button and navy styling to match app
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
@@ -64,9 +72,16 @@ public class InvoicesActivity extends AppCompatActivity {
         binding.recyclerAllInvoices.setAdapter(adapter);
 
         binding.filtersContainer.setVisibility(View.GONE);
+        if (currentQuery != null && !currentQuery.isEmpty()) {
+            binding.filtersContainer.setVisibility(View.VISIBLE);
+        }
         binding.cardDateRangeFilter.setVisibility(View.GONE);
         binding.btnClearDateRangeFilter.setOnClickListener(v -> clearDateRangeFilter());
 
+        binding.fabAddInvoice.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, CreateInvoiceActivity.class);
+            startActivity(intent);
+        });
 
         viewModel.invoices.observe(this, invoices -> {
             invoicesCache = invoices == null ? new ArrayList<>() : invoices;

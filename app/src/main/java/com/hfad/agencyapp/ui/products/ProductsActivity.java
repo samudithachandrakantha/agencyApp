@@ -59,6 +59,20 @@ public class ProductsActivity extends AppCompatActivity {
         setupSearch();
         setupStockFilters();
 
+        if (getIntent().getBooleanExtra("filter_low_stock", false)) {
+            // Find and click the low stock chip
+            for (int i = 0; i < binding.chipGroupFilters.getChildCount(); i++) {
+                View child = binding.chipGroupFilters.getChildAt(i);
+                if (child instanceof Chip) {
+                    Chip chip = (Chip) child;
+                    if ("LOW".equals(chip.getTag())) {
+                        chip.performClick();
+                        break;
+                    }
+                }
+            }
+        }
+
         binding.fabAddProduct.setOnClickListener(v -> openAddEditProduct(null));
     }
 

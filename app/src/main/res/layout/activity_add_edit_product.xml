@@ -158,6 +158,21 @@
                             android:layout_height="wrap_content"
                             android:inputType="number" />
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilLowStockThreshold"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="@string/hint_low_stock_threshold">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etLowStockThreshold"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number" />
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

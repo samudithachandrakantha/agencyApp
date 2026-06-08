@@ -31,10 +31,10 @@ public interface InvoiceDao {
     @Query("SELECT * FROM invoices ORDER BY createdAt DESC")
     List<Invoice> getAllOnce();
 
-    @Query("SELECT COALESCE(SUM(totalAmount), 0) FROM invoices WHERE createdAt >= :startOfDay AND createdAt < :endOfDay")
+    @Query("SELECT COALESCE(SUM(totalAmount), 0) FROM invoices WHERE createdAt >= :startOfDay AND createdAt < :endOfDay AND status != 'CANCELLED'")
     LiveData<Double> getTodaySales(long startOfDay, long endOfDay);
 
-    @Query("SELECT COUNT(*) FROM invoices WHERE createdAt >= :startOfDay AND createdAt < :endOfDay")
+    @Query("SELECT COUNT(*) FROM invoices WHERE createdAt >= :startOfDay AND createdAt < :endOfDay AND status != 'CANCELLED'")
     LiveData<Integer> getTodayInvoiceCount(long startOfDay, long endOfDay);
 
     @Query("SELECT * FROM invoices WHERE id = :id LIMIT 1")

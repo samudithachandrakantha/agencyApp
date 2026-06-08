@@ -50,6 +50,7 @@ public class HomeFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
         binding.includeBottomNav.getRoot().setVisibility(View.GONE);
+        binding.tvUserName.setText(R.string.business_name_shanka);
 
         setupRecyclerView();
         setupObservers();
@@ -72,6 +73,15 @@ public class HomeFragment extends Fragment {
         viewModel.todayInvoiceCount.observe(getViewLifecycleOwner(), count -> {
             int value = count != null ? count : 0;
             binding.tvInvoiceCount.setText(String.valueOf(value));
+        });
+
+        viewModel.lowStockProducts.observe(getViewLifecycleOwner(), lowStockList -> {
+            if (lowStockList != null && !lowStockList.isEmpty()) {
+                binding.cardLowStockAlert.setVisibility(View.VISIBLE);
+                binding.tvLowStockCount.setText(getString(R.string.low_stock_warning_format, lowStockList.size()));
+            } else {
+                binding.cardLowStockAlert.setVisibility(View.GONE);
+            }
         });
 
         viewModel.invoices.observe(getViewLifecycleOwner(), invoices -> {
@@ -131,6 +141,7 @@ public class HomeFragment extends Fragment {
                 }
             }
 
+            binding.tvEmptyInvoices.setVisibility(uiModels.isEmpty() ? View.VISIBLE : View.GONE);
             invoiceAdapter.submitList(uiModels);
             invoiceAdapter.setOnInvoiceClickListener(invoiceDbId -> com.hfad.agencyapp.utils.PreviewUtils.showInvoicePreview(requireContext(), invoiceDbId));
         });
@@ -150,6 +161,12 @@ public class HomeFragment extends Fragment {
         binding.actionProducts.setOnClickListener(v -> startActivity(new Intent(requireContext(), ProductsActivity.class)));
         binding.actionSync.setOnClickListener(v -> android.widget.Toast.makeText(requireContext(), R.string.sync_coming_soon, android.widget.Toast.LENGTH_SHORT).show());
         binding.tvViewAll.setOnClickListener(v -> startActivity(MainTabsActivity.createIntent(requireContext(), MainTabsActivity.TAB_INVOICES)));
+        
+        binding.btnViewLowStock.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), ProductsActivity.class);
+            intent.putExtra("filter_low_stock", true);
+            startActivity(intent);
+        });
     }
 
     private void setupProfileEntry() {

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import com.hfad.agencyapp.data.Repository;
 import com.hfad.agencyapp.data.entities.Category;
@@ -14,6 +15,7 @@ import com.hfad.agencyapp.data.entities.Invoice;
 import com.hfad.agencyapp.data.entities.InvoiceItem;
 import com.hfad.agencyapp.data.entities.Customer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -22,6 +24,7 @@ public class DashboardViewModel extends AndroidViewModel {
 
     private final Repository repository;
     public final LiveData<List<Product>> products;
+    public final LiveData<List<Product>> lowStockProducts;
     public final LiveData<List<Category>> categories;
     public final LiveData<List<Invoice>> invoices;
     public final LiveData<List<Customer>> customers;
@@ -33,6 +36,17 @@ public class DashboardViewModel extends AndroidViewModel {
         super(application);
         repository = Repository.getInstance(application);
         products = repository.getAllProducts();
+        lowStockProducts = Transformations.map(products, list -> {
+            List<Product> low = new ArrayList<>();
+            if (list != null) {
+                for (Product p : list) {
+                    if (p.stock <= p.lowStockThreshold) {
+                        low.add(p);
+                    }
+                }
+            }
+            return low;
+        });
         categories = repository.getAllCategories();
         invoices = repository.getAllInvoices();
         customers = repository.getAllCustomers();

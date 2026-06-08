@@ -66,7 +66,31 @@ public class InvoiceItemsAdapter extends ListAdapter<InvoiceItem, InvoiceItemsAd
             binding.tvProductName.setText(item.getProductName());
 
             // Quantity
-            binding.tvQuantity.setText(String.valueOf(item.getQuantity()));
+            binding.etQuantity.setText(String.valueOf(item.getQuantity()));
+            binding.etQuantity.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    String input = binding.etQuantity.getText().toString();
+                    try {
+                        int val = Integer.parseInt(input);
+                        if (val < 1) val = 1;
+                        if (val != item.getQuantity()) {
+                            listener.onQuantityChange(position, val);
+                        } else {
+                            binding.etQuantity.setText(String.valueOf(item.getQuantity()));
+                        }
+                    } catch (NumberFormatException e) {
+                        binding.etQuantity.setText(String.valueOf(item.getQuantity()));
+                    }
+                }
+            });
+
+            binding.etQuantity.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                    binding.etQuantity.clearFocus();
+                    return true;
+                }
+                return false;
+            });
 
             // Unit Price
             binding.tvUnitPrice.setText(binding.getRoot().getContext().getString(
