@@ -535,12 +535,12 @@ public class InsightsDashboardBinder {
                 }
                 if (entries.isEmpty()) {
                     binding.barChartTopProducts.clear();
-                    binding.barChartTopProducts.setNoDataText("No product sales data for this period");
+                    binding.barChartTopProducts.setNoDataText(context.getString(R.string.insights_no_product_sales_data));
                     binding.barChartTopProducts.invalidate();
                     return;
                 }
 
-                BarDataSet dataSet = new BarDataSet(entries, "Revenue");
+                BarDataSet dataSet = new BarDataSet(entries, context.getString(R.string.insights_revenue_label));
                 dataSet.setColor(context.getColor(R.color.soft_blue_icon));
                 dataSet.setValueTextColor(context.getColor(R.color.text_primary));
                 dataSet.setValueTextSize(10f);
@@ -570,9 +570,9 @@ public class InsightsDashboardBinder {
 
                 if (!finalRanking.isEmpty()) {
                     ProductStats top = finalRanking.get(0);
-                    binding.tvTopProductsTitle.setText("Top products - " + top.name);
+                    binding.tvTopProductsTitle.setText(context.getString(R.string.top_products_title_with_name, top.name));
                 } else {
-                    binding.tvTopProductsTitle.setText("Top products");
+                    binding.tvTopProductsTitle.setText(R.string.top_products_title);
                 }
             });
         }).start();

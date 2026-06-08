@@ -3,9 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_block"
-        android:title="@string/block_customer"
+        android:id="@+id/action_out_of_stock_behavior"
+        android:title="@string/menu_create_invoice_out_of_stock_behavior"
+        android:icon="@android:drawable/ic_menu_manage"
         app:showAsAction="never" />
 
 </menu>
+
 

@@ -44,10 +44,10 @@ public class AddEditCustomerActivity extends AppCompatActivity {
 
         customerId = getIntent().getStringExtra("customer_id");
         if (customerId != null) {
-            getSupportActionBar().setTitle("Edit Customer");
+            getSupportActionBar().setTitle(R.string.edit_customer);
             loadCustomer(customerId);
         } else {
-            getSupportActionBar().setTitle("Add Customer");
+            getSupportActionBar().setTitle(R.string.add_customer);
         }
     }
 
@@ -105,19 +105,19 @@ public class AddEditCustomerActivity extends AppCompatActivity {
 
         boolean valid = true;
         if (TextUtils.isEmpty(business)) {
-            binding.tilBusinessName.setError("Business name required");
+            binding.tilBusinessName.setError(getString(R.string.business_name_required));
             valid = false;
         } else {
             binding.tilBusinessName.setError(null);
         }
         if (TextUtils.isEmpty(contact)) {
-            binding.tilContactPerson.setError("Contact person required");
+            binding.tilContactPerson.setError(getString(R.string.contact_person_required));
             valid = false;
         } else {
             binding.tilContactPerson.setError(null);
         }
         if (TextUtils.isEmpty(address)) {
-            binding.tilAddress.setError("Address required");
+            binding.tilAddress.setError(getString(R.string.address_required));
             valid = false;
         } else {
             binding.tilAddress.setError(null);
@@ -125,7 +125,7 @@ public class AddEditCustomerActivity extends AppCompatActivity {
 
         String paymentMethods = collectPaymentMethods();
         if (paymentMethods.isEmpty()) {
-            Toast.makeText(this, "Select at least one payment method", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.select_payment_method_required, Toast.LENGTH_SHORT).show();
             valid = false;
         }
 
@@ -141,10 +141,10 @@ public class AddEditCustomerActivity extends AppCompatActivity {
             boolean ok = viewModel.saveCustomer(c);
             runOnUiThread(() -> {
                 if (ok) {
-                    Snackbar.make(binding.getRoot(), "Customer saved", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(binding.getRoot(), R.string.customer_saved, Snackbar.LENGTH_SHORT).show();
                     finish();
                 } else {
-                    Toast.makeText(this, "Save failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.save_failed, Toast.LENGTH_SHORT).show();
                 }
             });
         }).start();

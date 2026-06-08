@@ -12,6 +12,7 @@ import com.hfad.agencyapp.data.entities.Invoice;
 import com.hfad.agencyapp.databinding.ActivityProfileBinding;
 import com.hfad.agencyapp.ui.adapters.NotificationsAdapter;
 import com.hfad.agencyapp.ui.models.NotificationUiModel;
+import com.hfad.agencyapp.utils.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,11 +21,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import com.hfad.agencyapp.R;
 
 public class ProfileActivity extends AppCompatActivity {
-
-    private static final String PROFILE_NAME = "Shanka Distributors";
-    private static final String PROFILE_INITIALS = "SD";
 
     private ActivityProfileBinding binding;
     private Repository repository;
@@ -48,8 +47,18 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void bindProfile() {
-        binding.tvProfileAvatar.setText(PROFILE_INITIALS);
-        binding.tvProfileName.setText(PROFILE_NAME);
+        String displayName = getString(R.string.app_name);
+        binding.tvProfileName.setText(displayName);
+        String[] parts = displayName.trim().split("\\s+");
+        String initials;
+        if (parts.length >= 2 && !parts[0].isEmpty() && !parts[1].isEmpty()) {
+            initials = (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase(Locale.getDefault());
+        } else if (parts.length == 1 && !parts[0].isEmpty()) {
+            initials = parts[0].substring(0, 1).toUpperCase(Locale.getDefault());
+        } else {
+            initials = getString(R.string.profile_avatar_fallback);
+        }
+        binding.tvProfileAvatar.setText(initials);
     }
 
     private void setupRecyclerView() {
@@ -67,8 +76,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void clearNotificationBadge() {
         try {
-            android.content.SharedPreferences prefs = getSharedPreferences("cheque_prefs", MODE_PRIVATE);
-            prefs.edit().putInt("cheque_notification_count", 0).apply();
+            android.content.SharedPreferences prefs = getSharedPreferences(Constants.PREFS_CHEQUE, MODE_PRIVATE);
+            prefs.edit().putInt(Constants.KEY_CHEQUE_NOTIFICATION_COUNT, 0).apply();
         } catch (Exception ignored) { }
     }
 
@@ -125,14 +134,15 @@ public class ProfileActivity extends AppCompatActivity {
                     }
 
                     String amountText = "Rs. " + new java.text.DecimalFormat("#,##0.00").format(invoice.totalAmount);
+                    amountText = getString(R.string.price_label_currency, new java.text.DecimalFormat("#,##0.00").format(invoice.totalAmount));
                     String chqDateStr = chequeDateFormat.format(new Date(invoice.chequeDate));
                     String clrDateStr = clearanceDateFormat.format(new Date(clearanceTime));
                     
                     uiModels.add(new NotificationUiModel(
                             invoice.id,
-                            "Cheque Clearance Reminder",
-                            invoice.customerName != null ? invoice.customerName : "Unknown Customer",
-                            invoice.invoiceNumber != null ? invoice.invoiceNumber : "INV-",
+                            getString(R.string.notification_cheque_clearance_reminder),
+                            invoice.customerName != null ? invoice.customerName : getString(R.string.unknown_customer_name),
+                            invoice.invoiceNumber != null ? invoice.invoiceNumber : getString(R.string.invoice_number_fallback),
                             amountText,
                             chqDateStr,
                             clrDateStr,

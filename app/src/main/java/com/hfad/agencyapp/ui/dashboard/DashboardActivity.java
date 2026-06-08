@@ -3,6 +3,9 @@ package com.hfad.agencyapp.ui.dashboard;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
+import android.view.View;
+import android.animation.LayoutTransition;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -17,6 +20,7 @@ import com.hfad.agencyapp.ui.products.ProductsActivity;
 import com.hfad.agencyapp.ui.profile.ProfileActivity;
 import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.DashboardViewModel;
+import com.hfad.agencyapp.utils.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,6 +39,8 @@ public class DashboardActivity extends AppCompatActivity {
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.navy_900));
+
+        enableLayoutTransitions((ViewGroup) binding.getRoot());
 
         viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
@@ -71,10 +77,10 @@ public class DashboardActivity extends AppCompatActivity {
                 for (com.hfad.agencyapp.data.entities.Invoice invoice : invoices) {
                     String customerName = invoice.customerName != null && !invoice.customerName.isEmpty()
                             ? invoice.customerName
-                            : "Unknown";
-                    String invoiceNumber = invoice.invoiceNumber != null && !invoice.invoiceNumber.isEmpty() ? invoice.invoiceNumber : "-";
-                    String invoiceDate = invoice.createdAt > 0 ? invoiceCardDateFormat.format(new Date(invoice.createdAt)) : "-";
-                    String invoiceCardSubtitle = invoiceNumber + " | " + invoiceDate;
+                            : getString(R.string.value_unknown);
+                    String invoiceNumber = invoice.invoiceNumber != null && !invoice.invoiceNumber.isEmpty() ? invoice.invoiceNumber : getString(R.string.value_not_available);
+                    String invoiceDate = invoice.createdAt > 0 ? invoiceCardDateFormat.format(new Date(invoice.createdAt)) : getString(R.string.value_not_available);
+                    String invoiceCardSubtitle = getString(R.string.invoice_subtitle_with_date, invoiceNumber, invoiceDate);
 
                     String paymentStatus = "";
                     boolean isPending = false;
@@ -82,26 +88,26 @@ public class DashboardActivity extends AppCompatActivity {
                     String chequeDate = "";
                     
                     if (invoice.status != null && invoice.status.equals("CANCELLED")) {
-                        paymentStatus = "Cancelled";
+                        paymentStatus = getString(R.string.status_cancelled);
                     } else if ((invoice.status != null && (invoice.status.equals("COMPLETED") || invoice.status.equals("PAID")))
                             || invoice.paidAmount >= invoice.totalAmount) {
-                        paymentStatus = "Paid";
+                        paymentStatus = getString(R.string.status_paid);
                     } else if (invoice.paymentMethod != null && invoice.paymentMethod.equals("CASH")) {
-                        paymentStatus = "Cash";
+                        paymentStatus = getString(R.string.status_cash);
                     } else if (invoice.paymentMethod != null && invoice.paymentMethod.equals("CHEQUE")) {
-                        paymentStatus = "Pending";
+                        paymentStatus = getString(R.string.status_pending);
                         isPending = true;
                         // For cheque, show cheque date instead of due amount
                         if (invoice.chequeDate > 0) {
                             chequeDate = chequeDisplayFormat.format(new Date(invoice.chequeDate));
                         }
                     } else if (invoice.paymentMethod != null && invoice.paymentMethod.equals("CREDIT")) {
-                        paymentStatus = "Pending";
+                        paymentStatus = getString(R.string.status_pending);
                         isPending = true;
                         double due = invoice.totalAmount - invoice.paidAmount;
                         dueAmount = currencyFormat.format(Math.max(0, due));
                     } else if (invoice.paidAmount > 0) {
-                        paymentStatus = "Partial";
+                        paymentStatus = getString(R.string.status_partial);
                         isPending = true;
                         double due = invoice.totalAmount - invoice.paidAmount;
                         dueAmount = currencyFormat.format(Math.max(0, due));
@@ -111,7 +117,7 @@ public class DashboardActivity extends AppCompatActivity {
                             customerName,
                             invoiceCardSubtitle,
                             invoice.id,
-                            "Rs. " + currencyFormat.format(invoice.totalAmount),
+                            getString(R.string.price_label_currency, currencyFormat.format(invoice.totalAmount)),
                             paymentStatus,
                             dueAmount,
                             isPending,
@@ -149,7 +155,7 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        android.content.SharedPreferences prefs = getSharedPreferences("cheque_prefs", MODE_PRIVATE);
+        android.content.SharedPreferences prefs = getSharedPreferences(Constants.PREFS_CHEQUE, MODE_PRIVATE);
         int count = prefs.getInt(com.hfad.agencyapp.workers.ChequeNotificationWorker.KEY_COUNT, 0);
         if (count > 0) {
             binding.tvAvatarBadge.setVisibility(android.view.View.VISIBLE);
@@ -188,7 +194,22 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void showFeatureToast() {
-        Toast.makeText(this, "Sync coming soon", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.sync_coming_soon, Toast.LENGTH_SHORT).show();
+    }
+
+    private void enableLayoutTransitions(ViewGroup viewGroup) {
+        if (viewGroup instanceof androidx.recyclerview.widget.RecyclerView) {
+            return;
+        }
+        LayoutTransition transition = new LayoutTransition();
+        transition.enableTransitionType(LayoutTransition.CHANGING);
+        viewGroup.setLayoutTransition(transition);
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            View child = viewGroup.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                enableLayoutTransitions((ViewGroup) child);
+            }
+        }
     }
 }
 

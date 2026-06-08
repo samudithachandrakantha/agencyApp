@@ -1,59 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dashboard_bg">
+    android:background="@color/background">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/navy_900"
-        android:title="Products"
-        app:titleTextColor="@color/white"
-        app:navigationIconTint="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            app:title="Products"
+            app:titleTextColor="@color/white"
+            app:navigationIcon="@drawable/ic_arrow_back_black_24"
+            app:navigationIconTint="@color/white" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="100dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_search"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <!-- Search Area -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:visibility="gone"
-                app:endIconMode="clear_text"
-                android:hint="Search products...">
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/et_search"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_search"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="wrap_content"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:endIconMode="clear_text"
+                    app:startIconDrawable="@android:drawable/ic_menu_search"
+                    app:startIconTint="@color/slate_400"
+                    android:hint="Search products...">
 
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_search"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="12dp"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Filters -->
             <HorizontalScrollView
                 android:id="@+id/chip_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="8dp"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 android:overScrollMode="never"
                 android:scrollbars="none">
 
@@ -63,17 +84,17 @@
                     android:layout_height="wrap_content"
                     app:singleSelection="true"
                     app:selectionRequired="true"
-                    app:chipSpacingHorizontal="8dp"
-                    app:chipSpacingVertical="8dp" />
+                    app:chipSpacingHorizontal="8dp" />
             </HorizontalScrollView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_products"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:clipToPadding="false" />
+                android:paddingHorizontal="16dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_product" />
 
             <include
                 android:id="@+id/empty_state"
@@ -82,17 +103,16 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_add_product"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:contentDescription="Add product"
-        app:backgroundTint="@color/navy_900"
-        app:srcCompat="@android:drawable/ic_input_add"
-        app:tint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:text="Add Product"
+        android:textColor="@color/white"
+        app:icon="@drawable/ic_dashboard_add"
+        app:iconTint="@color/white"
+        app:backgroundTint="@color/secondary" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

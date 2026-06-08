@@ -1,119 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dashboard_bg">
+    android:background="@color/background">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/navy_900"
-        android:titleTextColor="@android:color/white"
-        app:navigationIcon="@drawable/ic_arrow_back_black_24"
-        app:navigationIconTint="@color/white"
-        android:contentDescription="Back"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="Invoices"
-        app:menu="@menu/menu_invoice_search" />
+        app:elevation="0dp">
 
-    <LinearLayout
-        android:id="@+id/filters_container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            app:title="All Invoices"
+            app:titleTextColor="@color/white"
+            app:navigationIcon="@drawable/ic_arrow_back_black_24"
+            app:navigationIconTint="@color/white"
+            app:menu="@menu/menu_invoice_search" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_date_range_filter"
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/soft_blue"
-            app:strokeWidth="1dp">
+            android:orientation="vertical"
+            android:paddingBottom="40dp">
 
+            <!-- Filters Bar -->
             <LinearLayout
+                android:id="@+id/filters_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="14dp">
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_search"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Date range"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    android:textAllCaps="true" />
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
 
-                <TextView
-                    android:id="@+id/tv_date_range_filter"
-                    android:layout_width="0dp"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_search"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="0dp"
+                        app:endIconMode="clear_text"
+                        android:hint="Search invoices...">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_date_range_filter"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="@color/info_container"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
 
-                <ImageView
-                    android:id="@+id/btnClearDateRangeFilter"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:contentDescription="Clear date range filter"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    app:tint="@color/text_secondary" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@android:drawable/ic_menu_my_calendar"
+                            app:tint="@color/info" />
+
+                        <TextView
+                            android:id="@+id/tv_date_range_filter"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            tools:text="01 May - 31 May"
+                            android:textColor="@color/on_info_container"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:id="@+id/btn_clear_date_range_filter"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:padding="4dp"
+                            android:src="@android:drawable/ic_menu_close_clear_cancel"
+                            app:tint="@color/info" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_search"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:visibility="gone"
-            app:endIconMode="clear_text"
-            android:hint="Search invoices...">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_search"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_all_invoices"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="16dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_invoice" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-    <include
-        android:id="@+id/include_bottom_nav"
-        layout="@layout/layout_bottom_nav"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_all_invoices"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@id/include_bottom_nav"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filters_container" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

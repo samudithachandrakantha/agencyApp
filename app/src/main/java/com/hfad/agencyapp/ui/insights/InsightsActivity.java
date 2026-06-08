@@ -40,28 +40,6 @@ public class InsightsActivity extends AppCompatActivity {
         binder = new InsightsDashboardBinder(binding, viewModel, this, this);
         binder.attach();
 
-        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_insights);
-        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_invoices) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INVOICES));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_customers) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_CUSTOMERS));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_insights) {
-                return true;
-            }
-            return false;
-        });
+
     }
 }

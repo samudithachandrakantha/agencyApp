@@ -20,6 +20,7 @@ import com.hfad.agencyapp.data.entities.Invoice;
 import com.hfad.agencyapp.data.entities.InvoiceItem;
 import com.hfad.agencyapp.data.entities.Payment;
 import com.hfad.agencyapp.data.entities.ChequePayment;
+import com.hfad.agencyapp.utils.Constants;
 
 @Database(entities = {
         Category.class,
@@ -47,7 +48,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "agency_app.db")
+                            AppDatabase.class, Constants.DB_NAME)
                             .fallbackToDestructiveMigration()
                             .build();
                 }

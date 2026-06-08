@@ -23,8 +23,10 @@ public class ProductViewHolder extends RecyclerView.ViewHolder {
                 ? product.brand
                 : binding.getRoot().getContext().getString(R.string.brand_not_set);
         binding.tvCategoryName.setText(brandLine);
-        binding.tvPrice.setText(String.format(Locale.getDefault(), "Rs. %.2f", product.sellingPrice));
-        binding.tvStockChip.setText(product.stock == 0 ? "Out of Stock" : "Stock: " + product.stock);
+        binding.tvPrice.setText(binding.getRoot().getContext().getString(R.string.price_label_currency, String.format(Locale.getDefault(), "%.2f", product.sellingPrice)));
+        binding.tvStockChip.setText(product.stock == 0
+                ? binding.getRoot().getContext().getString(R.string.stock_label_out_of_stock)
+                : binding.getRoot().getContext().getString(R.string.stock_label_in_stock, product.stock));
         binding.tvStockChip.setBackgroundResource(getStockBackground(product.stock, product.lowStockThreshold));
 
         binding.getRoot().setOnClickListener(v -> listener.onClick(product));

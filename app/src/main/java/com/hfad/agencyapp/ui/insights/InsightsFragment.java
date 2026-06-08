@@ -35,9 +35,7 @@ public class InsightsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
-        if (binding.includeBottomNav != null) {
-            binding.includeBottomNav.getRoot().setVisibility(View.GONE);
-        }
+
         binder = new InsightsDashboardBinder(binding, viewModel, getViewLifecycleOwner(), requireContext());
         binder.attach();
         binding.toolbar.setNavigationOnClickListener(v -> {

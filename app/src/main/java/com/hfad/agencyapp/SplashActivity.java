@@ -9,6 +9,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import com.hfad.agencyapp.databinding.ActivitySplashBinding;
 import com.hfad.agencyapp.ui.dashboard.DashboardActivity;
@@ -28,6 +29,7 @@ public class SplashActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.primary));
 
         startLoadingAnimation();
     }

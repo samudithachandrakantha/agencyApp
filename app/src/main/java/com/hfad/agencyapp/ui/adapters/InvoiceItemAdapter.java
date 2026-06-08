@@ -59,10 +59,11 @@ public class InvoiceItemAdapter extends RecyclerView.Adapter<InvoiceItemAdapter.
         }
 
         void bind(InvoiceItem item) {
-            tvProductId.setText("Product ID: " + item.productId);
-            tvQuantity.setText("Qty: " + item.quantity);
-            tvUnitPrice.setText(String.format("Price: Rs. %.2f", item.unitPrice));
-            tvTotalPrice.setText(String.format("Total: Rs. %.2f", item.totalPrice));
+            android.content.Context context = itemView.getContext();
+            tvProductId.setText(context.getString(R.string.product_id_label, item.productId));
+            tvQuantity.setText(context.getString(R.string.quantity_label_short, item.quantity));
+            tvUnitPrice.setText(context.getString(R.string.price_label_currency, String.format(java.util.Locale.getDefault(), "%.2f", item.unitPrice)));
+            tvTotalPrice.setText(context.getString(R.string.total_price_label, String.format(java.util.Locale.getDefault(), "%.2f", item.totalPrice)));
         }
     }
 }

@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/space_sm"
-    app:cardCornerRadius="@dimen/radius_md"
-    app:cardElevation="2dp">
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/slate_100"
+    app:strokeWidth="1dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/space_md">
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/tvProductId"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ABC Bakery"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
+            tools:text="ABC Bakery"
+            android:textColor="@color/on_surface"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/tvTotalPrice"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,10 +35,10 @@
             android:id="@+id/tvQuantity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xs"
-            android:text="INV-2026-001"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp"
+            android:layout_marginTop="4dp"
+            tools:text="INV-2026-001 | 27 May 2026"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="13sp"
             app:layout_constraintEnd_toStartOf="@id/tvTotalPrice"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvProductId" />
@@ -40,9 +47,9 @@
             android:id="@+id/tvTotalPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Rs. 12,400"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
+            tools:text="Rs. 12,400"
+            android:textColor="@color/secondary"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,13 +58,13 @@
             android:id="@+id/tvUnitPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_sm"
+            android:layout_marginTop="12dp"
             android:background="@drawable/bg_status_paid"
-            android:paddingStart="10dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="4dp"
-            android:text="Paid"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+            tools:text="Paid"
             android:textColor="@color/badge_paid_text"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -66,22 +73,14 @@
 
         <LinearLayout
             android:id="@+id/pendingContainer"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_sm"
+            android:layout_marginTop="12dp"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvUnitPrice">
-
-            <TextView
-                android:id="@+id/tvDuePayment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Due: Rs. 0.00"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+            app:layout_constraintTop_toBottomOf="@id/tvQuantity">
 
             <TextView
                 android:id="@+id/tvPendingLabel"
@@ -96,10 +95,18 @@
                 android:textColor="@color/badge_cheque_text"
                 android:textSize="10sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDuePayment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                tools:text="Due: Rs. 5,000.00"
+                android:textColor="@color/error"
+                android:textSize="13sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
-
-

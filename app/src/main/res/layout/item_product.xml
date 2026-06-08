@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/slate_100"
+    app:strokeWidth="1dp"
     android:clickable="true"
+    android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
@@ -25,15 +30,15 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:paddingEnd="8dp">
+                android:paddingEnd="12dp">
 
                 <TextView
                     android:id="@+id/tvProductName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Product Name"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
+                    tools:text="Premium Flour - 1kg"
+                    android:textColor="@color/on_surface"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     android:maxLines="2"
                     android:ellipsize="end" />
@@ -43,8 +48,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Category"
-                    android:textColor="@color/text_secondary"
+                    tools:text="Baking Supplies"
+                    android:textColor="@color/on_surface_variant"
                     android:textSize="12sp"
                     android:maxLines="1"
                     android:ellipsize="end" />
@@ -54,16 +59,16 @@
                 android:id="@+id/tvPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rs. 0.00"
-                android:textColor="@color/navy_900"
-                android:textSize="14sp"
+                tools:text="Rs. 450.00"
+                android:textColor="@color/secondary"
+                android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
@@ -71,9 +76,9 @@
                 android:id="@+id/tvStockChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
-                android:text="Stock: 0"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                tools:text="In Stock: 45"
                 android:textColor="@color/white"
                 android:textSize="11sp"
                 android:textStyle="bold"
@@ -84,16 +89,18 @@
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEdit"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
                 android:text="EDIT"
-                android:textAllCaps="true"
-                android:textColor="@color/navy_900"
-                android:textSize="10sp"
+                android:textColor="@color/secondary"
+                android:textSize="12sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.08" />
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:rippleColor="@color/info_container" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Shanka Distributors</string>
-    <string name="loading_title">SHANKA DISTRIBUTORS</string>
-    <string name="loading_subtitle">Delivering Quality, Baking Success</string>
+    <string name="app_name">Agency Sales App</string>
+    <string name="loading_title">AGENCY SALES APP</string>
+    <string name="loading_subtitle">Streamlining Distribution and Sales</string>
 
     <!-- Create Invoice Activity Strings -->
     <string name="create_invoice_title">Create Invoice</string>
@@ -44,13 +44,14 @@
     <string name="invoice_preview_cheque_number_label">Cheque No</string>
     <string name="invoice_preview_bank_name_label">Bank</string>
     <string name="invoice_preview_cheque_date_label">Cheque Date</string>
-    <string name="invoice_preview_payment_label">Payment</string>
+    <string name="invoice_preview_payment_label">Payment Terms</string>
+    <string name="save_failed">Failed to save.</string>
     <string name="invoice_preview_item_count_empty">0 items</string>
 
     <!-- Customers -->
     <string name="customers_title">Customers</string>
     <string name="search_customers_hint">Search customers…</string>
-    <string name="no_customers_message">No customers yet</string>
+    <string name="no_customers_empty_message">No customers yet</string>
     <string name="no_customers_sub">Tap + to add your first customer</string>
     <string name="add_customer">Add Customer</string>
     <string name="edit_customer">Edit Customer</string>
@@ -133,4 +134,147 @@
     <string name="filter_all">All</string>
     <string name="filter_low_stock">Low Stock</string>
     <string name="filter_out_of_stock">Out of Stock</string>
+
+    <!-- Shared visible UI strings -->
+    <string name="ok">OK</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="invoice_saved_successfully">Invoice saved successfully</string>
+    <string name="failed_load_customers">Failed to load customers</string>
+    <string name="failed_load_products">Failed to load products</string>
+    <string name="select_customer_dialog_title">Select Customer</string>
+    <string name="no_customers_title">No customers</string>
+    <string name="no_customers_dialog_message">No customers found. Please add a customer first.</string>
+    <string name="no_active_customers_title">No active customers</string>
+    <string name="no_active_customers_message">All customers are blocked. Please unblock a customer first.</string>
+    <string name="no_products_title">No products</string>
+    <string name="no_products_message">No products found. Please add a product first.</string>
+    <string name="add_product_title">Add Product</string>
+    <string name="out_of_stock_title">Out of stock</string>
+    <string name="out_of_stock_message">The product %1$s is out of stock. Do you want to add it to the invoice anyway?</string>
+    <string name="product_added_message">%1$s added</string>
+    <string name="product_added_free_issue_message">%1$s added • Free issue: buy %2$d get %3$d free</string>
+    <string name="out_of_stock_behavior_title">Out-of-stock behavior</string>
+    <string name="out_of_stock_behavior_auto_allow">Auto-allow</string>
+    <string name="out_of_stock_behavior_prompt">Prompt</string>
+    <string name="out_of_stock_behavior_block">Block</string>
+    <string name="out_of_stock_behavior_summary">When a product has no stock, the app can auto-add it, ask you, or block it.</string>
+    <string name="out_of_stock_behavior_saved_message">Out-of-stock behavior set to %1$s</string>
+    <string name="out_of_stock_blocked_message">%1$s is out of stock and blocked by your current setting.</string>
+    <string name="menu_create_invoice_out_of_stock_behavior">Out-of-stock behavior</string>
+    <string name="edit_invoice_title">Edit Invoice</string>
+    <string name="product_deleted">Product deleted</string>
+    <string name="delete_failed">Delete failed</string>
+    <string name="stock_label_out_of_stock">Out of Stock</string>
+    <string name="stock_label_in_stock">Stock: %1$d</string>
+    <string name="stock_label_low_stock">Low Stock: %1$d</string>
+    <string name="product_id_label">Product ID: %1$d</string>
+    <string name="quantity_label_short">Qty: %1$d</string>
+    <string name="price_label_currency">Rs. %1$s</string>
+    <string name="price_label_currency_qty">Rs. %1$s × %2$d</string>
+    <string name="discount_label_currency_percent">Discount: %1$s%% (Rs. %2$s)</string>
+    <string name="line_total_label_currency">Rs. %1$s</string>
+    <string name="quantity_with_colon">Qty: %1$d</string>
+    <string name="unit_price_label">Unit: Rs. %1$s</string>
+    <string name="total_price_label">Total: Rs. %1$s</string>
+    <string name="discount_price_label">Discount: Rs. %1$s</string>
+    <string name="cheque_date_label">Cheque Date: %1$s</string>
+    <string name="clearance_scheduled_label">Clearance Scheduled: %1$s</string>
+    <string name="due_amount_label">Due: Rs. %1$s</string>
+    <string name="top_products_title">Top products</string>
+    <string name="top_products_title_with_name">Top products - %1$s</string>
+    <string name="invoice_subtitle_format">%1$s | %2$s</string>
+    <string name="cheque_reminder_title">Cheque Reminder</string>
+    <string name="cheque_reminder_message">A cheque is expected to clear. Please follow up.</string>
+    <string name="cheque_channel_name">Cheque reminders</string>
+    <string name="cheque_channel_description">Notifications for cheque clearance reminders</string>
+
+    <!-- Invoice generator / print text -->
+    <string name="invoice_generator_brand">CAKE INGREDIENTS SALES</string>
+    <string name="invoice_generator_receipt">Invoice Receipt</string>
+    <string name="invoice_generator_invoice_number">Invoice #: %1$s</string>
+    <string name="invoice_generator_date">Date: %1$s</string>
+    <string name="invoice_generator_customer">Customer:</string>
+    <string name="invoice_generator_phone">Phone: %1$s</string>
+    <string name="invoice_generator_address">Address: %1$s</string>
+    <string name="invoice_generator_item_details">Item Details:</string>
+    <string name="invoice_generator_unknown">Unknown</string>
+    <string name="invoice_generator_qty_line">Qty: %1$d x %2$.2f = %3$.2f</string>
+    <string name="invoice_generator_discount_line">Discount: %1$.2f</string>
+    <string name="invoice_generator_line_total">Line Total: %1$.2f</string>
+    <string name="invoice_generator_free_issue">Free issue: +%1$d (Buy %2$d get %3$d free)</string>
+    <string name="invoice_generator_subtotal">Subtotal: %1$.2f</string>
+    <string name="invoice_generator_total_discount">Discount: %1$.2f</string>
+    <string name="invoice_generator_total">Total: %1$.2f</string>
+    <string name="invoice_generator_paid">Paid: %1$.2f</string>
+    <string name="invoice_generator_outstanding">Outstanding: %1$.2f</string>
+    <string name="invoice_generator_note">Note: %1$s</string>
+    <string name="invoice_generator_thank_you">Thank you for your business!</string>
+    <string name="invoice_generator_print_receipt_brand">===== CAKE INGREDIENTS SALES =====</string>
+    <string name="invoice_generator_print_receipt_title">INVOICE RECEIPT</string>
+    <string name="invoice_generator_invoice">Invoice: %1$s</string>
+    <string name="invoice_generator_customer_walk_in">Walk-in</string>
+    <string name="invoice_generator_items">Items:</string>
+    <string name="invoice_generator_print_row" formatted="false">%-20s %d x %.2f</string>
+    <string name="invoice_generator_print_subtotal" formatted="false">                        Subtotal: %.2f</string>
+    <string name="invoice_generator_print_discount" formatted="false">                        Discount: %.2f</string>
+    <string name="invoice_generator_print_total" formatted="false">                        Total: %.2f</string>
+    <string name="invoice_generator_print_free" formatted="false">                        Free: +%d (Buy %d get %d free)</string>
+    <string name="invoice_generator_total_amount">Total Amount: %1$.2f</string>
+    <string name="invoice_generator_paid_amount">Paid Amount: %1$.2f</string>
+    <string name="invoice_generator_balance">Balance: %1$.2f</string>
+    <string name="invoice_generator_thank_you_short">Thank You!</string>
+
+    <!-- Shared UI defaults -->
+    <string name="value_unknown">Unknown</string>
+    <string name="value_not_available">-</string>
+    <string name="invoice_subtitle_with_date">%1$s | %2$s</string>
+    <string name="sync_coming_soon">Sync coming soon</string>
+
+    <!-- Dashboard / invoice card statuses -->
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_paid">Paid</string>
+    <string name="status_cash">Cash</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_partial">Partial</string>
+
+    <!-- Profile / notifications -->
+    <string name="profile_avatar_fallback">U</string>
+    <string name="notification_cheque_clearance_reminder">Cheque Clearance Reminder</string>
+    <string name="unknown_customer_name">Unknown Customer</string>
+    <string name="invoice_number_fallback">INV-</string>
+
+    <!-- Customers -->
+    <string name="edit_action">Edit</string>
+    <string name="delete_action">Delete</string>
+    <string name="deleted">Deleted</string>
+    <string name="customer_details_title">Customer Details</string>
+    <string name="customer_context_title">Customer</string>
+    <string name="customer_saved">Customer saved</string>
+    <string name="business_name_required">Business name required</string>
+    <string name="contact_person_required">Contact person required</string>
+    <string name="address_required">Address required</string>
+    <string name="select_payment_method_required">Select at least one payment method</string>
+    <string name="delete_customer_title">Delete Customer</string>
+    <string name="delete_customer_message">Are you sure you want to delete %1$s?</string>
+    <string name="block_customer">Block Customer</string>
+    <string name="unblock_customer">Unblock Customer</string>
+    <string name="customer_blocked">Customer blocked</string>
+    <string name="customer_unblocked">Customer unblocked</string>
+    <string name="customer_status_update_failed">Failed to update customer status</string>
+    <string name="default_payment_methods">Cash, Credit, Cheque</string>
+
+    <!-- Products -->
+    <string name="delete_product_title">Delete Product</string>
+    <string name="delete_product_message">Delete %1$s?</string>
+    <string name="undo">UNDO</string>
+
+    <!-- Insights -->
+    <string name="insights_no_product_sales_data">No product sales data for this period</string>
+    <string name="insights_revenue_label">Revenue</string>
+
+    <!-- Menu labels -->
+    <string name="menu_search">Search</string>
+    <string name="menu_filter_by_date">Filter by date</string>
+    <string name="menu_save">Save</string>
 </resources>

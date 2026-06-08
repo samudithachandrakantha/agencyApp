@@ -30,7 +30,7 @@ public class CustomerDetailActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Customer Details");
+            getSupportActionBar().setTitle(R.string.customer_details_title);
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
 
@@ -51,16 +51,16 @@ public class CustomerDetailActivity extends AppCompatActivity {
 
     private void displayCustomerDetails(Customer customer) {
         // Business Information
-        binding.tvBusinessName.setText(customer.getBusinessName() != null ? customer.getBusinessName() : "-");
-        binding.tvContactPerson.setText(customer.getContactPerson() != null ? customer.getContactPerson() : "-");
-        binding.tvAddress.setText(customer.getAddress() != null ? customer.getAddress() : "-");
+        binding.tvBusinessName.setText(customer.getBusinessName() != null ? customer.getBusinessName() : getString(R.string.value_not_available));
+        binding.tvContactPerson.setText(customer.getContactPerson() != null ? customer.getContactPerson() : getString(R.string.value_not_available));
+        binding.tvAddress.setText(customer.getAddress() != null ? customer.getAddress() : getString(R.string.value_not_available));
 
         // Contact Information
-        binding.tvPhone.setText(customer.getPhone() != null && !customer.getPhone().isEmpty() ? customer.getPhone() : "-");
+        binding.tvPhone.setText(customer.getPhone() != null && !customer.getPhone().isEmpty() ? customer.getPhone() : getString(R.string.value_not_available));
 
         // Additional Details
-        binding.tvBrNumber.setText(customer.getBrNumber() != null && !customer.getBrNumber().isEmpty() ? customer.getBrNumber() : "-");
-        binding.tvIdNumber.setText(customer.getIdNumber() != null && !customer.getIdNumber().isEmpty() ? customer.getIdNumber() : "-");
+        binding.tvBrNumber.setText(customer.getBrNumber() != null && !customer.getBrNumber().isEmpty() ? customer.getBrNumber() : getString(R.string.value_not_available));
+        binding.tvIdNumber.setText(customer.getIdNumber() != null && !customer.getIdNumber().isEmpty() ? customer.getIdNumber() : getString(R.string.value_not_available));
 
         // Payment Methods
         String paymentMethods = formatPaymentMethods(customer.getPaymentMethods());
@@ -93,7 +93,7 @@ public class CustomerDetailActivity extends AppCompatActivity {
         if (currentCustomer != null) {
             MenuItem blockItem = menu.findItem(R.id.action_block);
             if (blockItem != null) {
-                blockItem.setTitle(currentCustomer.isBlocked() ? "Unblock Customer" : "Block Customer");
+                blockItem.setTitle(currentCustomer.isBlocked() ? R.string.unblock_customer : R.string.block_customer);
             }
         }
         return true;
@@ -120,10 +120,10 @@ public class CustomerDetailActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 if (ok) {
                     updateBlockedStatus();
-                    String message = currentCustomer.isBlocked() ? "Customer blocked" : "Customer unblocked";
+                    String message = currentCustomer.isBlocked() ? getString(R.string.customer_blocked) : getString(R.string.customer_unblocked);
                     Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "Failed to update customer status", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.customer_status_update_failed, Toast.LENGTH_SHORT).show();
                 }
             });
         }).start();
@@ -131,7 +131,7 @@ public class CustomerDetailActivity extends AppCompatActivity {
 
     private String formatPaymentMethods(String paymentMethods) {
         if (paymentMethods == null || paymentMethods.trim().isEmpty()) {
-            return "Cash, Credit, Cheque";
+            return getString(R.string.default_payment_methods);
         }
         // Convert CSV format (CASH,CREDIT,CHEQUE) to readable format
         String[] methods = paymentMethods.split(",");

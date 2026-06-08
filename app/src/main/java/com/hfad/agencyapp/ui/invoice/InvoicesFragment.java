@@ -58,9 +58,7 @@ public class InvoicesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
-        if (binding.includeBottomNav != null) {
-            binding.includeBottomNav.getRoot().setVisibility(View.GONE);
-        }
+
 
         if (binding.toolbar != null) {
             binding.toolbar.setNavigationOnClickListener(v -> {
