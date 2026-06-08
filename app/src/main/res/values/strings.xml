@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Shanka Distributors</string>
-    <string name="loading_title">SHANKA DISTRIBUTORS</string>
-    <string name="loading_subtitle">Delivering Quality, Baking Success</string>
+    <string name="app_name">Agency Sales App</string>
+    <string name="loading_title">AGENCY SALES APP</string>
+    <string name="loading_subtitle">Streamlining Distribution and Sales</string>
 
     <!-- Create Invoice Activity Strings -->
     <string name="create_invoice_title">Create Invoice</string>
@@ -223,4 +223,57 @@
     <string name="invoice_generator_paid_amount">Paid Amount: %1$.2f</string>
     <string name="invoice_generator_balance">Balance: %1$.2f</string>
     <string name="invoice_generator_thank_you_short">Thank You!</string>
+
+    <!-- Shared UI defaults -->
+    <string name="value_unknown">Unknown</string>
+    <string name="value_not_available">-</string>
+    <string name="invoice_subtitle_with_date">%1$s | %2$s</string>
+    <string name="sync_coming_soon">Sync coming soon</string>
+
+    <!-- Dashboard / invoice card statuses -->
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_paid">Paid</string>
+    <string name="status_cash">Cash</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_partial">Partial</string>
+
+    <!-- Profile / notifications -->
+    <string name="profile_avatar_fallback">U</string>
+    <string name="notification_cheque_clearance_reminder">Cheque Clearance Reminder</string>
+    <string name="unknown_customer_name">Unknown Customer</string>
+    <string name="invoice_number_fallback">INV-</string>
+
+    <!-- Customers -->
+    <string name="edit_action">Edit</string>
+    <string name="delete_action">Delete</string>
+    <string name="deleted">Deleted</string>
+    <string name="customer_details_title">Customer Details</string>
+    <string name="customer_context_title">Customer</string>
+    <string name="customer_saved">Customer saved</string>
+    <string name="business_name_required">Business name required</string>
+    <string name="contact_person_required">Contact person required</string>
+    <string name="address_required">Address required</string>
+    <string name="select_payment_method_required">Select at least one payment method</string>
+    <string name="delete_customer_title">Delete Customer</string>
+    <string name="delete_customer_message">Are you sure you want to delete %1$s?</string>
+    <string name="block_customer">Block Customer</string>
+    <string name="unblock_customer">Unblock Customer</string>
+    <string name="customer_blocked">Customer blocked</string>
+    <string name="customer_unblocked">Customer unblocked</string>
+    <string name="customer_status_update_failed">Failed to update customer status</string>
+    <string name="default_payment_methods">Cash, Credit, Cheque</string>
+
+    <!-- Products -->
+    <string name="delete_product_title">Delete Product</string>
+    <string name="delete_product_message">Delete %1$s?</string>
+    <string name="undo">UNDO</string>
+
+    <!-- Insights -->
+    <string name="insights_no_product_sales_data">No product sales data for this period</string>
+    <string name="insights_revenue_label">Revenue</string>
+
+    <!-- Menu labels -->
+    <string name="menu_search">Search</string>
+    <string name="menu_filter_by_date">Filter by date</string>
+    <string name="menu_save">Save</string>
 </resources>

@@ -4,19 +4,19 @@
 
     <item
         android:id="@+id/action_search"
-        android:title="Search"
+        android:title="@string/menu_search"
         android:icon="@android:drawable/ic_menu_search"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_date_filter"
-        android:title="Filter by date"
+        android:title="@string/menu_filter_by_date"
         android:icon="@android:drawable/ic_menu_my_calendar"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_out_of_stock_behavior"
-        android:title="Out-of-stock behavior"
+        android:title="@string/menu_create_invoice_out_of_stock_behavior"
         android:icon="@android:drawable/ic_menu_manage"
         app:showAsAction="never" />
 

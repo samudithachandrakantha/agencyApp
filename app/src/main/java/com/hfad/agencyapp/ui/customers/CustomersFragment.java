@@ -67,7 +67,7 @@ public class CustomersFragment extends Fragment {
                 return false;
             });
             try { binding.toolbar.setTitleTextColor(requireContext().getColor(com.hfad.agencyapp.R.color.white)); } catch (Exception ignored) {}
-            binding.toolbar.setTitle("Customers");
+            binding.toolbar.setTitle(R.string.customers_title);
         }
         setupRecyclerView();
         setupObservers();
@@ -144,9 +144,9 @@ public class CustomersFragment extends Fragment {
 
     private void showContextMenu(Customer c, View anchor) {
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Customer")
+                .setTitle(R.string.customer_context_title)
                 .setMessage(c.getBusinessName())
-                .setPositiveButton("OK", null)
+                .setPositiveButton(R.string.ok, null)
                 .show();
     }
 
@@ -192,9 +192,9 @@ public class CustomersFragment extends Fragment {
             String addressValue = etAddress.getText() != null ? etAddress.getText().toString().trim() : "";
 
             boolean valid = true;
-            if (businessValue.isEmpty()) { tilBusiness.setError("Business name required"); valid = false; } else tilBusiness.setError(null);
-            if (contactValue.isEmpty()) { tilContact.setError("Contact person required"); valid = false; } else tilContact.setError(null);
-            if (addressValue.isEmpty()) { tilAddress.setError("Address required"); valid = false; } else tilAddress.setError(null);
+            if (businessValue.isEmpty()) { tilBusiness.setError(getString(R.string.business_name_required)); valid = false; } else tilBusiness.setError(null);
+            if (contactValue.isEmpty()) { tilContact.setError(getString(R.string.contact_person_required)); valid = false; } else tilContact.setError(null);
+            if (addressValue.isEmpty()) { tilAddress.setError(getString(R.string.address_required)); valid = false; } else tilAddress.setError(null);
 
             if (!valid) return;
 
@@ -283,7 +283,7 @@ public class CustomersFragment extends Fragment {
         btnSave.setOnClickListener(v -> {
             String methods = collectPaymentMethods(cbCash, cbCredit, cbCheque);
             if (methods.isEmpty()) {
-                Toast.makeText(requireContext(), "Select at least one payment method", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.select_payment_method_required, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -298,10 +298,10 @@ public class CustomersFragment extends Fragment {
                 boolean ok = viewModel.saveCustomer(c);
                 requireActivity().runOnUiThread(() -> {
                     if (ok) {
-                        Snackbar.make(binding.getRoot(), "Customer saved", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(binding.getRoot(), R.string.customer_saved, Snackbar.LENGTH_SHORT).show();
                         dialog.dismiss();
                     } else {
-                        Snackbar.make(binding.getRoot(), "Save failed", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(binding.getRoot(), R.string.save_failed, Snackbar.LENGTH_SHORT).show();
                     }
                 });
             }).start();

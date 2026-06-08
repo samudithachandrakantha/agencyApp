@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="12dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/slate_100"
+    app:strokeWidth="1dp"
     android:clickable="true"
+    android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
@@ -22,52 +27,54 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_toStartOf="@+id/ll_outstanding">
 
                 <TextView
                     android:id="@+id/tvBusinessName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Business Name"
+                    tools:text="ABC Bakery"
                     android:textStyle="bold"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_primary" />
+                    android:textSize="16sp"
+                    android:textColor="@color/on_surface" />
 
                 <TextView
                     android:id="@+id/tvContactPerson"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Contact Person"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_secondary"
+                    tools:text="John Smith"
+                    android:textSize="13sp"
+                    android:textColor="@color/on_surface_variant"
                     android:layout_marginTop="2dp" />
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/ll_outstanding"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_alignParentEnd="true">
+                android:layout_alignParentEnd="true"
+                android:gravity="end">
 
                 <TextView
                     android:id="@+id/tvOutstandingLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Outstanding"
-                    android:textSize="10sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_alignParentEnd="true" />
+                    android:textSize="11sp"
+                    android:textColor="@color/on_surface_variant" />
 
                 <TextView
                     android:id="@+id/tvOutstandingAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rs. 0.00"
+                    tools:text="Rs. 5,450.00"
                     android:textStyle="bold"
-                    android:textColor="@color/error_red"
-                    android:layout_marginTop="2dp"
-                    android:layout_alignParentEnd="true" />
+                    android:textSize="15sp"
+                    android:textColor="@color/error"
+                    android:layout_marginTop="2dp" />
 
             </LinearLayout>
 
@@ -76,25 +83,19 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:background="@color/soft_blue" />
+            android:layout_marginTop="12dp"
+            android:background="@color/slate_100" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvAddress"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="8dp">
-
-            <TextView
-                    android:id="@+id/tvAddress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                    android:text="Address"
-                android:textColor="@color/text_secondary"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
+            tools:text="No 123, Galle Road, Colombo"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="13sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginTop="12dp" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

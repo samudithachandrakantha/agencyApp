@@ -82,10 +82,10 @@ public class HomeFragment extends Fragment {
                 for (com.hfad.agencyapp.data.entities.Invoice invoice : invoices) {
                     String customerName = invoice.customerName != null && !invoice.customerName.isEmpty()
                             ? invoice.customerName
-                            : "Unknown";
-                    String invoiceNumber = invoice.invoiceNumber != null && !invoice.invoiceNumber.isEmpty() ? invoice.invoiceNumber : "-";
-                    String invoiceDate = invoice.createdAt > 0 ? invoiceCardDateFormat.format(new Date(invoice.createdAt)) : "-";
-                    String invoiceCardSubtitle = invoiceNumber + " | " + invoiceDate;
+                            : getString(R.string.value_unknown);
+                    String invoiceNumber = invoice.invoiceNumber != null && !invoice.invoiceNumber.isEmpty() ? invoice.invoiceNumber : getString(R.string.value_not_available);
+                    String invoiceDate = invoice.createdAt > 0 ? invoiceCardDateFormat.format(new Date(invoice.createdAt)) : getString(R.string.value_not_available);
+                    String invoiceCardSubtitle = getString(R.string.invoice_subtitle_with_date, invoiceNumber, invoiceDate);
 
                     String paymentStatus = "";
                     boolean isPending = false;
@@ -93,26 +93,26 @@ public class HomeFragment extends Fragment {
                     String chequeDate = "";
                     
                     if (invoice.status != null && invoice.status.equals("CANCELLED")) {
-                        paymentStatus = "Cancelled";
+                        paymentStatus = getString(R.string.status_cancelled);
                     } else if ((invoice.status != null && (invoice.status.equals("COMPLETED") || invoice.status.equals("PAID")))
                             || invoice.paidAmount >= invoice.totalAmount) {
-                        paymentStatus = "Paid";
+                        paymentStatus = getString(R.string.status_paid);
                     } else if (invoice.paymentMethod != null && invoice.paymentMethod.equals("CASH")) {
-                        paymentStatus = "Cash";
+                        paymentStatus = getString(R.string.status_cash);
                     } else if (invoice.paymentMethod != null && invoice.paymentMethod.equals("CHEQUE")) {
-                        paymentStatus = "Pending";
+                        paymentStatus = getString(R.string.status_pending);
                         isPending = true;
                         // For cheque, show cheque date instead of due amount
                         if (invoice.chequeDate > 0) {
                             chequeDate = chequeDisplayFormat.format(new Date(invoice.chequeDate));
                         }
                     } else if (invoice.paymentMethod != null && invoice.paymentMethod.equals("CREDIT")) {
-                        paymentStatus = "Pending";
+                        paymentStatus = getString(R.string.status_pending);
                         isPending = true;
                         double due = invoice.totalAmount - invoice.paidAmount;
                         dueAmount = currencyFormat.format(Math.max(0, due));
                     } else if (invoice.paidAmount > 0) {
-                        paymentStatus = "Partial";
+                        paymentStatus = getString(R.string.status_partial);
                         isPending = true;
                         double due = invoice.totalAmount - invoice.paidAmount;
                         dueAmount = currencyFormat.format(Math.max(0, due));
@@ -122,7 +122,7 @@ public class HomeFragment extends Fragment {
                             customerName,
                             invoiceCardSubtitle,
                             invoice.id,
-                            "Rs. " + currencyFormat.format(invoice.totalAmount),
+                            getString(R.string.price_label_currency, currencyFormat.format(invoice.totalAmount)),
                             paymentStatus,
                             dueAmount,
                             isPending,
@@ -148,7 +148,7 @@ public class HomeFragment extends Fragment {
         binding.actionNewInvoice.setOnClickListener(v -> startActivity(new Intent(requireContext(), CreateInvoiceActivity.class)));
         // Customers quick-action removed
         binding.actionProducts.setOnClickListener(v -> startActivity(new Intent(requireContext(), ProductsActivity.class)));
-        binding.actionSync.setOnClickListener(v -> android.widget.Toast.makeText(requireContext(), "Sync coming soon", android.widget.Toast.LENGTH_SHORT).show());
+        binding.actionSync.setOnClickListener(v -> android.widget.Toast.makeText(requireContext(), R.string.sync_coming_soon, android.widget.Toast.LENGTH_SHORT).show());
         binding.tvViewAll.setOnClickListener(v -> startActivity(MainTabsActivity.createIntent(requireContext(), MainTabsActivity.TAB_INVOICES)));
     }
 

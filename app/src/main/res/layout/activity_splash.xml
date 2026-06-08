@@ -5,97 +5,102 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <!-- App Logo (centered) -->
-    <ImageView
-        android:id="@+id/iv_splash_logo"
-        android:layout_width="220dp"
-        android:layout_height="220dp"
-        android:src="@drawable/app_logo"
-        android:adjustViewBounds="true"
-        app:layout_constraintBottom_toTopOf="@id/tv_splash_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
-    <!-- Title -->
-    <TextView
-        android:id="@+id/tv_splash_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/loading_title"
-        android:textColor="@color/navy_900"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/tv_splash_subtitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_splash_logo" />
-
-    <!-- Subtitle -->
-    <TextView
-        android:id="@+id/tv_splash_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/loading_subtitle"
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@id/tv_progress_percent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_splash_title" />
-
-    <!-- Progress Percentage Readout -->
-    <TextView
-        android:id="@+id/tv_progress_percent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:text="0%"
-        android:textColor="@color/navy_900"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/progress_track_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_splash_subtitle" />
-
-    <!-- Progress Track Layout -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/progress_track_layout"
+    <LinearLayout
+        android:id="@+id/ll_logo_container"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="40dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/progress_section"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/slate_100"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:id="@+id/iv_splash_logo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="24dp"
+                android:src="@drawable/app_logo"
+                android:adjustViewBounds="true" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/tv_splash_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/loading_title"
+            android:textColor="@color/primary"
+            android:textSize="24sp"
+            android:letterSpacing="0.15"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_splash_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/loading_subtitle"
+            android:textColor="@color/slate_400"
+            android:textSize="14sp"
+            android:letterSpacing="0.02" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/progress_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_progress_percent">
+        app:layout_constraintTop_toBottomOf="@id/ll_logo_container">
 
-        <!-- Thin horizontal line track -->
-        <View
-            android:id="@+id/progress_track_line"
+        <TextView
+            android:id="@+id/tv_progress_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0%"
+            android:textColor="@color/secondary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/progress_track_layout"
             android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:background="@drawable/bg_loading_track"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp">
 
-        <!-- Truck/Lorry progress indicator -->
-        <ImageView
-            android:id="@+id/iv_truck_progress"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_lorry_loading"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_bias="0.0" />
+            <View
+                android:id="@+id/progress_track_line"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/slate_100"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/iv_truck_progress"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_lorry_loading"
+                app:tint="@color/secondary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="0.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

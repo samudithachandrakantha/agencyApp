@@ -7,17 +7,33 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.ui.models.NotificationUiModel;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
-public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.NotificationViewHolder> {
+public class NotificationsAdapter extends ListAdapter<NotificationUiModel, NotificationsAdapter.NotificationViewHolder> {
 
-    private final List<NotificationUiModel> items = new ArrayList<>();
+    public NotificationsAdapter() {
+        super(new DiffUtil.ItemCallback<>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull NotificationUiModel oldItem, @NonNull NotificationUiModel newItem) {
+                return Objects.equals(oldItem.invoiceNumber, newItem.invoiceNumber) 
+                        && Objects.equals(oldItem.title, newItem.title);
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull NotificationUiModel oldItem, @NonNull NotificationUiModel newItem) {
+                return Objects.equals(oldItem.status, newItem.status)
+                        && Objects.equals(oldItem.amount, newItem.amount)
+                        && Objects.equals(oldItem.chequeDateFormatted, newItem.chequeDateFormatted);
+            }
+        });
+    }
 
     @NonNull
     @Override
@@ -28,20 +44,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     @Override
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
-        holder.bind(items.get(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return items.size();
-    }
-
-    public void submitList(List<NotificationUiModel> data) {
-        items.clear();
-        if (data != null) {
-            items.addAll(data);
-        }
-        notifyDataSetChanged();
+        holder.bind(getItem(position));
     }
 
     static class NotificationViewHolder extends RecyclerView.ViewHolder {

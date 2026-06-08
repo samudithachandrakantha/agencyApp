@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hfad.agencyapp.R;
@@ -17,10 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdapter.InvoiceViewHolder> {
+public class RecentInvoiceAdapter extends ListAdapter<RecentInvoiceUiModel, RecentInvoiceAdapter.InvoiceViewHolder> {
 
-    private final List<RecentInvoiceUiModel> items = new ArrayList<>();
-    private final List<RecentInvoiceUiModel> originalItems = new ArrayList<>();
+    private List<RecentInvoiceUiModel> originalItems = new ArrayList<>();
     private OnInvoiceClickListener listener;
 
     public interface OnInvoiceClickListener {
@@ -29,6 +30,26 @@ public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdap
 
     public void setOnInvoiceClickListener(OnInvoiceClickListener l) {
         this.listener = l;
+    }
+
+    public RecentInvoiceAdapter() {
+        super(new DiffUtil.ItemCallback<>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull RecentInvoiceUiModel oldItem, @NonNull RecentInvoiceUiModel newItem) {
+                return oldItem.invoiceDbId == newItem.invoiceDbId;
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull RecentInvoiceUiModel oldItem, @NonNull RecentInvoiceUiModel newItem) {
+                return java.util.Objects.equals(oldItem.customerName, newItem.customerName)
+                        && java.util.Objects.equals(oldItem.invoiceId, newItem.invoiceId)
+                        && java.util.Objects.equals(oldItem.totalAmount, newItem.totalAmount)
+                        && java.util.Objects.equals(oldItem.paymentStatus, newItem.paymentStatus)
+                        && java.util.Objects.equals(oldItem.dueAmount, newItem.dueAmount)
+                        && oldItem.isPending == newItem.isPending
+                        && java.util.Objects.equals(oldItem.chequeDate, newItem.chequeDate);
+            }
+        });
     }
 
     @NonNull
@@ -40,7 +61,7 @@ public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdap
 
     @Override
     public void onBindViewHolder(@NonNull InvoiceViewHolder holder, int position) {
-        RecentInvoiceUiModel model = items.get(position);
+        RecentInvoiceUiModel model = getItem(position);
         holder.bind(model);
         holder.itemView.setOnClickListener(v -> {
             if (listener != null && model.invoiceDbId > 0) {
@@ -50,35 +71,30 @@ public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdap
     }
 
     @Override
-    public int getItemCount() {
-        return items.size();
-    }
-
     public void submitList(List<RecentInvoiceUiModel> data) {
-        items.clear();
-        originalItems.clear();
         if (data != null) {
-            items.addAll(data);
-            originalItems.addAll(data);
+            originalItems = new ArrayList<>(data);
+        } else {
+            originalItems = new ArrayList<>();
         }
-        notifyDataSetChanged();
+        super.submitList(data);
     }
 
     public void filter(String query) {
-        items.clear();
         if (query == null || query.trim().isEmpty()) {
-            items.addAll(originalItems);
+            super.submitList(originalItems);
         } else {
             String queryLower = query.toLowerCase(Locale.US).trim();
+            List<RecentInvoiceUiModel> filtered = new ArrayList<>();
             for (RecentInvoiceUiModel item : originalItems) {
                 if (item.customerName.toLowerCase(Locale.US).contains(queryLower)
                         || item.invoiceId.toLowerCase(Locale.US).contains(queryLower)
                         || item.totalAmount.toLowerCase(Locale.US).contains(queryLower)) {
-                    items.add(item);
+                    filtered.add(item);
                 }
             }
+            super.submitList(filtered);
         }
-        notifyDataSetChanged();
     }
 
     static class InvoiceViewHolder extends RecyclerView.ViewHolder {
@@ -111,48 +127,39 @@ public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdap
                 tvStatus.setVisibility(View.GONE);
                 pendingContainer.setVisibility(View.VISIBLE);
                 tvDuePayment.setText(itemView.getContext().getString(R.string.cheque_date_label, item.chequeDate));
-                return;
-            }
-            
-            // Handle pending status with due payment display
-            if (item.isPending && item.dueAmount != null && !item.dueAmount.isEmpty()) {
+            } else if (item.isPending && item.dueAmount != null && !item.dueAmount.isEmpty()) {
                 tvStatus.setVisibility(View.GONE);
                 pendingContainer.setVisibility(View.VISIBLE);
                 tvDuePayment.setText(itemView.getContext().getString(R.string.due_amount_label, item.dueAmount));
-                return;
+            } else {
+                pendingContainer.setVisibility(View.GONE);
             }
-            
-            pendingContainer.setVisibility(View.GONE);
             
             String rawStatus = item.paymentStatus == null ? "" : item.paymentStatus.trim();
-            if (rawStatus.isEmpty()) {
+            if (rawStatus.isEmpty() || (pendingContainer.getVisibility() == View.VISIBLE)) {
                 tvStatus.setVisibility(View.GONE);
-                tvStatus.setText("");
-                return;
-            }
-
-            tvStatus.setVisibility(View.VISIBLE);
-            tvStatus.setText(rawStatus);
-
-            String status = rawStatus.toLowerCase(Locale.US);
-            if ("paid".equals(status)) {
-                tvStatus.setBackgroundResource(R.drawable.bg_status_paid);
-                tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_paid_text));
-            } else if ("cash".equals(status)) {
-                tvStatus.setBackgroundResource(R.drawable.bg_status_cash);
-                tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_cash_text));
-            } else if ("pending".equals(status)) {
-                tvStatus.setBackgroundResource(R.drawable.bg_status_cheque);
-                tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_cheque_text));
-            } else if ("credit".equals(status)) {
-                tvStatus.setBackgroundResource(R.drawable.bg_status_credit);
-                tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_credit_text));
             } else {
-                tvStatus.setBackgroundResource(R.drawable.bg_status_cheque);
-                tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_cheque_text));
+                tvStatus.setVisibility(View.VISIBLE);
+                tvStatus.setText(rawStatus);
+
+                String status = rawStatus.toLowerCase(Locale.US);
+                if ("paid".equals(status)) {
+                    tvStatus.setBackgroundResource(R.drawable.bg_status_paid);
+                    tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_paid_text));
+                } else if ("cash".equals(status)) {
+                    tvStatus.setBackgroundResource(R.drawable.bg_status_cash);
+                    tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_cash_text));
+                } else if ("pending".equals(status)) {
+                    tvStatus.setBackgroundResource(R.drawable.bg_status_cheque);
+                    tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_cheque_text));
+                } else if ("credit".equals(status)) {
+                    tvStatus.setBackgroundResource(R.drawable.bg_status_credit);
+                    tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_credit_text));
+                } else {
+                    tvStatus.setBackgroundResource(R.drawable.bg_status_cheque);
+                    tvStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.badge_cheque_text));
+                }
             }
         }
     }
 }
-
-

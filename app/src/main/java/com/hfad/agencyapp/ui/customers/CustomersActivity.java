@@ -44,7 +44,7 @@ public class CustomersActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Customers");
+            getSupportActionBar().setTitle(R.string.customers_title);
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
 
@@ -179,23 +179,25 @@ public class CustomersActivity extends AppCompatActivity {
     }
 
     private void showContextMenu(Customer c, View anchor) {
+        final int actionEdit = 1;
+        final int actionDelete = 2;
         PopupMenu popup = new PopupMenu(this, anchor);
-        popup.getMenu().add("Edit");
-        popup.getMenu().add("Delete");
+        popup.getMenu().add(Menu.NONE, actionEdit, Menu.NONE, R.string.edit_action);
+        popup.getMenu().add(Menu.NONE, actionDelete, Menu.NONE, R.string.delete_action);
         popup.setOnMenuItemClickListener(item -> {
-            CharSequence title = item.getTitle();
-            if ("Edit".contentEquals(title)) {
+            int itemId = item.getItemId();
+            if (itemId == actionEdit) {
                 showAddEditCustomerDialog(c);
                 return true;
-            } else if ("Delete".contentEquals(title)) {
+            } else if (itemId == actionDelete) {
                 new MaterialAlertDialogBuilder(this)
-                        .setTitle("Delete Customer")
-                        .setMessage("Are you sure you want to delete " + c.getBusinessName() + "?")
-                        .setPositiveButton("Delete", (dialog, which) -> {
+                        .setTitle(R.string.delete_customer_title)
+                        .setMessage(getString(R.string.delete_customer_message, c.getBusinessName()))
+                        .setPositiveButton(R.string.delete_action, (dialog, which) -> {
                             boolean ok = viewModel.deleteCustomer(c.getId());
-                            Toast.makeText(this, ok ? "Deleted" : "Delete failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, ok ? R.string.deleted : R.string.delete_failed, Toast.LENGTH_SHORT).show();
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(R.string.cancel, null)
                         .show();
                 return true;
             }
@@ -251,9 +253,9 @@ public class CustomersActivity extends AppCompatActivity {
             String addressValue = etAddress.getText() != null ? etAddress.getText().toString().trim() : "";
 
             boolean valid = true;
-            if (businessValue.isEmpty()) { tilBusiness.setError("Business name required"); valid = false; } else tilBusiness.setError(null);
-            if (contactValue.isEmpty()) { tilContact.setError("Contact person required"); valid = false; } else tilContact.setError(null);
-            if (addressValue.isEmpty()) { tilAddress.setError("Address required"); valid = false; } else tilAddress.setError(null);
+            if (businessValue.isEmpty()) { tilBusiness.setError(getString(R.string.business_name_required)); valid = false; } else tilBusiness.setError(null);
+            if (contactValue.isEmpty()) { tilContact.setError(getString(R.string.contact_person_required)); valid = false; } else tilContact.setError(null);
+            if (addressValue.isEmpty()) { tilAddress.setError(getString(R.string.address_required)); valid = false; } else tilAddress.setError(null);
 
             if (!valid) return;
 
@@ -342,7 +344,7 @@ public class CustomersActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> {
             String methods = collectPaymentMethods(cbCash, cbCredit, cbCheque);
             if (methods.isEmpty()) {
-                Toast.makeText(this, "Select at least one payment method", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.select_payment_method_required, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -357,10 +359,10 @@ public class CustomersActivity extends AppCompatActivity {
                 boolean ok = viewModel.saveCustomer(c);
                 runOnUiThread(() -> {
                     if (ok) {
-                        Snackbar.make(binding.getRoot(), "Customer saved", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(binding.getRoot(), R.string.customer_saved, Snackbar.LENGTH_SHORT).show();
                         dialog.dismiss();
                     } else {
-                        Snackbar.make(binding.getRoot(), "Save failed", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(binding.getRoot(), R.string.save_failed, Snackbar.LENGTH_SHORT).show();
                     }
                 });
             }).start();

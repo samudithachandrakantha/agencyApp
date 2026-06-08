@@ -170,15 +170,17 @@ public class ProductsActivity extends AppCompatActivity {
     }
 
     private void showContextMenu(Product product, View anchor) {
+        final int actionEdit = 1;
+        final int actionDelete = 2;
         PopupMenu popupMenu = new PopupMenu(this, anchor);
-        popupMenu.getMenu().add("Edit");
-        popupMenu.getMenu().add("Delete");
+        popupMenu.getMenu().add(Menu.NONE, actionEdit, Menu.NONE, R.string.edit_action);
+        popupMenu.getMenu().add(Menu.NONE, actionDelete, Menu.NONE, R.string.delete_action);
         popupMenu.setOnMenuItemClickListener(item -> {
-            String title = item.getTitle().toString();
-            if ("Edit".equals(title)) {
+            int itemId = item.getItemId();
+            if (itemId == actionEdit) {
                 openAddEditProduct(product.id);
                 return true;
-            } else if ("Delete".equals(title)) {
+            } else if (itemId == actionDelete) {
                 confirmDelete(product);
                 return true;
             }
@@ -201,15 +203,15 @@ public class ProductsActivity extends AppCompatActivity {
 
     private void confirmDelete(Product product) {
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Delete Product")
-                .setMessage("Delete " + product.name + "?")
-                .setPositiveButton("Delete", (dialog, which) -> {
+                .setTitle(R.string.delete_product_title)
+                .setMessage(getString(R.string.delete_product_message, product.name))
+                .setPositiveButton(R.string.delete_action, (dialog, which) -> {
                     boolean ok = viewModel.deleteProduct(product.id);
-                    Snackbar.make(binding.getRoot(), ok ? "Product deleted" : "Delete failed", Snackbar.LENGTH_LONG)
-                            .setAction("UNDO", v -> openAddEditProduct(product.id))
+                    Snackbar.make(binding.getRoot(), ok ? R.string.product_deleted : R.string.delete_failed, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.undo, v -> openAddEditProduct(product.id))
                             .show();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
