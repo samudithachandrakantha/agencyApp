@@ -12,6 +12,7 @@ import com.hfad.agencyapp.data.entities.Invoice;
 import com.hfad.agencyapp.databinding.ActivityProfileBinding;
 import com.hfad.agencyapp.ui.adapters.NotificationsAdapter;
 import com.hfad.agencyapp.ui.models.NotificationUiModel;
+import com.hfad.agencyapp.utils.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -67,8 +68,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void clearNotificationBadge() {
         try {
-            android.content.SharedPreferences prefs = getSharedPreferences("cheque_prefs", MODE_PRIVATE);
-            prefs.edit().putInt("cheque_notification_count", 0).apply();
+            android.content.SharedPreferences prefs = getSharedPreferences(Constants.PREFS_CHEQUE, MODE_PRIVATE);
+            prefs.edit().putInt(Constants.KEY_CHEQUE_NOTIFICATION_COUNT, 0).apply();
         } catch (Exception ignored) { }
     }
 

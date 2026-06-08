@@ -110,7 +110,7 @@ public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdap
             if (item.chequeDate != null && !item.chequeDate.isEmpty()) {
                 tvStatus.setVisibility(View.GONE);
                 pendingContainer.setVisibility(View.VISIBLE);
-                tvDuePayment.setText("Cheque Date: " + item.chequeDate);
+                tvDuePayment.setText(itemView.getContext().getString(R.string.cheque_date_label, item.chequeDate));
                 return;
             }
             
@@ -118,7 +118,7 @@ public class RecentInvoiceAdapter extends RecyclerView.Adapter<RecentInvoiceAdap
             if (item.isPending && item.dueAmount != null && !item.dueAmount.isEmpty()) {
                 tvStatus.setVisibility(View.GONE);
                 pendingContainer.setVisibility(View.VISIBLE);
-                tvDuePayment.setText("Due: Rs. " + item.dueAmount);
+                tvDuePayment.setText(itemView.getContext().getString(R.string.due_amount_label, item.dueAmount));
                 return;
             }
             

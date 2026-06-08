@@ -17,6 +17,7 @@ import com.hfad.agencyapp.ui.products.ProductsActivity;
 import com.hfad.agencyapp.ui.profile.ProfileActivity;
 import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.DashboardViewModel;
+import com.hfad.agencyapp.utils.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -149,7 +150,7 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        android.content.SharedPreferences prefs = getSharedPreferences("cheque_prefs", MODE_PRIVATE);
+        android.content.SharedPreferences prefs = getSharedPreferences(Constants.PREFS_CHEQUE, MODE_PRIVATE);
         int count = prefs.getInt(com.hfad.agencyapp.workers.ChequeNotificationWorker.KEY_COUNT, 0);
         if (count > 0) {
             binding.tvAvatarBadge.setVisibility(android.view.View.VISIBLE);

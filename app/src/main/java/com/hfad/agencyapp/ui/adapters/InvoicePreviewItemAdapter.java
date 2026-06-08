@@ -68,12 +68,13 @@ public class InvoicePreviewItemAdapter extends RecyclerView.Adapter<InvoicePrevi
         void bind(InvoicePreviewLineItem item, DecimalFormat currencyFormat) {
             tvProductName.setText(item.productName);
             tvProductCode.setText(item.productCode);
-            tvQuantity.setText("Qty: " + item.quantity);
-            tvUnitPrice.setText("Unit: Rs. " + currencyFormat.format(item.unitPrice));
-            tvLineTotal.setText("Total: Rs. " + currencyFormat.format(item.lineTotal));
+            android.content.Context context = itemView.getContext();
+            tvQuantity.setText(context.getString(R.string.quantity_with_colon, item.quantity));
+            tvUnitPrice.setText(context.getString(R.string.unit_price_label, currencyFormat.format(item.unitPrice)));
+            tvLineTotal.setText(context.getString(R.string.total_price_label, currencyFormat.format(item.lineTotal)));
             if (item.discountAmount > 0.0) {
                 tvDiscount.setVisibility(View.VISIBLE);
-                tvDiscount.setText("Discount: Rs. " + currencyFormat.format(item.discountAmount));
+                tvDiscount.setText(context.getString(R.string.discount_price_label, currencyFormat.format(item.discountAmount)));
             } else {
                 tvDiscount.setVisibility(View.GONE);
             }

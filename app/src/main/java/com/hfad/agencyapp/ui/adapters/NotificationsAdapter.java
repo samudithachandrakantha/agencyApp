@@ -64,10 +64,10 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
         void bind(NotificationUiModel item) {
             tvTitle.setText(item.title);
-            tvSubtitle.setText(item.invoiceNumber + " | " + item.customerName);
+            tvSubtitle.setText(itemView.getContext().getString(R.string.invoice_subtitle_format, item.invoiceNumber, item.customerName));
             tvAmount.setText(item.amount);
-            tvChequeDate.setText("Cheque Date: " + item.chequeDateFormatted);
-            tvClearanceDate.setText("Clearance Scheduled: " + item.clearanceDateFormatted);
+            tvChequeDate.setText(itemView.getContext().getString(R.string.cheque_date_label, item.chequeDateFormatted));
+            tvClearanceDate.setText(itemView.getContext().getString(R.string.clearance_scheduled_label, item.clearanceDateFormatted));
 
             tvBadge.setText(item.status);
 

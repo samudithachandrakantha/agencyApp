@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.hfad.agencyapp.ui.models.Customer;
+import com.hfad.agencyapp.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.UUID;
  */
 public class CustomerDbHelper extends SQLiteOpenHelper {
     // Keep this separate from Room's agency_app.db to avoid schema conflicts.
-    private static final String DATABASE_NAME = "customer_ui.db";
+    private static final String DATABASE_NAME = Constants.CUSTOMER_DB_NAME;
     // bumped to 5 to add blocked status column
     private static final int DATABASE_VERSION = 5;
 

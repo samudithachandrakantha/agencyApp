@@ -6,9 +6,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import com.hfad.agencyapp.R;
 import com.hfad.agencyapp.ui.models.InvoiceItem;
 import com.hfad.agencyapp.databinding.ItemRowInvoiceBinding;
 import java.text.DecimalFormat;
+import java.util.Locale;
 
 /**
  * RecyclerView adapter for displaying invoice items.
@@ -67,18 +69,21 @@ public class InvoiceItemsAdapter extends ListAdapter<InvoiceItem, InvoiceItemsAd
             binding.tvQuantity.setText(String.valueOf(item.getQuantity()));
 
             // Unit Price
-            binding.tvUnitPrice.setText("Rs. " + currencyFormat.format(item.getUnitPrice()) + 
-                    " × " + item.getQuantity());
+            binding.tvUnitPrice.setText(binding.getRoot().getContext().getString(
+                    R.string.price_label_currency_qty,
+                    currencyFormat.format(item.getUnitPrice()),
+                    item.getQuantity()
+            ));
 
             // Discount percentage (visible only when discount is applied)
             if (item.getDiscountPercent() > 0.0) {
                 binding.tvDiscountPercent.setVisibility(android.view.View.VISIBLE);
                 binding.tvDiscountPercent.setText(
-                        "Discount: "
-                                + currencyFormat.format(item.getDiscountPercent())
-                                + "% (Rs. "
-                                + currencyFormat.format(item.getDiscount())
-                                + ")"
+                        binding.getRoot().getContext().getString(
+                                R.string.discount_label_currency_percent,
+                                currencyFormat.format(item.getDiscountPercent()),
+                                currencyFormat.format(item.getDiscount())
+                        )
                 );
             } else {
                 binding.tvDiscountPercent.setVisibility(android.view.View.GONE);
@@ -93,7 +98,10 @@ public class InvoiceItemsAdapter extends ListAdapter<InvoiceItem, InvoiceItemsAd
             }
 
             // Line Total (with discount applied)
-            binding.tvLineTotal.setText("Rs. " + currencyFormat.format(item.getLineTotal()));
+            binding.tvLineTotal.setText(binding.getRoot().getContext().getString(
+                    R.string.line_total_label_currency,
+                    currencyFormat.format(item.getLineTotal())
+            ));
 
             // Minus Button
             binding.btnMinus.setOnClickListener(v -> {

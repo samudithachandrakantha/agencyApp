@@ -25,6 +25,8 @@ import android.content.SharedPreferences;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import com.hfad.agencyapp.utils.Constants;
+
 /**
  * ViewModel for Create Invoice screen.
  * Manages invoice items, totals, customer selection, and payment type.
@@ -472,8 +474,8 @@ public class CreateInvoiceViewModel extends AndroidViewModel {
         // Persist a friendly text for profile UI
         SimpleDateFormat fmt = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
         String friendly = "Cheque reminder scheduled on " + fmt.format(cal.getTime());
-        SharedPreferences prefs = context.getSharedPreferences("cheque_prefs", Context.MODE_PRIVATE);
-        prefs.edit().putString("next_cheque_notification_text", friendly).apply();
+        SharedPreferences prefs = context.getSharedPreferences(Constants.PREFS_CHEQUE, Context.MODE_PRIVATE);
+        prefs.edit().putString(Constants.KEY_NEXT_CHEQUE_NOTIFICATION_TEXT, friendly).apply();
 
         // Enqueue WorkManager one-time request
         OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(com.hfad.agencyapp.workers.ChequeNotificationWorker.class)

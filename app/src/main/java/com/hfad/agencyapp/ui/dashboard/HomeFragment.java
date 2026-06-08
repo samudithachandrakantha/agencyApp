@@ -20,6 +20,7 @@ import com.hfad.agencyapp.ui.products.ProductsActivity;
 import com.hfad.agencyapp.ui.profile.ProfileActivity;
 import com.hfad.agencyapp.ui.tabs.MainTabsActivity;
 import com.hfad.agencyapp.viewmodel.DashboardViewModel;
+import com.hfad.agencyapp.utils.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -159,7 +160,7 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         // update avatar badge from prefs
-        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("cheque_prefs", android.content.Context.MODE_PRIVATE);
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences(Constants.PREFS_CHEQUE, android.content.Context.MODE_PRIVATE);
         int count = prefs.getInt(com.hfad.agencyapp.workers.ChequeNotificationWorker.KEY_COUNT, 0);
         if (count > 0) {
             binding.tvAvatarBadge.setVisibility(View.VISIBLE);

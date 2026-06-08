@@ -4,16 +4,20 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.LayoutInflater;
 import android.widget.TextView;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hfad.agencyapp.R;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
@@ -26,6 +30,7 @@ import com.hfad.agencyapp.ui.models.Customer;
 import com.hfad.agencyapp.ui.models.InvoicePreviewLineItem;
 import com.hfad.agencyapp.ui.models.PaymentType;
 import com.hfad.agencyapp.viewmodel.CreateInvoiceViewModel;
+import com.hfad.agencyapp.utils.Constants;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -67,6 +72,8 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         currencyFormat = new DecimalFormat("#,##0.00");
         dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
+        ensureDefaultInvoicePreferences();
+
         setupToolbar();
         setupRecyclerView();
         setupObservers();
@@ -85,7 +92,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         if (requestCode == 9876 && resultCode == RESULT_OK) {
             // User tapped Save in the full-screen preview
             viewModel.saveInvoice(editingInvoiceId > 0 ? editingInvoiceId : null, editingInvoiceNumber);
-            Snackbar.make(binding.getRoot(), "Invoice saved successfully", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.getRoot(), getString(R.string.invoice_saved_successfully), Snackbar.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -103,6 +110,21 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         }
         
         binding.toolbar.setNavigationOnClickListener(v -> finish());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_create_invoice, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_out_of_stock_behavior) {
+            showOutOfStockBehaviorDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setupRecyclerView() {
@@ -129,13 +151,13 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         });
 
         viewModel.getSubtotal().observe(this, subtotal ->
-                binding.tvSubtotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(subtotal))));
+                binding.tvSubtotal.setText(getString(R.string.amount_format, currencyFormat.format(subtotal))));
 
         viewModel.getDiscount().observe(this, discount ->
-                binding.tvDiscount.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(discount))));
+                binding.tvDiscount.setText(getString(R.string.amount_format, currencyFormat.format(discount))));
 
         viewModel.getTotal().observe(this, total ->
-                binding.tvTotal.setText(getString(com.hfad.agencyapp.R.string.amount_format, currencyFormat.format(total))));
+                binding.tvTotal.setText(getString(R.string.amount_format, currencyFormat.format(total))));
 
         viewModel.getSelectedCustomer().observe(this, customer -> {
             if (customer != null) {
@@ -243,7 +265,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         com.hfad.agencyapp.ui.models.Customer customer = viewModel.getSelectedCustomer().getValue();
         String customerName = customer != null && customer.getBusinessName() != null && !customer.getBusinessName().trim().isEmpty()
                 ? customer.getBusinessName()
-                : getString(com.hfad.agencyapp.R.string.unknown_value);
+                : getString(R.string.unknown_value);
         String contact = customer != null ? customer.getContactPerson() : null;
         String address = customer != null ? customer.getAddress() : null;
 
@@ -252,7 +274,7 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         intent.putExtra(InvoicePreviewDraftActivity.EXTRA_ADDRESS, address);
         String invoiceNumber = "INV-" + (System.currentTimeMillis() / 1000);
         intent.putExtra(InvoicePreviewDraftActivity.EXTRA_INVOICE_NUMBER, invoiceNumber);
-        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_INVOICE_DATE, "Date: " + dateFormat.format(new java.util.Date()));
+        intent.putExtra(InvoicePreviewDraftActivity.EXTRA_INVOICE_DATE, getString(R.string.invoice_generator_date, dateFormat.format(new java.util.Date())));
         intent.putExtra(InvoicePreviewDraftActivity.EXTRA_ITEMS_JSON, arr.toString());
         intent.putExtra(InvoicePreviewDraftActivity.EXTRA_SUBTOTAL, subtotal);
         intent.putExtra(InvoicePreviewDraftActivity.EXTRA_DISCOUNT, totalDiscount);
@@ -320,9 +342,9 @@ public class CreateInvoiceActivity extends AppCompatActivity {
             List<Customer> list = repo.getAllCustomersAsync().get();
             if (list == null || list.isEmpty()) {
                 new MaterialAlertDialogBuilder(this)
-                        .setTitle("No customers")
-                        .setMessage("No customers found. Please add a customer first.")
-                        .setPositiveButton("OK", null)
+                        .setTitle(R.string.no_customers_title)
+                        .setMessage(R.string.no_customers_dialog_message)
+                        .setPositiveButton(R.string.ok, null)
                         .show();
                 return;
             }
@@ -336,9 +358,9 @@ public class CreateInvoiceActivity extends AppCompatActivity {
 
             if (activeCustomers.isEmpty()) {
                 new MaterialAlertDialogBuilder(this)
-                        .setTitle("No active customers")
-                        .setMessage("All customers are blocked. Please unblock a customer first.")
-                        .setPositiveButton("OK", null)
+                        .setTitle(R.string.no_active_customers_title)
+                        .setMessage(R.string.no_active_customers_message)
+                        .setPositiveButton(R.string.ok, null)
                         .show();
                 return;
             }
@@ -349,11 +371,11 @@ public class CreateInvoiceActivity extends AppCompatActivity {
             }
 
             new MaterialAlertDialogBuilder(this)
-                    .setTitle("Select Customer")
+                    .setTitle(R.string.select_customer_dialog_title)
                     .setItems(names, (dialog, which) -> viewModel.setSelectedCustomer(activeCustomers.get(which)))
                     .show();
         } catch (java.util.concurrent.ExecutionException | InterruptedException e) {
-            Snackbar.make(binding.getRoot(), "Failed to load customers", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.getRoot(), getString(R.string.failed_load_customers), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -411,9 +433,9 @@ public class CreateInvoiceActivity extends AppCompatActivity {
             List<Product> list = repo.searchAsync("%").get();
             if (list == null || list.isEmpty()) {
                 new MaterialAlertDialogBuilder(this)
-                        .setTitle("No products")
-                        .setMessage("No products found. Please add a product first.")
-                        .setPositiveButton("OK", null)
+                        .setTitle(R.string.no_products_title)
+                        .setMessage(R.string.no_products_message)
+                        .setPositiveButton(R.string.ok, null)
                         .show();
                 return;
             }
@@ -421,30 +443,22 @@ public class CreateInvoiceActivity extends AppCompatActivity {
             CharSequence[] labels = new CharSequence[list.size()];
             for (int i = 0; i < list.size(); i++) {
                 Product p = list.get(i);
-                labels[i] = p.name + " - Rs. " + currencyFormat.format(p.sellingPrice);
+                labels[i] = p.name + " - " + getString(R.string.price_label_currency, currencyFormat.format(p.sellingPrice));
             }
 
             new MaterialAlertDialogBuilder(this)
-                    .setTitle("Add Product")
+                    .setTitle(R.string.add_product_title)
                     .setItems(labels, (dialog, which) -> {
                         Product selected = list.get(which);
-                        // If product is out of stock, ask for confirmation before adding
                         if (selected.stock <= 0) {
-                            new MaterialAlertDialogBuilder(CreateInvoiceActivity.this)
-                                    .setTitle("Out of stock")
-                                    .setMessage("The product '" + selected.name + "' is out of stock. Do you want to add it to the invoice anyway?")
-                                    .setPositiveButton("Add", (d, w) -> {
-                                        addSelectedProductToInvoice(selected);
-                                    })
-                                    .setNegativeButton("Cancel", null)
-                                    .show();
+                            handleOutOfStockSelection(selected);
                         } else {
                             addSelectedProductToInvoice(selected);
                         }
                     })
                     .show();
         } catch (Exception e) {
-            Snackbar.make(binding.getRoot(), "Failed to load products", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.getRoot(), getString(R.string.failed_load_products), Snackbar.LENGTH_SHORT).show();
         } finally {
             repo.shutdown();
         }
@@ -459,11 +473,82 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                 selected.buyQtyForFreeIssue,
                 selected.freeIssueQty
         );
-        String message = selected.name + " added";
+        String message = getString(R.string.product_added_message, selected.name);
         if (selected.buyQtyForFreeIssue > 0 && selected.freeIssueQty > 0) {
-            message += " • Free issue: buy " + selected.buyQtyForFreeIssue + " get " + selected.freeIssueQty + " free";
+            message = getString(R.string.product_added_free_issue_message, selected.name, selected.buyQtyForFreeIssue, selected.freeIssueQty);
         }
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
+    }
+
+    private void handleOutOfStockSelection(Product selected) {
+        String behavior = getOutOfStockBehavior();
+
+        if (Constants.OUT_OF_STOCK_AUTO_ALLOW.equals(behavior)) {
+            addSelectedProductToInvoice(selected);
+            return;
+        }
+
+        if (Constants.OUT_OF_STOCK_BLOCK.equals(behavior)) {
+            Snackbar.make(binding.getRoot(), getString(R.string.out_of_stock_blocked_message, selected.name), Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.out_of_stock_title)
+                .setMessage(getString(R.string.out_of_stock_message, selected.name))
+                .setPositiveButton(R.string.add, (d, w) -> addSelectedProductToInvoice(selected))
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void showOutOfStockBehaviorDialog() {
+        final String[] values = {
+                Constants.OUT_OF_STOCK_AUTO_ALLOW,
+                Constants.OUT_OF_STOCK_PROMPT,
+                Constants.OUT_OF_STOCK_BLOCK
+        };
+        final CharSequence[] labels = {
+                getString(R.string.out_of_stock_behavior_auto_allow),
+                getString(R.string.out_of_stock_behavior_prompt),
+                getString(R.string.out_of_stock_behavior_block)
+        };
+
+        String current = getOutOfStockBehavior();
+        int checkedIndex = 1;
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].equals(current)) {
+                checkedIndex = i;
+                break;
+            }
+        }
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.out_of_stock_behavior_title)
+                .setMessage(R.string.out_of_stock_behavior_summary)
+                .setSingleChoiceItems(labels, checkedIndex, (dialog, which) -> {
+                    setOutOfStockBehavior(values[which]);
+                    dialog.dismiss();
+                    Snackbar.make(binding.getRoot(), getString(R.string.out_of_stock_behavior_saved_message, labels[which]), Snackbar.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private String getOutOfStockBehavior() {
+        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_APP_SETTINGS, MODE_PRIVATE);
+        return prefs.getString(Constants.KEY_OUT_OF_STOCK_BEHAVIOR, Constants.OUT_OF_STOCK_PROMPT);
+    }
+
+    private void setOutOfStockBehavior(String behavior) {
+        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_APP_SETTINGS, MODE_PRIVATE);
+        prefs.edit().putString(Constants.KEY_OUT_OF_STOCK_BEHAVIOR, behavior).apply();
+    }
+
+    private void ensureDefaultInvoicePreferences() {
+        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_APP_SETTINGS, MODE_PRIVATE);
+        if (!prefs.contains(Constants.KEY_OUT_OF_STOCK_BEHAVIOR)) {
+            prefs.edit().putString(Constants.KEY_OUT_OF_STOCK_BEHAVIOR, Constants.OUT_OF_STOCK_PROMPT).apply();
+        }
     }
 
     private void openDatePicker() {
@@ -497,12 +582,12 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         binding.tvChequeError.setVisibility(View.GONE);
 
         viewModel.saveInvoice(editingInvoiceId > 0 ? editingInvoiceId : null, editingInvoiceNumber);
-        Snackbar.make(binding.getRoot(), "Invoice saved successfully", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(binding.getRoot(), getString(R.string.invoice_saved_successfully), Snackbar.LENGTH_SHORT).show();
         finish();
     }
 
     private void loadInvoiceForEdit(long invoiceId) {
-        setTitle("Edit Invoice");
+        setTitle(R.string.edit_invoice_title);
         com.hfad.agencyapp.data.Repository repo = com.hfad.agencyapp.data.Repository.getInstance(this);
         repo.getInvoiceById(invoiceId).observe(this, invoice -> {
             if (invoice == null) {

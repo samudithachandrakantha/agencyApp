@@ -11,12 +11,15 @@ import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.hfad.agencyapp.R;
+import com.hfad.agencyapp.utils.Constants;
+
 public class ChequeNotificationWorker extends Worker {
 
-    public static final String PREFS_NAME = "cheque_prefs";
-    public static final String KEY_COUNT = "cheque_notification_count";
+    public static final String PREFS_NAME = Constants.PREFS_CHEQUE;
+    public static final String KEY_COUNT = Constants.KEY_CHEQUE_NOTIFICATION_COUNT;
 
-    private static final String CHANNEL_ID = "cheque_notifications";
+    private static final String CHANNEL_ID = Constants.CHANNEL_CHEQUE_NOTIFICATIONS;
 
     public ChequeNotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -32,8 +35,8 @@ public class ChequeNotificationWorker extends Worker {
         // Build a simple notification
         NotificationCompat.Builder nb = new NotificationCompat.Builder(ctx, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
-                .setContentTitle("Cheque Reminder")
-                .setContentText("A cheque is expected to clear. Please follow up.")
+                .setContentTitle(ctx.getString(R.string.cheque_reminder_title))
+                .setContentText(ctx.getString(R.string.cheque_reminder_message))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true);
 
@@ -48,7 +51,7 @@ public class ChequeNotificationWorker extends Worker {
         prefs.edit().putInt(KEY_COUNT, count + 1).apply();
 
         // Clear any 'next notification' entry - UI will refresh based on count
-        prefs.edit().remove("next_cheque_notification_text").apply();
+        prefs.edit().remove(Constants.KEY_NEXT_CHEQUE_NOTIFICATION_TEXT).apply();
 
         return Result.success();
     }
@@ -57,8 +60,8 @@ public class ChequeNotificationWorker extends Worker {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm != null) {
-                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Cheque reminders", NotificationManager.IMPORTANCE_HIGH);
-                channel.setDescription("Notifications for cheque clearance reminders");
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, ctx.getString(R.string.cheque_channel_name), NotificationManager.IMPORTANCE_HIGH);
+                channel.setDescription(ctx.getString(R.string.cheque_channel_description));
                 nm.createNotificationChannel(channel);
             }
         }
