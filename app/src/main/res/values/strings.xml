@@ -44,7 +44,8 @@
     <string name="invoice_preview_cheque_number_label">Cheque No</string>
     <string name="invoice_preview_bank_name_label">Bank</string>
     <string name="invoice_preview_cheque_date_label">Cheque Date</string>
-    <string name="invoice_preview_payment_label">Payment</string>
+    <string name="invoice_preview_payment_label">Payment Terms</string>
+    <string name="save_failed">Failed to save.</string>
     <string name="invoice_preview_item_count_empty">0 items</string>
 
     <!-- Customers -->

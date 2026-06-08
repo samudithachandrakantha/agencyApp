@@ -67,29 +67,6 @@ public class InvoicesActivity extends AppCompatActivity {
         binding.cardDateRangeFilter.setVisibility(View.GONE);
         binding.btnClearDateRangeFilter.setOnClickListener(v -> clearDateRangeFilter());
 
-        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_invoices);
-        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_invoices) {
-                return true;
-            }
-            if (id == R.id.nav_customers) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_CUSTOMERS));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_insights) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
-                finish();
-                return true;
-            }
-            return false;
-        });
 
         viewModel.invoices.observe(this, invoices -> {
             invoicesCache = invoices == null ? new ArrayList<>() : invoices;

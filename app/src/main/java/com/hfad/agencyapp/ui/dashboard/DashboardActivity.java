@@ -198,6 +198,9 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void enableLayoutTransitions(ViewGroup viewGroup) {
+        if (viewGroup instanceof androidx.recyclerview.widget.RecyclerView) {
+            return;
+        }
         LayoutTransition transition = new LayoutTransition();
         transition.enableTransitionType(LayoutTransition.CHANGING);
         viewGroup.setLayoutTransition(transition);

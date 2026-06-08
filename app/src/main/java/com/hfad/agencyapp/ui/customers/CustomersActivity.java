@@ -53,7 +53,6 @@ public class CustomersActivity extends AppCompatActivity {
         setupRecyclerView();
         setupObservers();
         setupListeners();
-        setupBottomNavigation();
         binding.tilSearch.setEndIconOnClickListener(v -> hideSearchBar());
     }
 
@@ -144,31 +143,7 @@ public class CustomersActivity extends AppCompatActivity {
         }
     }
 
-    private void setupBottomNavigation() {
-        binding.includeBottomNav.bottomNav.setSelectedItemId(R.id.nav_customers);
-        binding.includeBottomNav.bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_HOME));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_invoices) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INVOICES));
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_customers) {
-                return true;
-            }
-            if (id == R.id.nav_insights) {
-                startActivity(MainTabsActivity.createIntent(this, MainTabsActivity.TAB_INSIGHTS));
-                finish();
-                return true;
-            }
-            return false;
-        });
-    }
+
 
     @Override
     protected void onResume() {

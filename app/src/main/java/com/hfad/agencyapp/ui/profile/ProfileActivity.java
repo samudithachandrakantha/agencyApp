@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import com.hfad.agencyapp.R;
 
 public class ProfileActivity extends AppCompatActivity {
 

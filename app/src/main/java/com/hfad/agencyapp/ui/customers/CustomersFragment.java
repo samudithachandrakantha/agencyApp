@@ -46,9 +46,7 @@ public class CustomersFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(CustomerViewModel.class);
-        if (binding.includeBottomNav != null) {
-            binding.includeBottomNav.getRoot().setVisibility(View.GONE);
-        }
+
         if (binding.toolbar != null) {
             binding.toolbar.inflateMenu(R.menu.menu_products);
             binding.toolbar.setNavigationOnClickListener(v -> {

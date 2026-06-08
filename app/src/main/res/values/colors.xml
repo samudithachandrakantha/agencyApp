@@ -79,5 +79,4 @@
     <color name="badge_overdue_text">@color/on_error_container</color>
 
     <color name="error_red">@color/error</color>
-    <color name="bottom_nav_tint">@color/slate_500</color>
 </resources>
