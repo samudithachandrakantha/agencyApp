@@ -428,19 +428,19 @@ public class CreateInvoiceActivity extends AppCompatActivity {
                     .setTitle("Add Product")
                     .setItems(labels, (dialog, which) -> {
                         Product selected = list.get(which);
-                        viewModel.addItem(
-                                String.valueOf(selected.id),
-                                selected.name,
-                                selected.sellingPrice,
-                                selected.discountPercent,
-                                selected.buyQtyForFreeIssue,
-                                selected.freeIssueQty
-                        );
-                        String message = selected.name + " added";
-                        if (selected.buyQtyForFreeIssue > 0 && selected.freeIssueQty > 0) {
-                            message += " • Free issue: buy " + selected.buyQtyForFreeIssue + " get " + selected.freeIssueQty + " free";
+                        // If product is out of stock, ask for confirmation before adding
+                        if (selected.stock <= 0) {
+                            new MaterialAlertDialogBuilder(CreateInvoiceActivity.this)
+                                    .setTitle("Out of stock")
+                                    .setMessage("The product '" + selected.name + "' is out of stock. Do you want to add it to the invoice anyway?")
+                                    .setPositiveButton("Add", (d, w) -> {
+                                        addSelectedProductToInvoice(selected);
+                                    })
+                                    .setNegativeButton("Cancel", null)
+                                    .show();
+                        } else {
+                            addSelectedProductToInvoice(selected);
                         }
-                        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
                     })
                     .show();
         } catch (Exception e) {
@@ -448,6 +448,22 @@ public class CreateInvoiceActivity extends AppCompatActivity {
         } finally {
             repo.shutdown();
         }
+    }
+
+    private void addSelectedProductToInvoice(Product selected) {
+        viewModel.addItem(
+                String.valueOf(selected.id),
+                selected.name,
+                selected.sellingPrice,
+                selected.discountPercent,
+                selected.buyQtyForFreeIssue,
+                selected.freeIssueQty
+        );
+        String message = selected.name + " added";
+        if (selected.buyQtyForFreeIssue > 0 && selected.freeIssueQty > 0) {
+            message += " • Free issue: buy " + selected.buyQtyForFreeIssue + " get " + selected.freeIssueQty + " free";
+        }
+        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
 
     private void openDatePicker() {
