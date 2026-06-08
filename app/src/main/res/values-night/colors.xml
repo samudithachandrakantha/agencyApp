@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base standard overrides (not recommended but kept for compatibility) -->
+    <color name="black">#FFFFFFFF</color> <!-- Inverted for any hardcoded references -->
+    <color name="white">#FF000000</color> <!-- Inverted for any hardcoded references -->
+    <color name="blur_white">#1E1E1E</color>
+    <color name="blur_white_stroke">#33FFFFFF</color>
+    <color name="dashboard_bg">#121212</color>
+    <color name="navy_900">#8AB4F8</color> <!-- Brand primary inverted for dark mode -->
+    <color name="navy_700">#669DF6</color>
+    <color name="text_primary">#E8EAED</color>
+    <color name="text_secondary">#9AA0A6</color>
+
+    <color name="soft_green">#133824</color>
+    <color name="soft_green_icon">#81C995</color>
+    <color name="soft_blue">#182B4A</color>
+    <color name="soft_blue_icon">#8AB4F8</color>
+    <color name="soft_orange">#452713</color>
+    <color name="soft_orange_icon">#F29900</color>
+
+    <color name="badge_paid_bg">#133824</color>
+    <color name="badge_paid_text">#81C995</color>
+    <color name="badge_cash_bg">#133824</color>
+    <color name="badge_cash_text">#81C995</color>
+    <color name="badge_credit_bg">#452713</color>
+    <color name="badge_credit_text">#F29900</color>
+    <color name="badge_cheque_bg">#182B4A</color>
+    <color name="badge_cheque_text">#8AB4F8</color>
+
+    <!-- Additional colors for Create Invoice -->
+    <color name="error_red">#F28B82</color>
+</resources>
