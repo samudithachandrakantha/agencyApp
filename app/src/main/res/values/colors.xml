@@ -53,6 +53,9 @@
     <color name="slate_500">@color/zinc_500</color>
     <color name="slate_600">@color/zinc_600</color>
 
+    <color name="card_border">@color/zinc_200</color>
+    <color name="card_shadow">#1A000000</color>
+
     <!-- Compatibility mappings -->
     <color name="navy_900">@color/zinc_900</color>
     <color name="navy_700">@color/zinc_700</color>

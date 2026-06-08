@@ -106,16 +106,13 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_today_sales"
+                    style="@style/Widget.AgencyApp.MaterialCardView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/dashboard_stat_card_height"
                     android:layout_marginEnd="@dimen/space_sm"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="@color/surface"
-                    app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="1dp"
-                    app:strokeColor="@color/zinc_100"
-                    app:strokeWidth="1dp">
+                    app:cardBackgroundColor="@color/surface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -152,16 +149,13 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.AgencyApp.MaterialCardView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/dashboard_stat_card_height"
                     android:layout_marginStart="@dimen/space_sm"
                     android:layout_weight="1"
-                    app:cardBackgroundColor="@color/surface"
-                    app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="1dp"
-                    app:strokeColor="@color/zinc_100"
-                    app:strokeWidth="1dp">
+                    app:cardBackgroundColor="@color/surface">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -197,20 +191,18 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_low_stock_alert"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/space_lg"
-                android:layout_marginTop="@dimen/space_md"
-                android:layout_marginEnd="@dimen/space_lg"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/soft_orange"
-                app:cardCornerRadius="@dimen/radius_md"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/soft_orange_icon"
-                app:strokeWidth="1dp"
-                tools:visibility="visible">
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_low_stock_alert"
+                    style="@style/Widget.AgencyApp.MaterialCardView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_lg"
+                    android:layout_marginTop="@dimen/space_md"
+                    android:layout_marginEnd="@dimen/space_lg"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/soft_orange"
+                    app:strokeColor="@color/soft_orange_icon"
+                    tools:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -267,15 +259,12 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/action_new_invoice"
+                    style="@style/Widget.AgencyApp.MaterialCardView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/space_sm"
                     android:layout_weight="1"
                     app:cardBackgroundColor="@color/surface"
-                    app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="1dp"
-                    app:strokeColor="@color/zinc_100"
-                    app:strokeWidth="1dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -308,16 +297,13 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/action_products"
+                    style="@style/Widget.AgencyApp.MaterialCardView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_sm"
                     android:layout_marginEnd="@dimen/space_sm"
                     android:layout_weight="1"
                     app:cardBackgroundColor="@color/surface"
-                    app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="1dp"
-                    app:strokeColor="@color/zinc_100"
-                    app:strokeWidth="1dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -348,15 +334,12 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/action_sync"
+                    style="@style/Widget.AgencyApp.MaterialCardView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_sm"
                     android:layout_weight="1"
                     app:cardBackgroundColor="@color/surface"
-                    app:cardCornerRadius="@dimen/radius_md"
-                    app:cardElevation="1dp"
-                    app:strokeColor="@color/zinc_100"
-                    app:strokeWidth="1dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">

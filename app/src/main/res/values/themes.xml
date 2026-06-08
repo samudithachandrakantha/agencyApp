@@ -27,6 +27,7 @@
         <!-- Material 3 Dialog & Component Styling -->
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.AgencyApp.MaterialAlertDialog</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.AgencyApp.MediumComponent</item>
+        <item name="materialCardViewStyle">@style/Widget.AgencyApp.MaterialCardView</item>
 
         <!-- Typography -->
         <item name="textAppearanceHeadlineLarge">@style/TextAppearance.AgencyApp.HeadlineLarge</item>
@@ -44,6 +45,14 @@
         <item name="shapeAppearance">@style/ShapeAppearance.AgencyApp.MediumComponent</item>
         <item name="colorSurface">@color/surface</item>
         <item name="materialAlertDialogTitleTextStyle">@style/TextAppearance.AgencyApp.TitleMedium</item>
+    </style>
+
+    <!-- Global Card Style with Border and Shadow -->
+    <style name="Widget.AgencyApp.MaterialCardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardElevation">3dp</item>
+        <item name="strokeColor">@color/card_border</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.AgencyApp.MediumComponent</item>
     </style>
 
     <style name="Theme.AgencyApp" parent="Base.Theme.AgencyApp" />
